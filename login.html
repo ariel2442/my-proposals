@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#02132C">
+<title>כניסה · Quotes</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overscroll-behavior:none}
+
+:root{
+  --navy-deepest:#010918;--navy-deep:#02132C;--navy-dark:#0a2456;
+  --blue-primary:#428EFF;--blue-bright:#60a5fa;--indigo:#404BF2;
+  --blue-soft:#93c5fd;--blue-soft-muted:#bfdbfe;
+  --success:#10b981;--danger:#ef4444;--danger-soft:#fca5a5;
+  --text:#f1f5f9;--text-muted:#cbd5e1;--text-dim:#94a3b8;
+  --glass-bg:linear-gradient(135deg,rgba(66,142,255,0.08) 0%,rgba(10,36,86,0.4) 50%,rgba(2,19,44,0.55) 100%);
+  --glass-border:rgba(255,255,255,0.1);
+  --radius-md:14px;--radius-lg:18px;--radius-xl:24px;
+}
+
+body{
+  font-family:'Heebo',-apple-system,sans-serif;
+  color:var(--text);direction:rtl;
+  background:radial-gradient(ellipse at top,var(--navy-dark) 0%,var(--navy-deep) 55%,var(--navy-deepest) 100%);
+  min-height:100vh;display:flex;align-items:center;justify-content:center;
+  padding:20px;-webkit-font-smoothing:antialiased;position:relative;overflow:hidden;
+}
+
+.bg-glow{position:fixed;border-radius:50%;filter:blur(120px);pointer-events:none;z-index:0}
+.bg-glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(66,142,255,0.3) 0%,transparent 70%);top:-200px;right:-150px;animation:float-1 25s ease-in-out infinite}
+.bg-glow-2{width:600px;height:600px;background:radial-gradient(circle,rgba(64,75,242,0.25) 0%,transparent 70%);bottom:-250px;left:-200px;animation:float-2 30s ease-in-out infinite}
+.bg-grid{position:fixed;inset:0;background-image:linear-gradient(rgba(66,142,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(66,142,255,0.04) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);pointer-events:none;z-index:0}
+@keyframes float-1{0%,100%{transform:translate(0,0)}50%{transform:translate(-40px,50px)}}
+@keyframes float-2{0%,100%{transform:translate(0,0)}50%{transform:translate(50px,-40px)}}
+
+.card{
+  position:relative;z-index:1;
+  background:var(--glass-bg);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-xl);
+  padding:40px 32px;
+  width:100%;max-width:400px;
+  box-shadow:0 8px 40px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.12);
+  animation:fadeUp 0.5s ease backwards;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  pointer-events:none;
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.logo{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  box-shadow:0 6px 24px rgba(66,142,255,0.5),inset 0 1px 0 rgba(255,255,255,0.3);
+  position:relative;
+}
+.logo::after{
+  content:'';position:absolute;inset:-4px;border-radius:18px;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  opacity:0.35;filter:blur(12px);z-index:-1;
+}
+.logo svg{width:26px;height:26px;stroke:white;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+
+h1{text-align:center;font-size:24px;font-weight:900;letter-spacing:-0.02em;margin-bottom:6px}
+.subtitle{text-align:center;font-size:13px;color:var(--text-dim);margin-bottom:30px}
+
+.field{margin-bottom:14px}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--text-muted);margin-bottom:6px;letter-spacing:0.3px}
+.field input{
+  width:100%;padding:13px 14px;
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.2);
+  border-radius:var(--radius-md);
+  font-size:15px;font-family:inherit;color:white;
+  transition:all 0.2s;-webkit-appearance:none;
+}
+.field input::placeholder{color:var(--text-dim);opacity:0.6}
+.field input:focus{
+  outline:none;border-color:var(--blue-primary);
+  background:rgba(2,19,44,0.8);
+  box-shadow:0 0 0 3px rgba(66,142,255,0.15);
+}
+
+.btn-login{
+  width:100%;padding:14px;margin-top:6px;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  color:white;border:none;border-radius:var(--radius-md);
+  font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;
+  box-shadow:0 4px 20px rgba(66,142,255,0.5),inset 0 1px 0 rgba(255,255,255,0.25);
+  transition:all 0.2s;position:relative;
+}
+.btn-login:active{transform:scale(0.98)}
+.btn-login:disabled{opacity:0.6;cursor:not-allowed}
+
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--text-dim);font-size:12px}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:rgba(66,142,255,0.15)}
+
+.btn-google{
+  width:100%;padding:13px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:var(--radius-md);
+  color:var(--text);font-size:14px;font-weight:600;font-family:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all 0.2s;margin-bottom:10px;
+}
+.btn-google:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.25)}
+.btn-google:active{transform:scale(0.98)}
+.btn-google svg{width:18px;height:18px;flex-shrink:0}
+
+.btn-biometric{
+  width:100%;padding:13px;
+  background:rgba(16,185,129,0.08);
+  border:1px solid rgba(16,185,129,0.3);
+  border-radius:var(--radius-md);
+  color:#6ee7b7;font-size:14px;font-weight:600;font-family:inherit;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:all 0.2s;
+}
+.btn-biometric:hover{background:rgba(16,185,129,0.15)}
+.btn-biometric:active{transform:scale(0.98)}
+.btn-biometric svg{width:20px;height:20px;flex-shrink:0;fill:currentColor;stroke:none}
+
+.error-msg{
+  background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);
+  color:var(--danger-soft);padding:11px 14px;border-radius:10px;
+  font-size:13px;font-weight:500;margin-top:14px;
+  display:none;text-align:center;
+}
+.error-msg.show{display:block;animation:fadeUp 0.25s}
+
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="bg-glow bg-glow-1"></div>
+<div class="bg-glow bg-glow-2"></div>
+<div class="bg-grid"></div>
+
+<div class="card">
+  <div class="logo">
+    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+  </div>
+  <h1>ברוך הבא</h1>
+  <p class="subtitle">Quotes · מערכת הצעות מחיר</p>
+
+  <div class="field">
+    <label>שם משתמש</label>
+    <input type="text" id="username" placeholder="ariel" autocomplete="username" autocorrect="off" autocapitalize="off">
+  </div>
+  <div class="field">
+    <label>סיסמה</label>
+    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+  </div>
+  <button class="btn-login" id="login-btn" onclick="doLogin()">כניסה</button>
+
+  <div class="divider">או</div>
+
+  <!-- Google -->
+  <button class="btn-google" id="google-btn" onclick="doGoogle()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+    </svg>
+    התחבר עם Google
+  </button>
+
+  <!-- Face ID / Touch ID -->
+  <button class="btn-biometric hidden" id="biometric-btn" onclick="doBiometric()">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M12 1C6.48 1 2 5.48 2 11s4.48 10 10 10 10-4.48 10-10S17.52 1 12 1zm-1 14H9V9h2v6zm4 0h-2V9h2v6z"/>
+    </svg>
+    <span id="biometric-label">Face ID / Touch ID</span>
+  </button>
+
+  <div class="error-msg" id="error-msg"></div>
+</div>
+
+<script>
+const BASE = window.location.pathname.replace(/\/login\.html$/, '') || '/price';
+const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+
+// ─── check already logged in ───────────────────────────────
+async function checkAuth() {
+  try {
+    const r = await fetch(BASE + '/auth.php?action=check');
+    const d = await r.json();
+    if (d.ok) window.location.replace(BASE + '/index.html');
+  } catch(e) {}
+}
+checkAuth();
+
+// ─── password login ────────────────────────────────────────
+async function doLogin() {
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+  if (!username || !password) return showError('מלא שם משתמש וסיסמה');
+  setLoading(true);
+  try {
+    const r = await fetch(BASE + '/auth.php?action=login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    const d = await r.json();
+    if (d.ok) window.location.replace(BASE + '/index.html');
+    else showError(d.error);
+  } catch(e) { showError('שגיאת חיבור'); }
+  finally { setLoading(false); }
+}
+
+// Enter key
+document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+// ─── Google Sign-In ────────────────────────────────────────
+function initGoogle() {
+  if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
+    document.getElementById('google-btn').style.display = 'none';
+    return;
+  }
+  google.accounts.id.initialize({
+    client_id: GOOGLE_CLIENT_ID,
+    callback: handleGoogleToken,
+    auto_select: true,
+  });
+}
+
+function doGoogle() {
+  if (GOOGLE_CLIENT_ID === 'YOUR_GOOGLE_CLIENT_ID') {
+    showError('Google Sign-In טרם הוגדר');
+    return;
+  }
+  google.accounts.id.prompt();
+}
+
+async function handleGoogleToken(response) {
+  setLoading(true);
+  try {
+    const r = await fetch(BASE + '/auth.php?action=google', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({credential: response.credential})
+    });
+    const d = await r.json();
+    if (d.ok) window.location.replace(BASE + '/index.html');
+    else showError(d.error);
+  } catch(e) { showError('שגיאת חיבור Google'); }
+  finally { setLoading(false); }
+}
+
+window.handleGoogleToken = handleGoogleToken;
+window.addEventListener('load', () => { if(typeof google !== 'undefined') initGoogle(); });
+
+// ─── WebAuthn (Face ID / Touch ID) ────────────────────────
+async function initBiometric() {
+  if (!window.PublicKeyCredential) return;
+  const available = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable().catch(()=>false);
+  if (available) {
+    document.getElementById('biometric-btn').classList.remove('hidden');
+    const isApple = /iPhone|iPad|Mac/.test(navigator.userAgent);
+    document.getElementById('biometric-label').textContent = isApple ? 'Face ID / Touch ID' : 'כניסה ביומטרית';
+  }
+}
+initBiometric();
+
+async function doBiometric() {
+  setLoading(true);
+  try {
+    const cr = await fetch(BASE + '/auth.php?action=webauthn-challenge', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({userId: '1'})
+    });
+    const {challenge, credentials} = await cr.json();
+    if (!credentials || credentials.length === 0) {
+      showError('לא נרשם זיהוי ביומטרי. התחבר עם סיסמה תחילה.');
+      return;
+    }
+
+    const challengeBuf = Uint8Array.from(atob(challenge), c => c.charCodeAt(0));
+    const allowCreds = credentials.map(id => ({
+      id: Uint8Array.from(atob(id.replace(/-/g,'+').replace(/_/g,'/')), c=>c.charCodeAt(0)),
+      type: 'public-key'
+    }));
+
+    const assertion = await navigator.credentials.get({
+      publicKey: {
+        challenge: challengeBuf,
+        allowCredentials: allowCreds,
+        userVerification: 'required',
+        timeout: 60000
+      }
+    });
+
+    const credId = btoa(String.fromCharCode(...new Uint8Array(assertion.rawId)))
+      .replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+
+    const vr = await fetch(BASE + '/auth.php?action=webauthn-verify', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({credentialId: credId})
+    });
+    const vd = await vr.json();
+    if (vd.ok) window.location.replace(BASE + '/index.html');
+    else showError(vd.error || 'אימות נכשל');
+  } catch(e) {
+    if (e.name !== 'NotAllowedError') showError('שגיאת זיהוי ביומטרי');
+  } finally { setLoading(false); }
+}
+
+// ─── utils ─────────────────────────────────────────────────
+function showError(msg) {
+  const el = document.getElementById('error-msg');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 4000);
+}
+function setLoading(on) {
+  const btn = document.getElementById('login-btn');
+  btn.disabled = on;
+  btn.textContent = on ? 'מתחבר...' : 'כניסה';
+}
+</script>
+</body>
+</html>

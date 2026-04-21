@@ -898,6 +898,21 @@ body{
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── auth guard ────────────────────────────────────────────
+(async function(){
+  const base=window.location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'');
+  try{
+    const r=await fetch(base+'/auth.php?action=check');
+    const d=await r.json();
+    if(!d.ok){window.location.replace(base+'/login.html');return;}
+    // הצג שם משתמש בהדר
+    if(d.user){
+      const el=document.querySelector('.header-sub');
+      if(el) el.textContent='שלום, '+d.user.name.split(' ')[0];
+    }
+  }catch(e){/* offline - allow */}
+})();
+
 let processSteps=[],includes=[],items=[],settings={},library={services:[],includes:[]};
 const VAT_RATE=18;
 

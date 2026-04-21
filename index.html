@@ -58,86 +58,111 @@ body{
 /* ── SIDEBAR ────────────────────────────── */
 .sidebar{
   width:var(--sidebar-w);flex-shrink:0;
-  display:none; /* mobile: hidden */
-  flex-direction:column;
+  display:none;flex-direction:column;
   position:fixed;right:0;top:0;bottom:0;z-index:50;
-  background:linear-gradient(180deg,rgba(2,13,38,0.97) 0%,rgba(1,9,24,0.99) 100%);
-  border-left:1px solid rgba(66,142,255,0.15);
-  backdrop-filter:blur(30px);
-  padding:0;
+  background:linear-gradient(180deg,#020c20 0%,#010918 60%,#010712 100%);
+  border-left:1px solid rgba(66,142,255,0.1);
+  backdrop-filter:blur(40px);padding:0;
+  overflow:hidden;
+}
+.sidebar::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(66,142,255,0.8),rgba(64,75,242,0.6),transparent);
+  z-index:1;
+}
+.sidebar::after{
+  content:'';position:absolute;top:0;right:0;width:1px;bottom:0;
+  background:linear-gradient(180deg,rgba(66,142,255,0.25),rgba(66,142,255,0.08) 40%,transparent);
 }
 .sidebar-top{
-  padding:22px 18px 18px;
-  border-bottom:1px solid rgba(66,142,255,0.1);
+  padding:24px 18px 20px;
+  border-bottom:1px solid rgba(255,255,255,0.05);
   display:flex;align-items:center;gap:12px;
-}
-.sidebar-logo{
-  width:38px;height:38px;border-radius:10px;flex-shrink:0;
-  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
-  display:flex;align-items:center;justify-content:center;
-  box-shadow:0 4px 16px rgba(66,142,255,0.5),inset 0 1px 0 rgba(255,255,255,0.3);
-}
-.sidebar-logo .icon{width:20px;height:20px;color:white;stroke-width:2.2}
-.sidebar-brand-title{font-size:16px;font-weight:800;letter-spacing:-0.01em}
-.sidebar-brand-sub{font-size:11px;color:var(--text-dim);margin-top:1px}
-
-.sidebar-nav{flex:1;padding:14px 10px;display:flex;flex-direction:column;gap:3px;overflow-y:auto}
-.nav-item{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 12px;border-radius:var(--radius-sm);
-  font-size:13px;font-weight:600;color:var(--text-dim);
-  background:transparent;border:none;cursor:pointer;font-family:inherit;
-  transition:all 0.2s;width:100%;text-align:right;
   position:relative;
 }
-.nav-item .icon{width:17px;height:17px;flex-shrink:0}
-.nav-item span{flex:1}
-.nav-item:hover{background:rgba(66,142,255,0.08);color:var(--text)}
-.nav-item.active{
-  background:linear-gradient(135deg,rgba(66,142,255,0.18) 0%,rgba(64,75,242,0.12) 100%);
-  color:white;border:1px solid rgba(66,142,255,0.3);
-  box-shadow:0 2px 8px rgba(66,142,255,0.15);
+.sidebar-logo{
+  width:40px;height:40px;border-radius:12px;flex-shrink:0;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(66,142,255,0.5),0 0 40px rgba(66,142,255,0.15),inset 0 1px 0 rgba(255,255,255,0.25);
 }
+.sidebar-logo .icon{width:20px;height:20px;color:white;stroke-width:2.2}
+.sidebar-brand-title{font-size:16px;font-weight:800;letter-spacing:-0.02em;color:#f1f5f9}
+.sidebar-brand-sub{font-size:10px;color:rgba(148,163,184,0.7);margin-top:2px;letter-spacing:0.3px}
+
+.sidebar-nav{flex:1;padding:16px 10px;display:flex;flex-direction:column;gap:2px;overflow-y:auto}
+.nav-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;border-radius:10px;
+  font-size:13px;font-weight:600;color:rgba(148,163,184,0.75);
+  background:transparent;border:none;cursor:pointer;font-family:inherit;
+  transition:all 0.2s ease;width:100%;text-align:right;
+  position:relative;
+}
+.nav-item .icon{width:16px;height:16px;flex-shrink:0;transition:all 0.2s}
+.nav-item span{flex:1}
+.nav-item:hover{
+  background:rgba(66,142,255,0.07);
+  color:rgba(241,245,249,0.9);
+  box-shadow:inset -2px 0 0 rgba(66,142,255,0.3);
+}
+.nav-item:hover .icon{color:var(--blue-bright)}
+.nav-item.active{
+  background:linear-gradient(135deg,rgba(66,142,255,0.14) 0%,rgba(64,75,242,0.07) 100%);
+  color:white;
+  box-shadow:inset -3px 0 0 var(--blue-primary),0 2px 16px rgba(66,142,255,0.12);
+}
+.nav-item.active .icon{color:var(--blue-bright)}
 .nav-badge{
-  background:var(--blue-primary);color:white;
-  font-size:10px;font-weight:700;padding:1px 7px;border-radius:100px;
-  min-width:20px;text-align:center;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  color:white;font-size:10px;font-weight:700;
+  padding:2px 7px;border-radius:100px;min-width:20px;text-align:center;
+  box-shadow:0 2px 8px rgba(66,142,255,0.35);
 }
 
 .sidebar-section{
-  padding:6px 12px 4px;
-  font-size:10px;font-weight:700;color:var(--text-dim);
-  text-transform:uppercase;letter-spacing:1px;
-  margin-top:6px;
+  padding:10px 14px 5px;
+  font-size:9px;font-weight:800;
+  color:rgba(66,142,255,0.45);
+  text-transform:uppercase;letter-spacing:1.5px;
+  margin-top:4px;
+}
+.sidebar-section::after{
+  content:'';display:block;height:1px;margin-top:7px;
+  background:linear-gradient(90deg,rgba(66,142,255,0.12),transparent);
 }
 
 .sidebar-footer{
-  padding:14px 10px;
-  border-top:1px solid rgba(66,142,255,0.1);
+  padding:14px 12px;
+  border-top:1px solid rgba(255,255,255,0.04);
+  background:rgba(1,9,24,0.6);
 }
 .user-card{
   display:flex;align-items:center;gap:10px;
-  padding:10px 12px;border-radius:var(--radius-sm);
-  margin-bottom:8px;
-  background:rgba(66,142,255,0.05);
-  border:1px solid rgba(66,142,255,0.1);
+  padding:11px 12px;border-radius:12px;margin-bottom:10px;
+  background:linear-gradient(135deg,rgba(66,142,255,0.09),rgba(64,75,242,0.05));
+  border:1px solid rgba(66,142,255,0.14);
+  box-shadow:0 2px 12px rgba(0,0,0,0.3);
 }
 .user-avatar{
-  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
   background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
   display:flex;align-items:center;justify-content:center;
-  font-size:14px;font-weight:800;color:white;
+  font-size:15px;font-weight:900;color:white;
+  box-shadow:0 4px 14px rgba(66,142,255,0.45);
 }
-.user-name{font-size:13px;font-weight:700;line-height:1.3}
-.user-role{font-size:11px;color:var(--text-dim)}
+.user-name{font-size:13px;font-weight:700;line-height:1.3;color:#f1f5f9}
+.user-role{font-size:10px;color:rgba(148,163,184,0.6);letter-spacing:0.2px}
 .btn-logout{
-  width:100%;padding:9px;
-  background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);
-  color:var(--danger-soft);border-radius:var(--radius-sm);
-  font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;
+  width:100%;padding:9px 12px;
+  background:rgba(239,68,68,0.06);
+  border:1px solid rgba(239,68,68,0.15);
+  color:rgba(252,165,165,0.7);
+  border-radius:10px;font-size:12px;font-weight:600;
+  cursor:pointer;font-family:inherit;
   transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:6px;
 }
-.btn-logout:hover{background:rgba(239,68,68,0.15)}
+.btn-logout:hover{background:rgba(239,68,68,0.12);border-color:rgba(239,68,68,0.25);color:#fca5a5}
 .btn-logout .icon{width:14px;height:14px}
 
 /* ── MAIN WRAPPER ───────────────────────── */
@@ -947,12 +972,51 @@ const DEFAULT_TERMS=`חתימת הלקוח תיחשב הסכמה סופית לפ
 הלקוח מאשר לספק לפנות אליו בכל אמצעי התקשורת הרלוונטים
 הספק שומר את הזכות להוסיף קרדיט שלו בתחתית הדף`;
 
-function init(){
+// ─── server sync ─────────────────────────────────────────────
+const BASE=window.location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'');
+
+async function serverLoad(){
+  try{
+    const r=await fetch(BASE+'/proposals.php');
+    if(!r.ok)return;
+    const d=await r.json();
+    if(d.proposals&&d.proposals.length){
+      const local=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+      const merged=mergeById([...local,...d.proposals]);
+      localStorage.setItem('pm_proposals',JSON.stringify(merged));
+    }
+    if(d.library){
+      localStorage.setItem('pm_library',JSON.stringify(d.library));
+      library=d.library;
+    }
+  }catch(e){}
+}
+
+async function serverSave(){
+  try{
+    const proposals=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+    await fetch(BASE+'/proposals.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({proposals,library})
+    });
+  }catch(e){}
+}
+
+function mergeById(arr){
+  const m=new Map();
+  arr.forEach(p=>{const ex=m.get(p.id);if(!ex||new Date(p.date)>new Date(ex.date))m.set(p.id,p);});
+  return[...m.values()].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,200);
+}
+// ─── end server sync ──────────────────────────────────────────
+
+async function init(){
   loadSettings();loadLibrary();
   processSteps=[...DEFAULT_PROCESS];includes=[];items=[];
   document.getElementById('proposal-num').value=genNum();
-  renderProcess();renderIncludes();renderItems();updateSummary();renderSaved();renderLibrary();
-  renderStatusPanel();
+  renderProcess();renderIncludes();renderItems();updateSummary();renderLibrary();
+  await serverLoad();
+  renderSaved();renderStatusPanel();
 }
 function genNum(){return new Date().getFullYear()+'-'+String(Math.floor(Math.random()*900)+100)}
 
@@ -1178,6 +1242,7 @@ function saveLibrary(){
   library.includes=library.includes.filter(i=>i.name.trim());
   localStorage.setItem('pm_library',JSON.stringify(library));
   renderLibrary();toast('הספריה נשמרה','success');
+  serverSave();
 }
 
 // ─── proposal data ────────────────────────────────────────────
@@ -1213,9 +1278,10 @@ function saveProposal(){
   if(!d.clientName){toast('יש למלא שם לקוח','error');return}
   const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
   saved.unshift(d);
-  localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,50)));
+  localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,200)));
   renderStatusPanel();
   toast('נשמר בהיסטוריה','success');
+  serverSave();
 }
 
 async function sendProposal(){
@@ -1230,7 +1296,8 @@ async function sendProposal(){
     d.status='sent';
     const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
     saved.unshift(d);
-    localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,50)));
+    localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,200)));
+    serverSave();
     const url=settings.baseUrl.replace(/\/$/,'')+'/p/'+d.id;
     document.getElementById('proposal-link').textContent=url;
     document.getElementById('link-modal').classList.add('show');
@@ -1299,6 +1366,7 @@ function deleteProposal(id){
   const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
   localStorage.setItem('pm_proposals',JSON.stringify(saved.filter(x=>x.id!==id)));
   renderSaved();renderStatusPanel();toast('נמחק','');
+  serverSave();
 }
 
 // ─── status panel ─────────────────────────────────────────────

@@ -521,6 +521,30 @@ body{
   .modal-handle{display:none}
 }
 
+/* ── FAB REFRESH (mobile only) ── */
+.fab-refresh{
+  display:flex;
+  position:fixed;
+  bottom:calc(80px + env(safe-area-inset-bottom));
+  left:16px;
+  z-index:99;
+  width:44px;height:44px;
+  border-radius:50%;
+  background:rgba(10,36,86,0.85);
+  border:1px solid rgba(66,142,255,0.3);
+  backdrop-filter:blur(20px);
+  box-shadow:0 4px 20px rgba(0,0,0,0.4),0 0 0 1px rgba(66,142,255,0.1);
+  align-items:center;justify-content:center;
+  color:var(--text-dim);cursor:pointer;
+  transition:all 0.2s;
+}
+.fab-refresh:hover{border-color:rgba(66,142,255,0.6);color:white}
+.fab-refresh:active{transform:scale(0.9)}
+.fab-refresh .icon{width:18px;height:18px}
+.fab-refresh.spinning .icon{animation:spin 0.6s linear}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media(min-width:1024px){.fab-refresh{display:none}}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important}
 }
@@ -558,6 +582,7 @@ body{
     <symbol id="i-mobile" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
     <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
     <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></symbol>
     <symbol id="i-bar-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
   </defs>
 </svg>
@@ -958,6 +983,10 @@ body{
     </div>
   </div>
 </div>
+
+<button class="fab-refresh" id="fab-refresh" onclick="fabRefresh()" aria-label="רענן">
+  <svg class="icon"><use href="#i-refresh"/></svg>
+</button>
 
 <div class="toast" id="toast"></div>
 
@@ -1526,6 +1555,15 @@ function renderStatusPanel(){
 
 // ─── utils ────────────────────────────────────────────────────
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function fabRefresh(){
+  const btn=document.getElementById('fab-refresh');
+  btn.classList.add('spinning');
+  await serverLoad();
+  renderSaved();renderStatusPanel();
+  setTimeout(()=>btn.classList.remove('spinning'),600);
+  toast('עודכן','success');
+}
+
 function toast(msg,type){
   const t=document.getElementById('toast');
   let iconId='i-info';

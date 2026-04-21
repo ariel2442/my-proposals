@@ -404,6 +404,30 @@ body{
 .toast.success{background:linear-gradient(135deg,rgba(16,185,129,0.95) 0%,rgba(5,150,105,0.95) 100%);border-color:rgba(16,185,129,0.5);box-shadow:0 10px 30px rgba(16,185,129,0.4)}
 .toast.error{background:linear-gradient(135deg,rgba(239,68,68,0.95) 0%,rgba(185,28,28,0.95) 100%);border-color:rgba(239,68,68,0.5);box-shadow:0 10px 30px rgba(239,68,68,0.4)}
 
+/* ── PREVIEW MODAL ──────────────────────── */
+.preview-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid rgba(66,142,255,0.15)}
+.preview-title{font-size:19px;font-weight:800;letter-spacing:-0.02em}
+.preview-num{font-size:12px;color:var(--text-dim);margin-top:3px}
+.preview-badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;background:rgba(66,142,255,0.1);border:1px solid rgba(66,142,255,0.25);border-radius:100px;font-size:11px;font-weight:600;color:var(--blue-bright)}
+.preview-client-card{background:rgba(66,142,255,0.06);border:1px solid rgba(66,142,255,0.15);border-radius:12px;padding:14px 16px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap}
+.preview-client-field{flex:1;min-width:120px}
+.preview-field-label{font-size:10px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:4px}
+.preview-field-val{font-size:14px;font-weight:600;color:var(--text)}
+.preview-section-title{font-size:11px;font-weight:700;color:var(--blue-soft-muted);text-transform:uppercase;letter-spacing:0.8px;margin:16px 0 8px;display:flex;align-items:center;gap:6px}
+.preview-items{border:1px solid rgba(66,142,255,0.12);border-radius:12px;overflow:hidden;margin-bottom:6px}
+.preview-item-row{display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid rgba(66,142,255,0.07);font-size:13px}
+.preview-item-row:last-child{border-bottom:none}
+.preview-item-name{flex:1;font-weight:600}
+.preview-item-qty{color:var(--text-dim);font-size:12px;min-width:40px;text-align:center}
+.preview-item-price{color:var(--text-dim);font-size:12px;min-width:70px;text-align:left;direction:ltr}
+.preview-item-total{font-weight:700;color:var(--blue-bright);min-width:70px;text-align:left;direction:ltr}
+.preview-summary{background:rgba(66,142,255,0.06);border:1px solid rgba(66,142,255,0.15);border-radius:12px;padding:14px 16px;margin-bottom:16px}
+.preview-sum-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;padding:4px 0}
+.preview-sum-row.total{font-size:16px;font-weight:800;color:white;border-top:1px solid rgba(66,142,255,0.2);margin-top:8px;padding-top:12px}
+.preview-tags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.preview-tag{background:rgba(66,142,255,0.08);border:1px solid rgba(66,142,255,0.18);border-radius:8px;padding:5px 10px;font-size:12px;color:var(--text-muted)}
+.preview-sticky-btns{position:sticky;bottom:0;padding:14px 0 0;background:linear-gradient(transparent,rgba(2,19,44,0.98) 30%);display:flex;gap:10px;margin-top:20px}
+
 /* ── MODAL ──────────────────────────────── */
 .modal-overlay{position:fixed;inset:0;background:rgba(1,9,24,0.8);display:none;align-items:flex-end;z-index:200;backdrop-filter:blur(10px)}
 .modal-overlay.show{display:flex;animation:fadeIn 0.25s}
@@ -758,7 +782,7 @@ body{
           <button class="btn btn-secondary" onclick="saveProposal()">
             <svg class="icon"><use href="#i-save"/></svg>שמור טיוטה
           </button>
-          <button class="btn btn-primary" onclick="sendProposal()" id="send-btn">
+          <button class="btn btn-primary" onclick="previewProposal()" id="send-btn">
             <svg class="icon"><use href="#i-send"/></svg>שלח ללקוח
           </button>
         </div>
@@ -860,9 +884,33 @@ body{
   <button class="btn btn-secondary" onclick="saveProposal()">
     <svg class="icon"><use href="#i-save"/></svg>שמור
   </button>
-  <button class="btn btn-primary" onclick="sendProposal()" id="send-btn-mobile">
+  <button class="btn btn-primary" onclick="previewProposal()" id="send-btn-mobile">
     <svg class="icon"><use href="#i-send"/></svg>שלח ללקוח
   </button>
+</div>
+
+<!-- MODAL: Preview -->
+<div class="modal-overlay" id="preview-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="preview-header">
+      <div>
+        <div class="preview-title">תצוגה מקדימה</div>
+        <div class="preview-num" id="preview-num"></div>
+      </div>
+      <div class="preview-badge">
+        <svg class="icon" style="width:12px;height:12px"><use href="#i-sparkles"/></svg>
+        טיוטה
+      </div>
+    </div>
+    <div id="preview-content"></div>
+    <div class="preview-sticky-btns">
+      <button class="btn btn-secondary" style="flex:1" onclick="closeModal('preview-modal')">ביטול</button>
+      <button class="btn btn-primary" style="flex:2" onclick="confirmSend()" id="confirm-send-btn">
+        <svg class="icon"><use href="#i-send"/></svg>שלח ללקוח
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- MODAL: Services -->
@@ -1284,8 +1332,68 @@ function saveProposal(){
   serverSave();
 }
 
-async function sendProposal(){
+let _pendingProposal=null;
+
+function previewProposal(){
   const d=getProposalData();
+  if(!d.clientName){toast('יש למלא שם לקוח','error');return}
+  if(!d.clientPhone){toast('יש למלא טלפון לקוח','error');return}
+  if(!d.items.length){toast('יש להוסיף לפחות פריט אחד','error');return}
+  _pendingProposal=d;
+
+  document.getElementById('preview-num').textContent='הצעה מס\' '+esc(d.proposalNum);
+
+  const itemsHtml=d.items.map(it=>`
+    <div class="preview-item-row">
+      <div class="preview-item-name">${esc(it.title)}${it.desc?'<div style="font-size:11px;color:var(--text-dim);font-weight:400;margin-top:2px">'+esc(it.desc)+'</div>':''}</div>
+      <div class="preview-item-qty">×${it.qty}</div>
+      <div class="preview-item-price">₪${Number(it.price).toLocaleString('he-IL')}</div>
+      <div class="preview-item-total">₪${(it.qty*it.price).toLocaleString('he-IL')}</div>
+    </div>`).join('');
+
+  const includesHtml=d.includes.length?`
+    <div class="preview-section-title">מה כולל</div>
+    <div class="preview-tags">${d.includes.map(s=>`<div class="preview-tag">${esc(s)}</div>`).join('')}</div>`:'';
+
+  const processHtml=d.processSteps.length?`
+    <div class="preview-section-title">שלבי התהליך</div>
+    <div class="preview-tags">${d.processSteps.map((s,i)=>`<div class="preview-tag">${i+1}. ${esc(s)}</div>`).join('')}</div>`:'';
+
+  document.getElementById('preview-content').innerHTML=`
+    <div class="preview-client-card">
+      <div class="preview-client-field">
+        <div class="preview-field-label">שם לקוח</div>
+        <div class="preview-field-val">${esc(d.clientName)}</div>
+      </div>
+      <div class="preview-client-field">
+        <div class="preview-field-label">טלפון</div>
+        <div class="preview-field-val" dir="ltr">${esc(d.clientPhone)}</div>
+      </div>
+      ${d.projectType?`<div class="preview-client-field">
+        <div class="preview-field-label">סוג פרויקט</div>
+        <div class="preview-field-val">${esc(d.projectType)}</div>
+      </div>`:''}
+    </div>
+    <div class="preview-section-title">פירוט מחיר</div>
+    <div class="preview-items">${itemsHtml}</div>
+    <div class="preview-summary">
+      <div class="preview-sum-row"><span>סכום ביניים</span><span>₪${d.subtotal.toLocaleString('he-IL')}</span></div>
+      <div class="preview-sum-row"><span>מע"מ ${d.vatRate}%</span><span>₪${d.vat.toLocaleString('he-IL')}</span></div>
+      <div class="preview-sum-row total"><span>סה"כ לתשלום</span><span>₪${d.total.toLocaleString('he-IL')}</span></div>
+    </div>
+    ${includesHtml}${processHtml}
+  `;
+
+  document.getElementById('preview-modal').classList.add('show');
+}
+
+async function confirmSend(){
+  closeModal('preview-modal');
+  if(_pendingProposal)await sendProposal(_pendingProposal);
+}
+
+async function sendProposal(prefilledData){
+  const d=prefilledData||getProposalData();
   const err=validateProposal(d);
   if(err){toast(err,'error');return}
   const btns=[document.getElementById('send-btn'),document.getElementById('send-btn-mobile')];

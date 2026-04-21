@@ -1104,6 +1104,20 @@ async function init(){
   renderProcess();renderIncludes();renderItems();updateSummary();renderLibrary();
   await serverLoad();
   renderSaved();renderStatusPanel();
+
+  // סנכרון אוטומטי כל 60 שניות
+  setInterval(async()=>{
+    await serverLoad();
+    renderSaved();renderStatusPanel();
+  },60000);
+
+  // סנכרון כשחוזרים לאפליקציה (מובייל)
+  document.addEventListener('visibilitychange',async()=>{
+    if(document.visibilityState==='visible'){
+      await serverLoad();
+      renderSaved();renderStatusPanel();
+    }
+  });
 }
 function genNum(){return new Date().getFullYear()+'-'+String(Math.floor(Math.random()*900)+100)}
 

@@ -1109,7 +1109,7 @@ async function init(){
   setInterval(async()=>{
     await serverLoad();
     renderSaved();renderStatusPanel();
-  },60000);
+  },5000);
 
   // סנכרון כשחוזרים לאפליקציה (מובייל)
   document.addEventListener('visibilitychange',async()=>{

@@ -1075,17 +1075,26 @@ async function serverLoad(){
     if(d.library){
       localStorage.setItem('pm_library',JSON.stringify(d.library));
       library=d.library;
+      renderLibrary();
     }
-  }catch(e){}
+    if(d.settings){
+      const merged=Object.assign({},d.settings,JSON.parse(localStorage.getItem('pm_settings')||'{}'));
+      localStorage.setItem('pm_settings',JSON.stringify(merged));
+      settings=merged;
+      loadSettings();
+    }
+    return true;
+  }catch(e){return false;}
 }
 
 async function serverSave(){
   try{
     const proposals=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+    const s=JSON.parse(localStorage.getItem('pm_settings')||'{}');
     await fetch(BASE+'/proposals.php',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({proposals,library})
+      body:JSON.stringify({proposals,library,settings:s})
     });
   }catch(e){}
 }
@@ -1299,6 +1308,7 @@ function saveSettings(){
   };
   localStorage.setItem('pm_settings',JSON.stringify(settings));
   toast('ההגדרות נשמרו','success');
+  serverSave();
 }
 
 // ─── library ─────────────────────────────────────────────────
@@ -1572,10 +1582,10 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 async function fabRefresh(){
   const btn=document.getElementById('fab-refresh');
   btn.classList.add('spinning');
-  await serverLoad();
+  const ok=await serverLoad();
   renderSaved();renderStatusPanel();
-  setTimeout(()=>btn.classList.remove('spinning'),600);
-  toast('עודכן','success');
+  setTimeout(()=>btn.classList.remove('spinning'),800);
+  toast(ok?'עודכן':'לא מחובר — התחבר מחדש','');
 }
 
 function toast(msg,type){

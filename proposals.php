@@ -36,6 +36,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (file_put_contents($file, json_encode($data)) === false) {
         http_response_code(500); echo json_encode(['ok' => false, 'error' => 'Write failed']); exit;
     }
+    // שמור קובץ נפרד לכל הצעה (לדף /p/)
+    if (!empty($data['proposals']) && is_array($data['proposals'])) {
+        foreach ($data['proposals'] as $proposal) {
+            if (!empty($proposal['id'])) {
+                $pid = preg_replace('/[^a-zA-Z0-9_\-]/', '', $proposal['id']);
+                file_put_contents($dir . $pid . '.json', json_encode($proposal));
+            }
+        }
+    }
+    echo json_encode(['ok' => true]);
+    exit;
+}
+
+// DELETE — remove single proposal file (optional cleanup)
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+    parse_str(file_get_contents('php://input'), $params);
+    $pid = preg_replace('/[^a-zA-Z0-9_\-]/', '', $params['id'] ?? '');
+    if ($pid && file_exists($dir . $pid . '.json')) unlink($dir . $pid . '.json');
     echo json_encode(['ok' => true]);
     exit;
 }

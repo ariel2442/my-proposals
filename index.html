@@ -1023,6 +1023,16 @@ const DEFAULT_TERMS=`חתימת הלקוח תיחשב הסכמה סופית לפ
 // ─── server sync ─────────────────────────────────────────────
 const BASE=window.location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'');
 
+async function savePropFile(proposal){
+  try{
+    await fetch(BASE+'/save.php',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-Token':'4ae9a09533485edf7a5e8f6bd11862a5'},
+      body:JSON.stringify(proposal)
+    });
+  }catch(e){}
+}
+
 async function serverLoad(){
   try{
     const r=await fetch(BASE+'/proposals.php');
@@ -1330,6 +1340,7 @@ function saveProposal(){
   renderStatusPanel();
   toast('נשמר בהיסטוריה','success');
   serverSave();
+  savePropFile(d);
 }
 
 let _pendingProposal=null;
@@ -1406,6 +1417,7 @@ async function sendProposal(prefilledData){
     saved.unshift(d);
     localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,200)));
     serverSave();
+    savePropFile(d);
     const url=settings.baseUrl.replace(/\/$/,'')+'/p/'+d.id;
     document.getElementById('proposal-link').textContent=url;
     document.getElementById('link-modal').classList.add('show');

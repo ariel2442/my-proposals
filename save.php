@@ -1,6 +1,6 @@
 <?php
 // Token סודי — שנה אותו וזכור אותו, תצטרך אותו ב-Make
-define('SECRET_TOKEN', 'CHANGE_THIS_SECRET_TOKEN');
+define('SECRET_TOKEN', '4ae9a09533485edf7a5e8f6bd11862a5');
 
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type, X-Token');

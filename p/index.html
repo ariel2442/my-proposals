@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#02132C">
+<title>הצעת מחיר</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+
+:root{
+  --navy-deepest:#010918;
+  --navy-deep:#02132C;
+  --navy-dark:#0a2456;
+  --blue-primary:#428EFF;
+  --blue-bright:#60a5fa;
+  --indigo:#404BF2;
+  --blue-soft:#93c5fd;
+  --blue-soft-muted:#bfdbfe;
+  --success:#10b981;
+  --success-bright:#6ee7b7;
+  --danger:#ef4444;
+  --danger-soft:#fca5a5;
+  --text:#f1f5f9;
+  --text-muted:#cbd5e1;
+  --text-dim:#94a3b8;
+  --card-bg:linear-gradient(135deg,rgba(66,142,255,0.08) 0%,rgba(10,36,86,0.4) 50%,rgba(2,19,44,0.55) 100%);
+  --card-border:rgba(255,255,255,0.1);
+  --card-highlight:rgba(255,255,255,0.12);
+}
+
+body{
+  font-family:'Heebo',-apple-system,sans-serif;
+  color:var(--text);line-height:1.7;direction:rtl;
+  background:radial-gradient(ellipse at top,var(--navy-dark) 0%,var(--navy-deep) 55%,var(--navy-deepest) 100%);
+  min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* ICONS */
+.icon{width:20px;height:20px;flex-shrink:0;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;fill:none}
+
+/* BG EFFECTS */
+.bg-effects{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-glow{position:absolute;border-radius:50%;filter:blur(140px);pointer-events:none}
+.bg-glow-1{width:600px;height:600px;background:radial-gradient(circle,rgba(66,142,255,0.35) 0%,transparent 70%);top:-200px;right:-150px;animation:float-1 25s ease-in-out infinite}
+.bg-glow-2{width:700px;height:700px;background:radial-gradient(circle,rgba(64,75,242,0.3) 0%,transparent 70%);bottom:-250px;left:-200px;animation:float-2 30s ease-in-out infinite}
+.bg-glow-3{width:400px;height:400px;background:radial-gradient(circle,rgba(66,142,255,0.22) 0%,transparent 70%);top:40%;left:50%;transform:translate(-50%,-50%);animation:float-3 20s ease-in-out infinite}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(66,142,255,0.05) 1px,transparent 1px),linear-gradient(90deg,rgba(66,142,255,0.05) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%)}
+@keyframes float-1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-50px,60px) scale(1.1)}}
+@keyframes float-2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(60px,-50px) scale(1.15)}}
+@keyframes float-3{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.6}50%{transform:translate(-50%,-50%) scale(1.3);opacity:1}}
+
+.page{max-width:620px;margin:0 auto;padding:36px 22px 80px;position:relative;z-index:1}
+
+/* ========== TOP HEADER (בסגנון PDF) ========== */
+.top-header{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:28px;
+  animation:fadeDown 0.6s ease backwards;
+}
+.date-tag{
+  font-size:13px;color:var(--text-muted);font-weight:500;
+  letter-spacing:0.02em;
+}
+.proposal-num-tag{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 12px;
+  background:rgba(66,142,255,0.08);
+  border:1px solid rgba(66,142,255,0.25);
+  border-radius:100px;
+  font-size:11px;font-weight:600;color:var(--blue-soft-muted);
+  letter-spacing:0.5px;
+}
+.proposal-num-tag .dot{
+  width:6px;height:6px;border-radius:50%;
+  background:var(--blue-primary);
+  box-shadow:0 0 8px rgba(66,142,255,0.8);
+}
+
+/* ========== MAIN TITLE (בסגנון PDF - מרכזי ועבה) ========== */
+.main-title{
+  font-size:clamp(32px,7vw,42px);
+  font-weight:900;letter-spacing:-0.02em;
+  line-height:1.15;text-align:center;
+  margin-bottom:36px;
+  animation:fadeUp 0.6s 0.1s ease backwards;
+}
+
+/* ========== CLIENT INFO (בסגנון PDF - לכבוד + סוג) ========== */
+.client-info{
+  text-align:right;
+  margin-bottom:30px;
+  padding:0 8px;
+  animation:fadeUp 0.6s 0.2s ease backwards;
+}
+.client-line{
+  font-size:17px;color:var(--text-muted);
+  margin-bottom:8px;font-weight:500;
+  display:flex;gap:8px;
+}
+.client-line-label{min-width:75px;color:var(--text-dim)}
+.client-line strong{color:white;font-weight:700}
+
+/* ========== CARDS (כמו ב-PDF — עיגולים גדולים) ========== */
+.card{
+  position:relative;
+  background:var(--card-bg);
+  backdrop-filter:blur(24px) saturate(140%);
+  -webkit-backdrop-filter:blur(24px) saturate(140%);
+  border:1px solid var(--card-border);
+  border-radius:24px;padding:32px 26px;margin-bottom:18px;
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.2),
+    0 8px 24px rgba(0,0,0,0.3),
+    0 20px 60px rgba(0,0,0,0.3),
+    inset 0 1px 0 var(--card-highlight);
+  animation:fadeUp 0.6s 0.3s ease backwards;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:15%;right:15%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
+  pointer-events:none;
+}
+
+.card-title{
+  font-size:26px;font-weight:900;
+  margin-bottom:22px;letter-spacing:-0.02em;
+  color:white;
+}
+
+/* ========== PROCESS (מספור עבה בסגנון PDF — 01, 02, 03) ========== */
+.process-list{list-style:none}
+.process-item{
+  display:flex;align-items:flex-start;gap:18px;
+  padding:13px 0;font-size:16px;
+}
+.process-num{
+  font-size:17px;font-weight:900;
+  min-width:28px;color:white;letter-spacing:-0.5px;
+  padding-top:2px;
+}
+.process-text{
+  font-weight:500;padding-top:3px;color:var(--text);
+  flex:1;line-height:1.5;
+}
+
+/* ========== INCLUDES (bullet נקי כמו PDF) ========== */
+.includes-list{list-style:none}
+.include-item{
+  position:relative;
+  padding:11px 22px 11px 0;
+  font-size:16px;font-weight:500;color:var(--text);
+  line-height:1.5;
+}
+.include-item::before{
+  content:'';position:absolute;right:4px;top:20px;
+  width:7px;height:7px;border-radius:50%;
+  background:white;
+  box-shadow:0 0 10px rgba(255,255,255,0.4);
+}
+
+/* ========== PRICING ========== */
+.price-row{
+  display:flex;justify-content:space-between;align-items:flex-start;gap:14px;
+  padding:14px 0;border-bottom:1px solid rgba(66,142,255,0.12);
+}
+.price-row:last-child{border-bottom:none}
+.price-info h4{font-size:16px;font-weight:700;margin-bottom:3px;color:white;line-height:1.3}
+.price-info p{font-size:13px;color:var(--text-dim);line-height:1.5}
+.price-amount{
+  font-size:18px;font-weight:800;white-space:nowrap;
+  padding:6px 12px;border-radius:9px;
+  background:rgba(66,142,255,0.1);
+  border:1px solid rgba(66,142,255,0.25);
+  color:white;
+}
+
+.totals-section{
+  border-top:1px solid rgba(66,142,255,0.2);
+  padding-top:16px;margin-top:12px;
+}
+.total-row{
+  display:flex;justify-content:space-between;padding:7px 0;
+  font-size:15px;color:var(--text-muted);
+}
+
+/* ========== TOTAL PILL (כמו ב-PDF - pill מעוגל עם סה"כ) ========== */
+.total-pill-wrapper{
+  display:flex;justify-content:center;margin:30px 0 8px;
+  animation:fadeUp 0.6s 0.4s ease backwards;
+}
+.total-pill{
+  position:relative;
+  display:inline-flex;align-items:center;gap:12px;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  padding:20px 40px;border-radius:100px;
+  font-size:20px;font-weight:800;color:white;
+  box-shadow:
+    0 10px 40px rgba(66,142,255,0.5),
+    0 0 0 1px rgba(66,142,255,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  letter-spacing:-0.01em;
+}
+.total-pill::after{
+  content:'';position:absolute;inset:-8px;border-radius:100px;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  opacity:0.4;filter:blur(18px);z-index:-1;
+}
+.total-pill-amount{font-size:22px;font-weight:900}
+
+/* ========== TERMS ========== */
+.terms-list{list-style:none;counter-reset:term}
+.term-item{
+  display:flex;gap:12px;padding:9px 0;
+  font-size:14px;line-height:1.6;align-items:flex-start;
+  color:var(--text);
+}
+.term-num{
+  font-weight:800;min-width:24px;flex-shrink:0;
+  color:var(--blue-bright);
+}
+
+/* ========== SIGN ========== */
+.sign-section{
+  margin-top:32px;padding-top:26px;
+  border-top:1px solid rgba(66,142,255,0.15);
+}
+.sign-intro{
+  font-size:14px;color:var(--text-muted);
+  margin-bottom:22px;line-height:1.6;text-align:center;
+}
+.sign-fields{display:flex;flex-direction:column;gap:18px;margin-bottom:22px}
+.sign-field{display:flex;flex-direction:column;gap:8px}
+.sign-label{
+  font-size:12px;font-weight:600;color:var(--text-muted);
+  letter-spacing:0.5px;text-transform:uppercase;
+}
+.sign-input{
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.25);
+  border-radius:12px;padding:14px 16px;
+  color:white;font-family:inherit;font-size:15px;width:100%;
+  transition:all 0.25s;
+}
+.sign-input::placeholder{color:var(--text-dim);opacity:0.6}
+.sign-input:focus{
+  outline:none;border-color:var(--blue-primary);
+  background:rgba(2,19,44,0.8);
+  box-shadow:0 0 0 3px rgba(66,142,255,0.15);
+}
+#signature-pad{
+  background:rgba(241,245,249,0.98);
+  border:1px solid rgba(66,142,255,0.25);
+  border-radius:12px;
+  width:100%;height:140px;
+  cursor:crosshair;touch-action:none;display:block;
+  transition:all 0.25s;
+}
+#signature-pad:hover{border-color:var(--blue-primary)}
+.sign-row-buttons{display:flex;gap:10px;align-items:center}
+.btn-clear{
+  background:rgba(66,142,255,0.08);color:var(--text-muted);
+  padding:8px 14px;border-radius:8px;
+  border:1px solid rgba(66,142,255,0.2);
+  font-size:12px;cursor:pointer;font-family:inherit;
+  transition:all 0.2s;
+  display:inline-flex;align-items:center;gap:6px;
+}
+.btn-clear:hover{background:rgba(66,142,255,0.15);color:white}
+.btn-clear .icon{width:13px;height:13px;stroke-width:2.2}
+
+.btn-approve{
+  position:relative;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  color:white;padding:18px 28px;
+  border-radius:14px;border:none;
+  font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;
+  width:100%;margin-top:20px;
+  box-shadow:
+    0 8px 24px rgba(66,142,255,0.5),
+    0 0 0 1px rgba(66,142,255,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  transition:all 0.25s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  letter-spacing:0.01em;
+}
+.btn-approve .icon{width:18px;height:18px;stroke-width:2.3}
+.btn-approve::after{
+  content:'';position:absolute;inset:-4px;border-radius:18px;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  opacity:0.4;filter:blur(14px);z-index:-1;
+}
+.btn-approve:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 12px 32px rgba(66,142,255,0.6),0 0 0 1px rgba(66,142,255,0.4),inset 0 1px 0 rgba(255,255,255,0.4)}
+.btn-approve:active:not(:disabled){transform:translateY(0)}
+.btn-approve:disabled{opacity:0.5;cursor:not-allowed}
+
+.status-msg{
+  margin-top:18px;padding:13px 16px;border-radius:12px;
+  display:none;font-weight:600;text-align:center;
+  font-size:14px;backdrop-filter:blur(10px);
+  align-items:center;justify-content:center;gap:8px;
+}
+.status-msg.show{display:flex;animation:fadeUp 0.3s}
+.status-msg .icon{width:16px;height:16px}
+.status-msg.error{
+  background:rgba(239,68,68,0.15);color:var(--danger-soft);
+  border:1px solid rgba(239,68,68,0.4);
+}
+
+.footer-contact{
+  text-align:center;margin-top:40px;padding-top:24px;
+  font-size:13px;color:var(--text-dim);
+  border-top:1px solid rgba(66,142,255,0.1);
+  display:flex;justify-content:center;align-items:center;gap:12px;
+  flex-wrap:wrap;
+}
+.footer-divider{
+  width:3px;height:3px;border-radius:50%;background:var(--text-dim);
+}
+
+/* ========== PAYMENT MODAL ========== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(1,9,24,0.85);
+  display:none;align-items:center;justify-content:center;
+  z-index:200;backdrop-filter:blur(20px);padding:20px;
+}
+.modal-overlay.show{display:flex;animation:fadeIn 0.3s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  position:relative;
+  background:linear-gradient(135deg,rgba(10,36,86,0.97) 0%,rgba(2,19,44,0.98) 100%);
+  backdrop-filter:blur(40px) saturate(140%);
+  border:1px solid rgba(66,142,255,0.3);
+  border-radius:26px;padding:38px 28px;
+  max-width:440px;width:100%;text-align:center;
+  animation:scaleIn 0.35s cubic-bezier(0.16,1,0.3,1);
+  box-shadow:
+    0 30px 80px rgba(0,0,0,0.6),
+    0 0 0 1px rgba(66,142,255,0.1),
+    inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.modal::before{
+  content:'';position:absolute;top:0;left:20%;right:20%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+}
+@keyframes scaleIn{from{transform:scale(0.9);opacity:0}to{transform:scale(1);opacity:1}}
+
+.modal-icon{
+  width:64px;height:64px;border-radius:18px;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  display:flex;align-items:center;justify-content:center;
+  color:white;margin:0 auto 18px;
+  box-shadow:0 10px 30px rgba(66,142,255,0.5),inset 0 1px 0 rgba(255,255,255,0.3);
+  position:relative;
+}
+.modal-icon .icon{width:28px;height:28px;stroke-width:2}
+.modal-icon::after{
+  content:'';position:absolute;inset:-6px;border-radius:22px;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  opacity:0.4;filter:blur(16px);z-index:-1;
+}
+.modal h3{
+  font-size:24px;font-weight:800;margin-bottom:10px;
+  letter-spacing:-0.01em;
+}
+.modal p{font-size:14px;color:var(--text-muted);margin-bottom:24px;line-height:1.6}
+
+.payment-options{display:flex;flex-direction:column;gap:10px}
+.pay-btn{
+  background:rgba(66,142,255,0.08);
+  border:1.5px solid rgba(66,142,255,0.3);
+  color:white;padding:16px 18px;border-radius:14px;
+  font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  transition:all 0.25s;backdrop-filter:blur(10px);
+}
+.pay-btn .icon{width:22px;height:22px;stroke-width:2}
+.pay-btn:hover{
+  background:rgba(66,142,255,0.15);
+  border-color:var(--blue-primary);
+  transform:translateY(-2px);
+  box-shadow:0 10px 24px rgba(66,142,255,0.3);
+}
+.pay-btn-primary{
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  border-color:transparent;position:relative;
+  box-shadow:0 8px 24px rgba(66,142,255,0.5),inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.pay-btn-primary::after{
+  content:'';position:absolute;inset:-3px;border-radius:17px;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  opacity:0.4;filter:blur(12px);z-index:-1;
+}
+.pay-btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 30px rgba(66,142,255,0.6)}
+
+/* ========== SUCCESS ========== */
+.success-screen{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at top,var(--navy-dark) 0%,var(--navy-deep) 55%,var(--navy-deepest) 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  z-index:300;padding:40px 24px;text-align:center;
+}
+.success-screen.show{display:flex;animation:fadeIn 0.4s}
+.success-icon-big{
+  width:88px;height:88px;border-radius:26px;
+  background:linear-gradient(135deg,var(--success) 0%,#059669 100%);
+  display:flex;align-items:center;justify-content:center;
+  color:white;margin-bottom:26px;
+  box-shadow:
+    0 20px 60px rgba(16,185,129,0.5),
+    0 0 0 1px rgba(16,185,129,0.3),
+    inset 0 1px 0 rgba(255,255,255,0.3);
+  position:relative;
+  animation:successBounce 0.6s cubic-bezier(0.16,1,0.3,1);
+}
+.success-icon-big .icon{width:44px;height:44px;stroke-width:2.5}
+.success-icon-big::after{
+  content:'';position:absolute;inset:-10px;border-radius:36px;
+  background:linear-gradient(135deg,var(--success),#059669);
+  opacity:0.4;filter:blur(20px);z-index:-1;
+}
+@keyframes successBounce{0%{transform:scale(0);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+
+.success-screen h2{
+  font-size:30px;font-weight:900;margin-bottom:12px;
+  letter-spacing:-0.02em;
+}
+.success-screen>p{
+  font-size:16px;color:var(--text-muted);
+  max-width:420px;line-height:1.6;
+}
+.success-details{
+  background:var(--card-bg);
+  backdrop-filter:blur(20px);
+  border:1px solid var(--card-border);
+  border-radius:18px;padding:22px;
+  margin-top:26px;max-width:420px;
+  font-size:14px;line-height:1.8;text-align:right;
+  box-shadow:0 8px 24px rgba(0,0,0,0.3),inset 0 1px 0 var(--card-highlight);
+}
+.success-details strong{color:var(--blue-bright);font-weight:700;display:block;margin-bottom:6px}
+.success-details ul{list-style:none}
+.success-details li{
+  padding:5px 0;display:flex;align-items:flex-start;gap:10px;
+  color:var(--text-muted);font-size:13px;
+}
+.success-details li .icon{width:16px;height:16px;color:var(--success);flex-shrink:0;margin-top:3px;stroke-width:2.5}
+
+/* ========== LOADING / ERROR ========== */
+.loading-screen{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at top,var(--navy-dark) 0%,var(--navy-deep) 55%,var(--navy-deepest) 100%);
+  display:flex;align-items:center;justify-content:center;z-index:400;
+}
+.loading-screen.hidden{display:none}
+.spinner{
+  width:52px;height:52px;
+  border:3px solid rgba(66,142,255,0.15);
+  border-top-color:var(--blue-primary);
+  border-radius:50%;
+  animation:spin 0.8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error-screen{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at top,var(--navy-dark) 0%,var(--navy-deep) 55%,var(--navy-deepest) 100%);
+  display:none;align-items:center;justify-content:center;
+  z-index:400;padding:40px;text-align:center;flex-direction:column;gap:12px;
+}
+.error-screen.show{display:flex}
+.error-icon{
+  width:60px;height:60px;border-radius:18px;
+  background:rgba(239,68,68,0.15);
+  border:1px solid rgba(239,68,68,0.3);
+  color:var(--danger-soft);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px;
+}
+.error-icon .icon{width:28px;height:28px;stroke-width:2}
+.error-screen h2{font-size:22px;color:white;font-weight:800}
+.error-screen p{color:var(--text-muted);font-size:14px;max-width:340px;line-height:1.6}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-15px)}to{opacity:1;transform:translateY(0)}}
+
+/* MOBILE */
+@media (max-width:640px){
+  .page{padding:26px 18px 50px}
+  .main-title{font-size:28px;margin-bottom:28px}
+  .client-line{font-size:15px;gap:6px}
+  .client-line-label{min-width:60px}
+  .card{padding:24px 20px;border-radius:20px}
+  .card-title{font-size:22px;margin-bottom:20px}
+  .process-item,.include-item{font-size:15px}
+  .process-num{font-size:16px}
+  .price-info h4{font-size:15px}
+  .price-amount{font-size:16px;padding:5px 10px}
+  .total-pill{font-size:16px;padding:16px 28px;gap:8px}
+  .total-pill-amount{font-size:18px}
+  .modal{padding:30px 22px;border-radius:22px}
+  .modal h3{font-size:20px}
+  .success-icon-big{width:74px;height:74px}
+  .success-icon-big .icon{width:36px;height:36px}
+  .success-screen h2{font-size:26px}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<!-- SVG Icon Definitions -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+    <symbol id="i-credit-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></symbol>
+    <symbol id="i-bank" viewBox="0 0 24 24"><path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M8 10v11M12 10v11M16 10v11M20 10v11"/></symbol>
+    <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  </defs>
+</svg>
+
+<!-- Background Effects -->
+<div class="bg-effects">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-glow bg-glow-3"></div>
+  <div class="bg-grid"></div>
+</div>
+
+<!-- Loading -->
+<div class="loading-screen" id="loading">
+  <div class="spinner"></div>
+</div>
+
+<!-- Error -->
+<div class="error-screen" id="error">
+  <div class="error-icon"><svg class="icon"><use href="#i-alert-circle"/></svg></div>
+  <h2>הצעה לא נמצאה</h2>
+  <p>ייתכן שהקישור שגוי או שההצעה פגה. צור קשר עם השולח.</p>
+</div>
+
+<!-- Main -->
+<div class="page" id="main-content" style="display:none">
+
+  <!-- Top Header: Date + Proposal Number -->
+  <div class="top-header">
+    <div class="date-tag" id="date-tag">—</div>
+    <div class="proposal-num-tag">
+      <span class="dot"></span>
+      <span id="proposal-num-text">#—</span>
+    </div>
+  </div>
+
+  <!-- Main Title -->
+  <h1 class="main-title">הצעת מחיר<br><span id="project-title"></span></h1>
+
+  <!-- Client Info -->
+  <div class="client-info">
+    <div class="client-line">
+      <span class="client-line-label">לכבוד:</span>
+      <strong id="client-name">—</strong>
+    </div>
+    <div class="client-line" id="project-line" style="display:none">
+      <span class="client-line-label">סוג הדף:</span>
+      <strong id="project-type">—</strong>
+    </div>
+  </div>
+
+  <!-- Process Card -->
+  <div class="card" id="process-card">
+    <h2 class="card-title">תהליך הפרוייקט</h2>
+    <ol class="process-list" id="process-container"></ol>
+  </div>
+
+  <!-- Includes Card -->
+  <div class="card" id="includes-card">
+    <h2 class="card-title">מה כולל בפרויקט</h2>
+    <ul class="includes-list" id="includes-container"></ul>
+  </div>
+
+  <!-- Pricing Card -->
+  <div class="card" id="pricing-card">
+    <h2 class="card-title">פירוט תמחור</h2>
+    <div id="items-container"></div>
+    <div class="totals-section">
+      <div class="total-row"><span>סכום ביניים</span><span id="subtotal">—</span></div>
+      <div class="total-row"><span>מע"מ 18%</span><span id="vat">—</span></div>
+    </div>
+  </div>
+
+  <!-- Total Pill (בסגנון PDF) -->
+  <div class="total-pill-wrapper">
+    <div class="total-pill">
+      <span>סה"כ הפרוייקט:</span>
+      <span class="total-pill-amount" id="total">—</span>
+    </div>
+  </div>
+
+  <!-- Terms & Sign Card -->
+  <div class="card">
+    <h2 class="card-title">הצהרות והתחייבויות</h2>
+    <ol class="terms-list" id="terms-container"></ol>
+
+    <div class="sign-section">
+      <p class="sign-intro">חתימה על ההצעה מהווה אישור לתנאים ולתחילת העבודה.</p>
+
+      <div class="sign-fields">
+        <div class="sign-field">
+          <label class="sign-label">שם מלא</label>
+          <input type="text" class="sign-input" id="signer-name" placeholder="השם שלך">
+        </div>
+        <div class="sign-field">
+          <label class="sign-label">חתימה</label>
+          <canvas id="signature-pad"></canvas>
+          <div class="sign-row-buttons">
+            <button type="button" class="btn-clear" id="clear-sign">
+              <svg class="icon"><use href="#i-edit"/></svg>
+              נקה חתימה
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="btn-approve" id="submit-btn">
+        <svg class="icon"><use href="#i-check"/></svg>
+        <span>אישור וחתימה על ההצעה</span>
+      </button>
+      <div class="status-msg" id="status"></div>
+    </div>
+  </div>
+
+  <div class="footer-contact" id="footer-contact">—</div>
+
+</div>
+
+<!-- Payment Modal -->
+<div class="modal-overlay" id="payment-modal">
+  <div class="modal">
+    <div class="modal-icon"><svg class="icon"><use href="#i-credit-card"/></svg></div>
+    <h3>בחר אמצעי תשלום</h3>
+    <p>ההצעה נחתמה בהצלחה!<br>כעת בחר איך תרצה לשלם:</p>
+    <div class="payment-options">
+      <button class="pay-btn pay-btn-primary" onclick="choosePayment('credit')">
+        <svg class="icon"><use href="#i-credit-card"/></svg>
+        <span>תשלום באשראי (Grow)</span>
+      </button>
+      <button class="pay-btn" onclick="choosePayment('bank')">
+        <svg class="icon"><use href="#i-bank"/></svg>
+        <span>העברה בנקאית</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Success Screen -->
+<div class="success-screen" id="success-screen">
+  <div class="success-icon-big"><svg class="icon"><use href="#i-check"/></svg></div>
+  <h2>מעולה! הכל מוכן</h2>
+  <p id="success-message">פרטי התשלום נשלחים אליך ב-WhatsApp ברגעים אלה</p>
+  <div class="success-details" id="success-details"></div>
+</div>
+
+<script>
+let proposalData=null,hasSignature=false;
+
+async function loadProposal(){
+  const params=new URLSearchParams(window.location.search);
+  let proposalId=params.get('id');
+  if(!proposalId){
+    const match=window.location.pathname.match(/\/p\/([^\/]+)/);
+    if(match)proposalId=match[1];
+  }
+
+  if(!proposalId){
+    proposalData=getDemoData();
+    renderProposal();
+    return;
+  }
+
+  try{
+    const r=await fetch(`/data/${proposalId}.json`);
+    if(!r.ok)throw new Error('not found');
+    proposalData=await r.json();
+    renderProposal();
+  }catch(e){
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('error').classList.add('show');
+  }
+}
+
+function getDemoData(){
+  return{
+    id:'demo',
+    clientName:'רויטל חזות',
+    clientPhone:'972500000000',
+    projectType:'קורס',
+    proposalNum:'2026-DEMO',
+    date:new Date().toISOString(),
+    processSteps:[
+      'פגישה ראשונית לאפיון דף הנחיתה בזום',
+      'העברת כל החומרים לתיקיה דרייב משותפת',
+      'עבודה על עיצוב ובניה סקיצה ראשונית של הדף',
+      'פגישה שניה לסבב תיקונים בזום',
+      'הדרכה לתפעול וניהול הדף',
+      'סוף פרוייקט'
+    ],
+    includes:[
+      'רכישת אחסון + הקמת אחסון',
+      'רכישה + הקמת דומיין (במידה וצריך)',
+      'סנכרון אחסון + הדומיין + ממשק הוורדפרס',
+      'התקנה תעודה אבטחה SSL',
+      'התאמה רספונסיבית מלאה לווב ומובייל',
+      'מעבר על דפים להשראה',
+      'רישיון פרו לאתר'
+    ],
+    items:[
+      {title:'דף נחיתה מלא',desc:'עיצוב ובנייה כולל התקנה',qty:1,price:3135}
+    ],
+    subtotal:3135,vat:565,total:3700,
+    terms:[
+      'חתימת הלקוח תיחשב הסכמה סופית לפרטי ההזמנה ולתנאים הנוספים',
+      'אין כל יחסי עובד מעביד בין הצדדים אלא יחסי ספק ולקוח',
+      'מזמין השירות יהיה בעל התוצר הסופי שינתן בכפוף לתשלום',
+      'הספק יחל בביצוע העבודה עם קבלת התשלום וקבלת חומרי הגלם',
+      'דף הנחיתה יסופק תוך 14 ימי עסקים',
+      'הקופי של הדף כלול במחיר',
+      'אחריות על הדף 14 ימי עסקים, סבב תיקונים נוסף בעלות של 500 ש"ח'
+    ],
+    biz:{name:'אריאל אזולאי',email:'hello@example.com',phone:'972500000000',bank:'בנק: 10\nסניף: 123\nחשבון: 456789'}
+  };
+}
+
+function renderProposal(){
+  const d=proposalData;
+
+  // Top header
+  const date=new Date(d.date);
+  document.getElementById('date-tag').textContent=
+    ('0'+date.getDate()).slice(-2)+'/'+('0'+(date.getMonth()+1)).slice(-2)+'/'+date.getFullYear();
+  document.getElementById('proposal-num-text').textContent='#'+d.proposalNum;
+
+  // Title
+  if(d.projectType){
+    document.getElementById('project-title').textContent=d.projectType;
+    document.getElementById('project-type').textContent=d.projectType;
+    document.getElementById('project-line').style.display='flex';
+  }else{
+    document.getElementById('project-title').style.display='none';
+  }
+
+  document.getElementById('client-name').textContent=d.clientName;
+
+  // Process
+  if(d.processSteps?.length){
+    document.getElementById('process-container').innerHTML=d.processSteps.map((s,i)=>`
+      <li class="process-item">
+        <span class="process-num">${String(i+1).padStart(2,'0')}</span>
+        <span class="process-text">${esc(s)}</span>
+      </li>`).join('');
+  }else document.getElementById('process-card').style.display='none';
+
+  // Includes
+  if(d.includes?.length){
+    document.getElementById('includes-container').innerHTML=d.includes.map(s=>`<li class="include-item">${esc(s)}</li>`).join('');
+  }else document.getElementById('includes-card').style.display='none';
+
+  // Items
+  if(d.items?.length){
+    document.getElementById('items-container').innerHTML=d.items.map(it=>`
+      <div class="price-row">
+        <div class="price-info">
+          <h4>${esc(it.title)}</h4>
+          ${it.desc?`<p>${esc(it.desc)}</p>`:''}
+          ${it.qty>1?`<p style="margin-top:3px">× ${it.qty}</p>`:''}
+        </div>
+        <div class="price-amount">₪${(it.qty*it.price).toLocaleString('he-IL')}</div>
+      </div>`).join('');
+  }
+
+  document.getElementById('subtotal').textContent='₪'+d.subtotal.toLocaleString('he-IL');
+  document.getElementById('vat').textContent='₪'+d.vat.toLocaleString('he-IL');
+  document.getElementById('total').textContent='₪'+d.total.toLocaleString('he-IL');
+
+  // Terms
+  if(d.terms?.length){
+    document.getElementById('terms-container').innerHTML=d.terms.map((t,i)=>`
+      <li class="term-item">
+        <span class="term-num">${i+1}.</span>
+        <span>${esc(t)}</span>
+      </li>`).join('');
+  }
+
+  // Footer
+  const parts=[d.biz.name,d.biz.email,d.biz.phone].filter(x=>x);
+  document.getElementById('footer-contact').innerHTML=parts.map(p=>esc(p)).join('<span class="footer-divider"></span>');
+
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('main-content').style.display='block';
+
+  setupSignature();
+}
+
+function setupSignature(){
+  const canvas=document.getElementById('signature-pad');
+  const ctx=canvas.getContext('2d');
+  let drawing=false;
+
+  function resize(){
+    const rect=canvas.getBoundingClientRect();
+    const dpr=window.devicePixelRatio||1;
+    canvas.width=rect.width*dpr;
+    canvas.height=rect.height*dpr;
+    ctx.scale(dpr,dpr);
+    ctx.strokeStyle='#02132C';
+    ctx.lineWidth=2.5;
+    ctx.lineCap='round';
+    ctx.lineJoin='round';
+  }
+  setTimeout(resize,150);
+
+  function pos(e){
+    const r=canvas.getBoundingClientRect();
+    const t=e.touches?e.touches[0]:e;
+    return{x:t.clientX-r.left,y:t.clientY-r.top};
+  }
+  function start(e){e.preventDefault();drawing=true;hasSignature=true;const p=pos(e);ctx.beginPath();ctx.moveTo(p.x,p.y)}
+  function draw(e){if(!drawing)return;e.preventDefault();const p=pos(e);ctx.lineTo(p.x,p.y);ctx.stroke()}
+  function end(){drawing=false}
+
+  canvas.addEventListener('mousedown',start);
+  canvas.addEventListener('mousemove',draw);
+  canvas.addEventListener('mouseup',end);
+  canvas.addEventListener('mouseleave',end);
+  canvas.addEventListener('touchstart',start,{passive:false});
+  canvas.addEventListener('touchmove',draw,{passive:false});
+  canvas.addEventListener('touchend',end);
+
+  document.getElementById('clear-sign').addEventListener('click',()=>{
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    hasSignature=false;
+  });
+
+  document.getElementById('submit-btn').addEventListener('click',submitSignature);
+}
+
+function submitSignature(){
+  const name=document.getElementById('signer-name').value.trim();
+  const statusEl=document.getElementById('status');
+  if(!name){statusEl.className='status-msg show error';statusEl.innerHTML='<svg class="icon"><use href="#i-alert-circle"/></svg>נא למלא שם מלא';return}
+  if(!hasSignature){statusEl.className='status-msg show error';statusEl.innerHTML='<svg class="icon"><use href="#i-alert-circle"/></svg>נא לחתום בריבוע החתימה';return}
+
+  const canvas=document.getElementById('signature-pad');
+  window._signatureData=canvas.toDataURL('image/png');
+  window._signerName=name;
+  document.getElementById('payment-modal').classList.add('show');
+}
+
+async function choosePayment(method){
+  document.getElementById('payment-modal').classList.remove('show');
+
+  const payload={
+    proposalId:proposalData.id,
+    proposalNum:proposalData.proposalNum,
+    clientName:proposalData.clientName,
+    clientPhone:proposalData.clientPhone,
+    signerName:window._signerName,
+    signature:window._signatureData,
+    paymentMethod:method,
+    bankDetails:proposalData.biz.bank,
+    bizName:proposalData.biz.name,
+    bizPhone:proposalData.biz.phone,
+    total:proposalData.total,
+    signedAt:new Date().toISOString(),
+    fullProposal:proposalData
+  };
+
+  try{
+    await fetch(window.PROPOSAL_WEBHOOK,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+  }catch(e){console.error('Webhook:',e)}
+
+  const successMsg=document.getElementById('success-message');
+  const successDetails=document.getElementById('success-details');
+  const ic='<svg class="icon"><use href="#i-check"/></svg>';
+
+  if(method==='credit'){
+    successMsg.textContent='פרטי התשלום באשראי נשלחים אליך ב-WhatsApp';
+    successDetails.innerHTML=`<strong>תשלום באשראי</strong><ul>
+      <li>${ic}קישור לתשלום יישלח ל-WhatsApp בדקות הקרובות</li>
+      <li>${ic}לאחר התשלום — נתחיל בעבודה מיד</li>
+      <li>${ic}הסכם חתום נשלח גם למייל שלך</li></ul>`;
+  }else{
+    successMsg.textContent='פרטי ההעברה הבנקאית נשלחים אליך ב-WhatsApp';
+    successDetails.innerHTML=`<strong>העברה בנקאית</strong><ul>
+      <li>${ic}פרטי החשבון יישלחו ל-WhatsApp</li>
+      <li>${ic}לאחר ההעברה — שלח אישור ב-WhatsApp</li>
+      <li>${ic}נתחיל בעבודה מיד לאחר קבלת התשלום</li></ul>`;
+  }
+  document.getElementById('success-screen').classList.add('show');
+}
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+
+window.PROPOSAL_WEBHOOK='YOUR_MAKE_WEBHOOK_2_URL_HERE';
+loadProposal();
+</script>
+
+</body>
+</html>

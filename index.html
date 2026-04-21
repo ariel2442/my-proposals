@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#02132C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="הצעות">
+<link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiB2aWV3Qm94PSIwIDAgMTgwIDE4MCI+PGRlZnM+PGxpbmVhckdyYWRpZW50IGlkPSJnIiB4MT0iMCUiIHkxPSIwJSIgeDI9IjEwMCUiIHkyPSIxMDAlIj48c3RvcCBvZmZzZXQ9IjAlIiBzdG9wLWNvbG9yPSIjNDI4RUZGIi8+PHN0b3Agb2Zmc2V0PSIxMDAlIiBzdG9wLWNvbG9yPSIjNDA0QkYyIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjE4MCIgaGVpZ2h0PSIxODAiIGZpbGw9IiMwMjEzMkMiLz48dGV4dCB4PSI5MCIgeT0iMTIwIiBmb250LXNpemU9IjkwIiBmb250LXdlaWdodD0iOTAwIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ1cmwoI2cpIj5RPC90ZXh0Pjwvc3ZnPg==">
+<title>Quotes · בונה הצעות</title>
+<link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{overscroll-behavior:none;height:100%}
+
+:root{
+  --navy-deepest:#010918;
+  --navy-deep:#02132C;
+  --navy-dark:#0a2456;
+  --blue-primary:#428EFF;
+  --blue-bright:#60a5fa;
+  --indigo:#404BF2;
+  --blue-soft:#93c5fd;
+  --blue-soft-muted:#bfdbfe;
+  --success:#10b981;
+  --success-bright:#6ee7b7;
+  --danger:#ef4444;
+  --danger-soft:#fca5a5;
+  --text:#f1f5f9;
+  --text-muted:#cbd5e1;
+  --text-dim:#94a3b8;
+  --glass-bg:linear-gradient(135deg,rgba(66,142,255,0.08) 0%,rgba(10,36,86,0.35) 50%,rgba(2,19,44,0.5) 100%);
+  --glass-border:rgba(255,255,255,0.1);
+  --glass-border-hover:rgba(66,142,255,0.35);
+  --glass-highlight:rgba(255,255,255,0.12);
+  --radius-sm:10px;
+  --radius-md:14px;
+  --radius-lg:18px;
+  --radius-xl:24px;
+  --radius-2xl:28px;
+}
+
+body{
+  font-family:'Heebo',-apple-system,BlinkMacSystemFont,sans-serif;
+  color:var(--text);direction:rtl;
+  background:radial-gradient(ellipse at top,var(--navy-dark) 0%,var(--navy-deep) 55%,var(--navy-deepest) 100%);
+  min-height:100vh;min-height:100dvh;
+  padding-top:env(safe-area-inset-top);
+  padding-bottom:env(safe-area-inset-bottom);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* ========== ICON BASE ========== */
+.icon{
+  width:20px;height:20px;flex-shrink:0;
+  stroke:currentColor;stroke-width:2;
+  stroke-linecap:round;stroke-linejoin:round;
+  fill:none;
+}
+.icon-sm{width:14px;height:14px}
+.icon-md{width:18px;height:18px}
+.icon-lg{width:24px;height:24px}
+
+/* ========== BG EFFECTS ========== */
+.bg-effects{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.bg-glow{position:absolute;border-radius:50%;filter:blur(120px);pointer-events:none}
+.bg-glow-1{width:500px;height:500px;background:radial-gradient(circle,rgba(66,142,255,0.3) 0%,transparent 70%);top:-200px;right:-150px;animation:float-1 25s ease-in-out infinite}
+.bg-glow-2{width:600px;height:600px;background:radial-gradient(circle,rgba(64,75,242,0.25) 0%,transparent 70%);bottom:-250px;left:-200px;animation:float-2 30s ease-in-out infinite}
+.bg-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(66,142,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(66,142,255,0.04) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%);-webkit-mask-image:radial-gradient(ellipse at center,black 30%,transparent 75%)}
+@keyframes float-1{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-40px,50px) scale(1.1)}}
+@keyframes float-2{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(50px,-40px) scale(1.15)}}
+
+/* ========== HEADER ========== */
+.app-header{
+  position:sticky;top:0;z-index:100;
+  padding:18px 20px 14px;
+  background:rgba(2,19,44,0.75);
+  backdrop-filter:blur(30px) saturate(140%);
+  -webkit-backdrop-filter:blur(30px) saturate(140%);
+  border-bottom:1px solid rgba(66,142,255,0.15);
+}
+.header-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px}
+.header-brand{display:flex;align-items:center;gap:10px}
+.header-logo{
+  width:36px;height:36px;border-radius:10px;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  display:flex;align-items:center;justify-content:center;
+  color:white;
+  box-shadow:0 4px 16px rgba(66,142,255,0.5),inset 0 1px 0 rgba(255,255,255,0.3);
+  position:relative;
+}
+.header-logo::after{
+  content:'';position:absolute;inset:-3px;border-radius:12px;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  opacity:0.35;filter:blur(10px);z-index:-1;
+}
+.header-logo .icon{width:20px;height:20px;color:white;stroke-width:2.2}
+.header-title{font-size:17px;font-weight:800;letter-spacing:-0.01em}
+.header-sub{font-size:11px;color:var(--text-dim);margin-top:1px}
+
+.status-chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:5px 11px;
+  background:rgba(16,185,129,0.1);
+  border:1px solid rgba(16,185,129,0.3);
+  border-radius:100px;
+  font-size:11px;font-weight:600;color:var(--success-bright);
+}
+.status-dot{
+  width:6px;height:6px;border-radius:50%;background:var(--success);
+  position:relative;box-shadow:0 0 8px rgba(16,185,129,0.8);
+}
+.status-dot::before{
+  content:'';position:absolute;inset:-3px;border-radius:50%;background:var(--success);
+  opacity:0.4;animation:pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:0.4}50%{transform:scale(1.8);opacity:0}}
+
+/* ========== TABS ========== */
+.tabs-bar{
+  display:flex;gap:3px;
+  background:rgba(66,142,255,0.05);
+  padding:4px;border-radius:12px;
+  border:1px solid rgba(66,142,255,0.15);
+}
+.tab{
+  flex:1;padding:9px 6px;
+  font-size:11px;font-weight:600;
+  color:var(--text-dim);background:transparent;border:none;
+  border-radius:9px;cursor:pointer;font-family:inherit;
+  transition:all 0.25s ease;
+  display:flex;align-items:center;justify-content:center;gap:5px;
+}
+.tab .icon{width:14px;height:14px}
+.tab.active{
+  background:linear-gradient(135deg,rgba(66,142,255,0.2) 0%,rgba(64,75,242,0.15) 100%);
+  color:white;
+  box-shadow:0 2px 8px rgba(66,142,255,0.2),inset 0 1px 0 rgba(255,255,255,0.1);
+  border:1px solid rgba(66,142,255,0.3);
+}
+
+.content{padding:16px 20px 140px;position:relative;z-index:1}
+
+.fade-in{animation:fadeUp 0.5s ease backwards}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ========== SECTION CARD ========== */
+.section-card{
+  position:relative;
+  background:var(--glass-bg);
+  backdrop-filter:blur(20px) saturate(140%);
+  -webkit-backdrop-filter:blur(20px) saturate(140%);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-xl);
+  padding:20px;margin-bottom:14px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.15),0 8px 24px rgba(0,0,0,0.25),inset 0 1px 0 var(--glass-highlight);
+  transition:border-color 0.3s ease;
+}
+.section-card::before{
+  content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  pointer-events:none;
+}
+.section-card:focus-within{border-color:var(--glass-border-hover)}
+
+.section-title{
+  font-size:11px;font-weight:700;color:var(--blue-soft-muted);
+  text-transform:uppercase;letter-spacing:1px;
+  margin-bottom:14px;
+  display:flex;align-items:center;gap:8px;
+}
+.section-title-icon{
+  width:26px;height:26px;border-radius:8px;
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 2px 8px rgba(66,142,255,0.4);
+  color:white;
+}
+.section-title-icon .icon{width:14px;height:14px;stroke-width:2.2}
+
+/* ========== FIELDS ========== */
+.field{margin-bottom:12px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:6px}
+.field input,.field textarea{
+  width:100%;padding:13px 14px;
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.15);
+  border-radius:var(--radius-sm);
+  font-size:15px;font-family:inherit;color:white;
+  transition:all 0.25s ease;-webkit-appearance:none;
+}
+.field input::placeholder,.field textarea::placeholder{color:var(--text-dim);opacity:0.6}
+.field input:focus,.field textarea:focus{
+  outline:none;border-color:var(--blue-primary);
+  background:rgba(2,19,44,0.8);
+  box-shadow:0 0 0 3px rgba(66,142,255,0.15);
+}
+.field textarea{resize:none;min-height:80px;line-height:1.5}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.field-hint{font-size:11px;color:var(--text-dim);margin-top:4px;line-height:1.4}
+
+/* ========== LIST ITEMS ========== */
+.list-items{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.list-item-row{display:flex;gap:7px;align-items:center}
+.list-item-row input{
+  flex:1;padding:10px 12px;
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.15);
+  border-radius:9px;
+  font-size:14px;color:white;font-family:inherit;
+  -webkit-appearance:none;transition:all 0.2s;
+}
+.list-item-row input:focus{outline:none;border-color:var(--blue-primary);background:rgba(2,19,44,0.8)}
+.icon-btn-danger{
+  background:rgba(239,68,68,0.1);
+  border:1px solid rgba(239,68,68,0.25);
+  color:var(--danger-soft);
+  width:36px;height:36px;border-radius:9px;
+  cursor:pointer;flex-shrink:0;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;
+  transition:all 0.2s;
+}
+.icon-btn-danger:active{background:rgba(239,68,68,0.2);transform:scale(0.95)}
+.icon-btn-danger .icon{width:14px;height:14px;stroke-width:2.2}
+
+.btn-add{
+  width:100%;padding:11px;
+  background:rgba(66,142,255,0.08);
+  border:1.5px dashed rgba(66,142,255,0.35);
+  border-radius:var(--radius-sm);
+  color:var(--blue-bright);font-size:13px;font-weight:600;
+  font-family:inherit;cursor:pointer;
+  transition:all 0.2s ease;
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
+}
+.btn-add:active{
+  background:rgba(66,142,255,0.15);
+  border-color:var(--blue-primary);color:white;
+  transform:scale(0.99);
+}
+.btn-add-icon{
+  width:18px;height:18px;border-radius:50%;
+  background:var(--blue-primary);color:white;
+  display:inline-flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  box-shadow:0 2px 6px rgba(66,142,255,0.5);
+}
+.btn-add-icon .icon{width:12px;height:12px;stroke-width:2.5;color:white}
+
+/* ========== PRICE ITEM ========== */
+.price-item{
+  background:linear-gradient(135deg,rgba(66,142,255,0.06) 0%,rgba(10,36,86,0.3) 100%);
+  border:1px solid rgba(66,142,255,0.2);
+  border-radius:var(--radius-md);padding:14px;margin-bottom:8px;
+  position:relative;
+}
+.price-item-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;gap:8px}
+.price-item-title{font-size:15px;font-weight:700;flex:1;line-height:1.3}
+.price-item-desc{font-size:12px;color:var(--text-dim);margin-top:3px;line-height:1.4}
+.price-item-remove{
+  background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.25);
+  color:var(--danger-soft);padding:5px 11px;border-radius:8px;
+  font-size:11px;font-weight:600;cursor:pointer;flex-shrink:0;font-family:inherit;
+  transition:all 0.2s;
+}
+.price-item-remove:active{background:rgba(239,68,68,0.2);transform:scale(0.95)}
+.price-item-controls{display:grid;grid-template-columns:80px 1fr;gap:8px;align-items:center}
+.price-qty-input{
+  padding:9px 10px;
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.15);
+  border-radius:9px;
+  font-size:14px;color:white;font-family:inherit;font-weight:600;
+  -webkit-appearance:none;text-align:center;
+}
+.price-qty-input:focus{outline:none;border-color:var(--blue-primary)}
+.price-amount-wrapper{
+  display:flex;align-items:center;gap:4px;
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.15);
+  border-radius:9px;padding:0 12px;
+  transition:all 0.2s;
+}
+.price-amount-wrapper:focus-within{border-color:var(--blue-primary)}
+.price-amount-wrapper input{
+  flex:1;background:none;border:none;color:white;
+  padding:9px 0;font-size:14px;font-family:inherit;font-weight:600;
+  -webkit-appearance:none;text-align:right;
+}
+.price-amount-wrapper input:focus{outline:none}
+.price-amount-wrapper span{color:var(--text-dim);font-size:13px;font-weight:500}
+
+/* ========== SUMMARY ========== */
+.summary-box{
+  position:relative;
+  background:linear-gradient(135deg,rgba(66,142,255,0.15) 0%,rgba(64,75,242,0.1) 100%);
+  border:1px solid rgba(66,142,255,0.4);
+  border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;
+  backdrop-filter:blur(20px);
+  box-shadow:0 0 40px rgba(66,142,255,0.1),inset 0 1px 0 rgba(255,255,255,0.15);
+  overflow:hidden;
+}
+.summary-box::before{
+  content:'';position:absolute;top:0;right:-30%;width:60%;height:100%;
+  background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,0.05) 50%,transparent 60%);
+  transform:skewX(-12deg);pointer-events:none;
+}
+.summary-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:14px;color:var(--text-muted)}
+.summary-final{
+  border-top:1px solid rgba(66,142,255,0.25);
+  margin-top:10px;padding-top:16px;
+  font-size:22px;font-weight:900;color:white;letter-spacing:-0.01em;
+}
+.summary-final-amount{
+  background:linear-gradient(135deg,var(--blue-bright) 0%,var(--blue-primary) 50%,var(--indigo) 100%);
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+  filter:drop-shadow(0 0 20px rgba(66,142,255,0.4));
+}
+
+/* ========== INFO TAG ========== */
+.info-tag{
+  background:linear-gradient(135deg,rgba(16,185,129,0.1) 0%,rgba(16,185,129,0.05) 100%);
+  border:1px solid rgba(16,185,129,0.25);
+  color:var(--success-bright);
+  padding:14px 16px;border-radius:var(--radius-md);
+  font-size:12px;line-height:1.6;margin-bottom:12px;
+  display:flex;gap:10px;align-items:flex-start;
+  backdrop-filter:blur(10px);
+}
+.info-tag-icon{
+  flex-shrink:0;width:22px;height:22px;border-radius:50%;
+  background:rgba(16,185,129,0.2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--success-bright);
+}
+.info-tag-icon .icon{width:12px;height:12px;stroke-width:2.2}
+
+/* ========== ACTION BAR ========== */
+.action-bar{
+  position:fixed;bottom:0;left:0;right:0;z-index:100;
+  padding:14px 20px;
+  padding-bottom:calc(14px + env(safe-area-inset-bottom));
+  background:rgba(1,9,24,0.85);
+  backdrop-filter:blur(30px) saturate(140%);
+  border-top:1px solid rgba(66,142,255,0.2);
+  display:flex;gap:8px;
+  box-shadow:0 -10px 40px rgba(0,0,0,0.3);
+}
+.btn{
+  padding:14px 16px;border-radius:var(--radius-md);
+  font-size:14px;font-weight:700;border:none;cursor:pointer;
+  font-family:inherit;display:inline-flex;align-items:center;
+  justify-content:center;gap:7px;-webkit-appearance:none;
+  transition:all 0.2s ease;letter-spacing:0.01em;
+}
+.btn .icon{width:16px;height:16px;stroke-width:2.2}
+.btn-primary{
+  background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);
+  color:white;flex:2;position:relative;
+  box-shadow:0 4px 20px rgba(66,142,255,0.5),0 0 0 1px rgba(66,142,255,0.3),inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.btn-primary:active{transform:scale(0.98)}
+.btn-primary::after{
+  content:'';position:absolute;inset:-3px;border-radius:calc(var(--radius-md) + 3px);
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  opacity:0.4;filter:blur(14px);z-index:-1;
+}
+.btn-primary:disabled{opacity:0.5;cursor:not-allowed}
+.btn-secondary{
+  background:rgba(66,142,255,0.08);color:white;
+  border:1px solid rgba(66,142,255,0.25);flex:1;
+  backdrop-filter:blur(10px);
+}
+.btn-secondary:active{background:rgba(66,142,255,0.15);transform:scale(0.98)}
+
+/* ========== TOAST ========== */
+.toast{
+  position:fixed;bottom:110px;left:50%;
+  transform:translateX(-50%) translateY(100px);
+  padding:13px 22px;border-radius:var(--radius-md);
+  font-size:13px;font-weight:600;
+  opacity:0;transition:all 0.3s cubic-bezier(0.16,1,0.3,1);z-index:1000;
+  box-shadow:0 10px 30px rgba(0,0,0,0.4),inset 0 1px 0 rgba(255,255,255,0.1);
+  white-space:nowrap;max-width:calc(100% - 40px);
+  backdrop-filter:blur(20px);
+  background:rgba(10,36,86,0.95);color:white;
+  border:1px solid rgba(66,142,255,0.3);
+  display:inline-flex;align-items:center;gap:8px;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast .icon{width:16px;height:16px;stroke-width:2.5}
+.toast.success{background:linear-gradient(135deg,rgba(16,185,129,0.95) 0%,rgba(5,150,105,0.95) 100%);border-color:rgba(16,185,129,0.5);box-shadow:0 10px 30px rgba(16,185,129,0.4)}
+.toast.error{background:linear-gradient(135deg,rgba(239,68,68,0.95) 0%,rgba(185,28,28,0.95) 100%);border-color:rgba(239,68,68,0.5);box-shadow:0 10px 30px rgba(239,68,68,0.4)}
+
+/* ========== MODAL ========== */
+.modal-overlay{
+  position:fixed;inset:0;background:rgba(1,9,24,0.8);
+  display:none;align-items:flex-end;z-index:200;
+  backdrop-filter:blur(10px);
+}
+.modal-overlay.show{display:flex;animation:fadeIn 0.25s}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.modal{
+  background:linear-gradient(180deg,rgba(10,36,86,0.97) 0%,rgba(2,19,44,0.98) 100%);
+  backdrop-filter:blur(40px) saturate(140%);
+  border:1px solid rgba(66,142,255,0.25);
+  border-bottom:none;
+  border-radius:var(--radius-2xl) var(--radius-2xl) 0 0;
+  padding:24px 20px calc(24px + env(safe-area-inset-bottom));
+  width:100%;max-height:85vh;overflow-y:auto;
+  animation:slideUp 0.35s cubic-bezier(0.16,1,0.3,1);
+  box-shadow:0 -20px 60px rgba(0,0,0,0.5);
+  position:relative;
+}
+.modal::before{
+  content:'';position:absolute;top:0;left:10%;right:10%;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.3),transparent);
+}
+.modal-handle{width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:100px;margin:0 auto 18px}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal h3{font-size:20px;font-weight:800;margin-bottom:6px;letter-spacing:-0.01em}
+.modal p{font-size:14px;color:var(--text-muted);margin-bottom:18px;line-height:1.5}
+.modal-link{
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.2);
+  border-radius:var(--radius-sm);padding:12px;
+  font-size:12px;color:var(--blue-soft);
+  word-break:break-all;margin-bottom:14px;font-family:'Menlo',monospace;
+}
+.modal-buttons{display:flex;gap:10px}
+
+/* ========== PICKER ========== */
+.picker-list{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.picker-item{
+  position:relative;
+  background:linear-gradient(135deg,rgba(66,142,255,0.06) 0%,rgba(10,36,86,0.3) 100%);
+  border:1px solid rgba(66,142,255,0.2);
+  border-radius:var(--radius-md);padding:14px;
+  cursor:pointer;transition:all 0.2s;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.picker-item:active{background:linear-gradient(135deg,rgba(66,142,255,0.15) 0%,rgba(64,75,242,0.1) 100%);border-color:var(--blue-primary);transform:scale(0.99)}
+.picker-item.selected{background:linear-gradient(135deg,rgba(16,185,129,0.15) 0%,rgba(16,185,129,0.08) 100%);border-color:rgba(16,185,129,0.5)}
+.picker-check{
+  width:22px;height:22px;border-radius:50%;
+  border:1.5px solid rgba(255,255,255,0.25);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  color:white;transition:all 0.2s;
+}
+.picker-check .icon{width:13px;height:13px;stroke-width:3;opacity:0}
+.picker-item.selected .picker-check{
+  background:var(--success);border-color:var(--success);
+  box-shadow:0 0 12px rgba(16,185,129,0.5);
+}
+.picker-item.selected .picker-check .icon{opacity:1}
+.picker-item-info{flex:1;min-width:0}
+.picker-item-name{font-size:15px;font-weight:600;margin-bottom:2px;line-height:1.3}
+.picker-item-desc{font-size:11px;color:var(--text-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.picker-item-price{
+  font-size:15px;font-weight:800;white-space:nowrap;
+  background:linear-gradient(135deg,var(--blue-bright),var(--blue-primary));
+  -webkit-background-clip:text;background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+.picker-empty{text-align:center;padding:32px 20px;color:var(--text-dim);font-size:13px;line-height:1.6}
+.picker-custom{
+  background:rgba(16,185,129,0.1);
+  border:1.5px dashed rgba(16,185,129,0.4);
+  color:var(--success-bright);
+  padding:13px;border-radius:var(--radius-md);
+  font-size:13px;font-weight:600;
+  cursor:pointer;margin-top:6px;
+  transition:all 0.2s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.picker-custom:active{background:rgba(16,185,129,0.18)}
+.picker-custom .icon{width:16px;height:16px;stroke-width:2.5}
+
+/* ========== SAVED LIST ========== */
+.saved-item{
+  position:relative;
+  background:var(--glass-bg);
+  border:1px solid var(--glass-border);
+  border-radius:var(--radius-md);padding:14px;margin-bottom:10px;
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  backdrop-filter:blur(20px);transition:all 0.2s;
+}
+.saved-item:active{border-color:var(--blue-primary);transform:scale(0.99)}
+.saved-item-info{flex:1;min-width:0}
+.saved-item-name{font-size:15px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.saved-item-meta{font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
+.saved-item-meta-dot{width:3px;height:3px;border-radius:50%;background:var(--text-dim)}
+.saved-status{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:600}
+.saved-status.sent{background:rgba(16,185,129,0.15);color:var(--success-bright)}
+.saved-status.draft{background:rgba(148,163,184,0.15);color:var(--text-dim)}
+.saved-item-actions{display:flex;gap:5px;flex-shrink:0}
+.saved-btn{
+  background:rgba(66,142,255,0.08);
+  border:1px solid rgba(66,142,255,0.2);
+  color:white;padding:7px 11px;
+  font-size:12px;border-radius:8px;cursor:pointer;font-family:inherit;
+  transition:all 0.2s;font-weight:500;
+  display:inline-flex;align-items:center;justify-content:center;gap:4px;
+}
+.saved-btn:active{background:rgba(66,142,255,0.15);transform:scale(0.95)}
+.saved-btn.danger{color:var(--danger-soft);border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.08)}
+.saved-btn .icon{width:13px;height:13px;stroke-width:2.2}
+
+.empty-state{
+  text-align:center;padding:50px 20px;
+  color:var(--text-dim);font-size:14px;line-height:1.6;
+}
+.empty-state-icon{
+  width:56px;height:56px;margin:0 auto 14px;
+  border-radius:16px;
+  background:rgba(66,142,255,0.08);
+  border:1px solid rgba(66,142,255,0.15);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--blue-soft);
+}
+.empty-state-icon .icon{width:26px;height:26px;stroke-width:1.8}
+
+/* ========== LIBRARY ========== */
+.library-item{
+  background:linear-gradient(135deg,rgba(66,142,255,0.05) 0%,rgba(10,36,86,0.25) 100%);
+  border:1px solid rgba(66,142,255,0.15);
+  border-radius:var(--radius-md);padding:14px;margin-bottom:10px;
+}
+.library-item-header{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+.library-item-title{font-size:13px;font-weight:700;flex:1;color:var(--blue-soft-muted);text-transform:uppercase;letter-spacing:0.5px}
+.library-item-fields{display:flex;flex-direction:column;gap:8px}
+.library-item-fields input,.library-item-fields textarea{
+  width:100%;padding:9px 11px;
+  background:rgba(2,19,44,0.6);
+  border:1px solid rgba(66,142,255,0.15);
+  border-radius:9px;font-size:13px;color:white;font-family:inherit;
+  -webkit-appearance:none;transition:all 0.2s;
+}
+.library-item-fields input:focus,.library-item-fields textarea:focus{outline:none;border-color:var(--blue-primary)}
+.library-item-fields textarea{resize:none;min-height:50px;line-height:1.4}
+.lib-price-row{display:grid;grid-template-columns:auto 1fr;gap:8px;align-items:center}
+.lib-price-label{font-size:12px;color:var(--text-dim);padding:0 4px;font-weight:500}
+
+/* ========== INSTALL BANNER ========== */
+.install-banner{
+  position:relative;
+  background:linear-gradient(135deg,rgba(66,142,255,0.1) 0%,rgba(64,75,242,0.05) 100%);
+  border:1px solid rgba(66,142,255,0.3);
+  border-radius:var(--radius-md);padding:14px;margin-bottom:14px;
+  font-size:12px;line-height:1.5;
+  display:flex;align-items:flex-start;gap:10px;
+  backdrop-filter:blur(10px);
+}
+.install-banner-icon{
+  flex-shrink:0;width:32px;height:32px;border-radius:9px;
+  background:linear-gradient(135deg,var(--blue-primary),var(--indigo));
+  display:flex;align-items:center;justify-content:center;
+  color:white;box-shadow:0 4px 12px rgba(66,142,255,0.4);
+}
+.install-banner-icon .icon{width:16px;height:16px}
+.install-banner-content{flex:1}
+.install-banner-title{font-weight:700;color:white;margin-bottom:4px;font-size:13px}
+.install-banner-close{
+  background:none;border:none;color:var(--text-dim);
+  cursor:pointer;padding:0;flex-shrink:0;
+  width:24px;height:24px;display:flex;align-items:center;justify-content:center;
+}
+.install-banner-close .icon{width:14px;height:14px;stroke-width:2.2}
+
+.hidden{display:none !important}
+.no-items{color:var(--text-dim);font-size:13px;padding:8px 0;text-align:center;line-height:1.5}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important}
+}
+</style>
+</head>
+<body>
+
+<!-- SVG Icon Definitions -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-sparkles" viewBox="0 0 24 24"><path d="M12 3l1.5 4.5L18 9l-4.5 1.5L12 15l-1.5-4.5L6 9l4.5-1.5L12 3zM19 14l.75 2.25L22 17l-2.25.75L19 20l-.75-2.25L16 17l2.25-.75L19 14zM5 14l.75 2.25L8 17l-2.25.75L5 20l-.75-2.25L2 17l2.25-.75L5 14z"/></symbol>
+    <symbol id="i-clipboard" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="18" rx="2"/><path d="M9 4V3a1 1 0 011-1h4a1 1 0 011 1v1"/><path d="M9 12h6M9 16h6"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 4v16a2 2 0 002 2h14V4a2 2 0 00-2-2H6a2 2 0 00-2 2z"/><path d="M4 18h14a2 2 0 012 2"/><path d="M8 6h8M8 10h8"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h0a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v0a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></symbol>
+    <symbol id="i-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="i-folder" viewBox="0 0 24 24"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+    <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="3"/><path d="M9 19h8.5a3.5 3.5 0 000-7h-11a3.5 3.5 0 010-7H15"/><circle cx="18" cy="5" r="3"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="i-check-circle" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+    <symbol id="i-diamond" viewBox="0 0 24 24"><path d="M2.7 10.3a1 1 0 000 1.4l8.6 8.6a1 1 0 001.4 0l8.6-8.6a1 1 0 000-1.4L13.4 2.3a2 2 0 00-2.8 0L2.7 10.3z"/></symbol>
+    <symbol id="i-zap" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></symbol>
+    <symbol id="i-building" viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><path d="M9 22v-4h6v4M8 6h.01M16 6h.01M12 6h.01M12 10h.01M12 14h.01M16 10h.01M16 14h.01M8 10h.01M8 14h.01"/></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></symbol>
+    <symbol id="i-file-text" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></symbol>
+    <symbol id="i-tool" viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+    <symbol id="i-mobile" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></symbol>
+    <symbol id="i-alert-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></symbol>
+  </defs>
+</svg>
+
+<div class="bg-effects">
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+  <div class="bg-grid"></div>
+</div>
+
+<header class="app-header">
+  <div class="header-top">
+    <div class="header-brand">
+      <div class="header-logo">
+        <svg class="icon"><use href="#i-file-text"/></svg>
+      </div>
+      <div>
+        <div class="header-title">Quotes</div>
+        <div class="header-sub">בונה הצעות מחיר</div>
+      </div>
+    </div>
+    <div class="status-chip">
+      <span class="status-dot"></span>
+      <span>פעיל</span>
+    </div>
+  </div>
+
+  <div class="tabs-bar">
+    <button class="tab active" onclick="switchTab('new')" id="tab-new">
+      <svg class="icon"><use href="#i-sparkles"/></svg><span>חדש</span>
+    </button>
+    <button class="tab" onclick="switchTab('saved')" id="tab-saved">
+      <svg class="icon"><use href="#i-clipboard"/></svg><span>היסטוריה</span>
+    </button>
+    <button class="tab" onclick="switchTab('library')" id="tab-library">
+      <svg class="icon"><use href="#i-book"/></svg><span>ספריה</span>
+    </button>
+    <button class="tab" onclick="switchTab('settings')" id="tab-settings">
+      <svg class="icon"><use href="#i-settings"/></svg><span>הגדרות</span>
+    </button>
+  </div>
+</header>
+
+<main class="content">
+
+  <!-- NEW -->
+  <div id="screen-new" class="fade-in">
+    <div class="install-banner" id="install-banner">
+      <div class="install-banner-icon"><svg class="icon"><use href="#i-mobile"/></svg></div>
+      <div class="install-banner-content">
+        <div class="install-banner-title">הוסף למסך הבית</div>
+        <div>אייפון: Safari → שתף → "הוסף למסך הבית"<br>אנדרואיד: תפריט Chrome → "הוסף למסך הבית"</div>
+      </div>
+      <button class="install-banner-close" onclick="this.parentElement.style.display='none'">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-user"/></svg></div>
+        פרטי הלקוח
+      </div>
+      <div class="field">
+        <label>שם הלקוח</label>
+        <input type="text" id="client-name" placeholder="ישראל ישראלי">
+      </div>
+      <div class="field">
+        <label>טלפון (972 במקום 0)</label>
+        <input type="tel" id="client-phone" placeholder="972501234567" inputmode="numeric">
+        <div class="field-hint">לדוגמה: 972501234567</div>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-folder"/></svg></div>
+        פרטי הפרויקט
+      </div>
+      <div class="field">
+        <label>סוג הפרויקט</label>
+        <input type="text" id="project-type" placeholder="דף נחיתה, אתר תדמית...">
+      </div>
+      <div class="field">
+        <label>מספר הצעה</label>
+        <input type="text" id="proposal-num">
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-route"/></svg></div>
+        שלבי התהליך
+      </div>
+      <div class="list-items" id="process-list"></div>
+      <button class="btn-add" onclick="addProcess()">
+        <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שלב
+      </button>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-check-circle"/></svg></div>
+        מה כולל בפרויקט
+      </div>
+      <div class="list-items" id="includes-list"></div>
+      <button class="btn-add" onclick="openIncludesPicker()">
+        <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>בחר מהספריה
+      </button>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-diamond"/></svg></div>
+        תמחור
+      </div>
+      <div id="items-list"></div>
+      <button class="btn-add" onclick="openServicesPicker()">
+        <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שירות
+      </button>
+    </div>
+
+    <div class="summary-box">
+      <div class="summary-row"><span>סכום ביניים</span><span id="sum-subtotal">₪0</span></div>
+      <div class="summary-row"><span>מע"מ 18%</span><span id="sum-vat">₪0</span></div>
+      <div class="summary-row summary-final"><span>סה"כ</span><span class="summary-final-amount" id="sum-total">₪0</span></div>
+    </div>
+
+    <div class="info-tag">
+      <div class="info-tag-icon"><svg class="icon"><use href="#i-zap"/></svg></div>
+      <div>לאחר שהלקוח יחתום ויבחר "תשלום באשראי" — האוטומציה ב-Make תיצור קישור Grow אוטומטית עם הסכום הסופי ותשלח לו ב-WhatsApp.</div>
+    </div>
+  </div>
+
+  <!-- SAVED -->
+  <div id="screen-saved" class="hidden fade-in">
+    <div id="saved-list"></div>
+  </div>
+
+  <!-- LIBRARY -->
+  <div id="screen-library" class="hidden fade-in">
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-tool"/></svg></div>
+        ספריית שירותים
+      </div>
+      <div class="field-hint" style="margin-bottom:14px;margin-top:-8px">
+        השירותים שיופיעו כאפשרויות בחירה בעת הוספת פריט תמחור להצעה.
+      </div>
+      <div id="services-library"></div>
+      <button class="btn-add" onclick="addService()">
+        <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שירות
+      </button>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-list"/></svg></div>
+        ספריית "מה כולל"
+      </div>
+      <div class="field-hint" style="margin-bottom:14px;margin-top:-8px">
+        פריטים שיופיעו כאפשרויות סימון בכל הצעה.
+      </div>
+      <div id="includes-library"></div>
+      <button class="btn-add" onclick="addIncludeLib()">
+        <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף פריט
+      </button>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;margin-top:6px;" onclick="saveLibrary()">
+      <svg class="icon"><use href="#i-save"/></svg>שמור ספריה
+    </button>
+  </div>
+
+  <!-- SETTINGS -->
+  <div id="screen-settings" class="hidden fade-in">
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-building"/></svg></div>
+        העסק שלך
+      </div>
+      <div class="field"><label>שם העסק / שם מלא</label><input type="text" id="biz-name"></div>
+      <div class="field"><label>מייל</label><input type="email" id="biz-email"></div>
+      <div class="field"><label>טלפון (עם 972)</label><input type="tel" id="biz-phone" inputmode="numeric"></div>
+      <div class="field">
+        <label>פרטי חשבון בנק</label>
+        <textarea id="biz-bank" rows="4" placeholder="בנק: XX
+סניף: XXX
+חשבון: XXXXXX
+שם בעל החשבון: XXX"></textarea>
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>
+        Make Webhooks
+      </div>
+      <div class="field">
+        <label>Webhook #1 — שליחת הצעה</label>
+        <input type="url" id="webhook-send" placeholder="https://hook.eu2.make.com/...">
+        <div class="field-hint">מופעל כשלוחצים "שלח ללקוח"</div>
+      </div>
+      <div class="field">
+        <label>כתובת בסיס (Vercel)</label>
+        <input type="url" id="base-url" placeholder="https://my-proposals.vercel.app">
+      </div>
+    </div>
+
+    <div class="section-card">
+      <div class="section-title">
+        <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>
+        הצהרות והתחייבויות
+      </div>
+      <div class="field">
+        <label>כל סעיף בשורה נפרדת</label>
+        <textarea id="default-terms" rows="10"></textarea>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" style="width:100%;margin-top:6px;" onclick="saveSettings()">
+      <svg class="icon"><use href="#i-save"/></svg>שמור הגדרות
+    </button>
+  </div>
+
+</main>
+
+<div class="action-bar" id="action-bar">
+  <button class="btn btn-secondary" onclick="saveProposal()">
+    <svg class="icon"><use href="#i-save"/></svg>שמור
+  </button>
+  <button class="btn btn-primary" onclick="sendProposal()" id="send-btn">
+    <svg class="icon"><use href="#i-send"/></svg>שלח ללקוח
+  </button>
+</div>
+
+<!-- MODAL: Services -->
+<div class="modal-overlay" id="services-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>בחר שירות</h3>
+    <p>בחר מהספריה או הוסף פריט חד-פעמי</p>
+    <div class="picker-list" id="services-picker-list"></div>
+    <div class="picker-custom" onclick="addCustomItem()">
+      <svg class="icon"><use href="#i-plus"/></svg>הוסף פריט חד-פעמי
+    </div>
+    <button class="btn btn-secondary" style="width:100%;margin-top:14px;" onclick="closeModal('services-modal')">סגור</button>
+  </div>
+</div>
+
+<!-- MODAL: Includes -->
+<div class="modal-overlay" id="includes-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>מה כולל בפרויקט</h3>
+    <p>לחץ על פריטים לבחירה (שוב להסרה)</p>
+    <div class="picker-list" id="includes-picker-list"></div>
+    <div class="picker-custom" onclick="addCustomInclude()">
+      <svg class="icon"><use href="#i-plus"/></svg>הוסף פריט חד-פעמי
+    </div>
+    <button class="btn btn-primary" style="width:100%;margin-top:14px;" onclick="closeModal('includes-modal')">
+      <svg class="icon"><use href="#i-check"/></svg>סיימתי
+    </button>
+  </div>
+</div>
+
+<!-- MODAL: Link -->
+<div class="modal-overlay" id="link-modal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <h3>ההצעה נשלחה</h3>
+    <p>הקישור נשלח אוטומטית ללקוח ב-WhatsApp. הנה הוא גם לך:</p>
+    <div class="modal-link" id="proposal-link">—</div>
+    <div class="modal-buttons">
+      <button class="btn btn-secondary" onclick="closeModal('link-modal')">סגור</button>
+      <button class="btn btn-primary" onclick="copyLink()">
+        <svg class="icon"><use href="#i-copy"/></svg>העתק
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+let processSteps=[],includes=[],items=[],settings={},library={services:[],includes:[]};
+const VAT_RATE=18;
+
+const DEFAULT_PROCESS=['פגישה ראשונית לאפיון בזום','העברת כל החומרים לתיקיה משותפת','עבודה על עיצוב וסקיצה ראשונית','פגישה שניה לסבב תיקונים','הדרכה לתפעול וניהול','סוף הפרויקט'];
+const DEFAULT_SERVICES=[
+  {id:'s1',name:'עיצוב עמוד בית',desc:'עיצוב מקורי ב-Figma כולל מובייל',price:3500},
+  {id:'s2',name:'עיצוב עמודים פנימיים',desc:'לכל עמוד נוסף',price:1500},
+  {id:'s3',name:'בניית אתר באלמנטור',desc:'בנייה ריספונסיבית מלאה',price:5200},
+  {id:'s4',name:'העלאה ואופטימיזציה',desc:'SSL + SEO בסיסי + מהירות',price:1800},
+  {id:'s5',name:'רישיון Elementor Pro',desc:'לשנה',price:400}
+];
+const DEFAULT_INCLUDES_LIB=[
+  {id:'i1',name:'רכישת אחסון + הקמת אחסון'},
+  {id:'i2',name:'רכישה + הקמת דומיין (במידה וצריך)'},
+  {id:'i3',name:'סנכרון אחסון + הדומיין + ממשק הוורדפרס'},
+  {id:'i4',name:'התקנה תעודה אבטחה SSL'},
+  {id:'i5',name:'התאמה רספונסיבית מלאה לווב ומובייל'},
+  {id:'i6',name:'מעבר על דפים להשראה'},
+  {id:'i7',name:'רישיון פרו לאתר'}
+];
+const DEFAULT_TERMS=`חתימת הלקוח תיחשב הסכמה סופית לפרטי ההזמנה ולתנאים הנוספים
+אין כל יחסי עובד מעביד בין הצדדים אלא יחסי ספק ולקוח
+מזמין השירות יהיה בעל התוצר הסופי שינתן בכפוף לתשלום
+הספק יחל בביצוע העבודה עם קבלת התשלום וקבלת חומרי הגלם
+דף הנחיתה יסופק תוך 14 ימי עסקים
+הקופי של הדף כלול במחיר
+קבלת התשלום תבוצע דרך חיוב בכרטיס אשראי, ביט או העברה בנקאית
+הזמנים שצוינו לעיל יכולים להשתנות ע"פ מידת שיתוף הפעולה
+אחריות על הדף 14 ימי עסקים, סבב תיקונים נוסף בעלות של 500 ש"ח
+רכישת הדומיין מגוף רשמי באיגוד האינטרנט הישראלי
+פתיחת האחסון ורכישת הדומיין יבוצעו תוך 48 שעות לאחר קבלת התשלום
+במידה והלקוח לא מרוצה, הזיכוי יהיה עד 50% מסכום התשלום
+הלקוח מאשר לספק לפנות אליו בכל אמצעי התקשורת הרלוונטים
+הספק שומר את הזכות להוסיף קרדיט שלו בתחתית הדף`;
+
+function init(){
+  loadSettings();loadLibrary();
+  processSteps=[...DEFAULT_PROCESS];includes=[];items=[];
+  document.getElementById('proposal-num').value=genNum();
+  renderProcess();renderIncludes();renderItems();updateSummary();renderSaved();renderLibrary();
+}
+function genNum(){return new Date().getFullYear()+'-'+String(Math.floor(Math.random()*900)+100)}
+
+function switchTab(tab){
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+tab).classList.add('active');
+  ['new','saved','library','settings'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
+  const screen=document.getElementById('screen-'+tab);
+  screen.classList.remove('hidden');
+  screen.classList.remove('fade-in');void screen.offsetWidth;screen.classList.add('fade-in');
+  document.getElementById('action-bar').style.display=tab==='new'?'flex':'none';
+  if(tab==='saved')renderSaved();
+  if(tab==='library')renderLibrary();
+}
+
+const iconX='<svg class="icon"><use href="#i-x"/></svg>';
+const iconTrash='<svg class="icon"><use href="#i-trash"/></svg>';
+const iconCheck='<svg class="icon"><use href="#i-check"/></svg>';
+
+function renderProcess(){
+  document.getElementById('process-list').innerHTML=processSteps.map((s,i)=>`
+    <div class="list-item-row">
+      <input type="text" value="${esc(s)}" oninput="processSteps[${i}]=this.value">
+      <button class="icon-btn-danger" onclick="removeProcess(${i})">${iconX}</button>
+    </div>`).join('');
+}
+function addProcess(){processSteps.push('');renderProcess()}
+function removeProcess(i){processSteps.splice(i,1);renderProcess()}
+
+function renderIncludes(){
+  const list=document.getElementById('includes-list');
+  if(!includes.length){list.innerHTML='<div class="no-items">עוד לא נבחרו פריטים</div>';return}
+  list.innerHTML=includes.map((s,i)=>`
+    <div class="list-item-row">
+      <input type="text" value="${esc(s)}" oninput="includes[${i}]=this.value">
+      <button class="icon-btn-danger" onclick="removeInclude(${i})">${iconX}</button>
+    </div>`).join('');
+}
+function removeInclude(i){includes.splice(i,1);renderIncludes()}
+
+function renderItems(){
+  const list=document.getElementById('items-list');
+  if(!items.length){list.innerHTML='<div class="no-items" style="margin-bottom:14px">עוד לא נוספו פריטי תמחור</div>';return}
+  list.innerHTML=items.map((item,i)=>`
+    <div class="price-item">
+      <div class="price-item-header">
+        <div>
+          <div class="price-item-title">${esc(item.title)}</div>
+          ${item.desc?`<div class="price-item-desc">${esc(item.desc)}</div>`:''}
+        </div>
+        <button class="price-item-remove" onclick="removeItem(${i})">הסר</button>
+      </div>
+      <div class="price-item-controls">
+        <input type="number" class="price-qty-input" value="${item.qty}" min="1" inputmode="numeric" oninput="items[${i}].qty=parseFloat(this.value)||1;updateSummary()" placeholder="כמות">
+        <div class="price-amount-wrapper">
+          <input type="number" value="${item.price}" min="0" inputmode="decimal" oninput="items[${i}].price=parseFloat(this.value)||0;updateSummary()">
+          <span>₪</span>
+        </div>
+      </div>
+    </div>`).join('');
+}
+function removeItem(i){items.splice(i,1);renderItems();updateSummary()}
+
+function openServicesPicker(){
+  const list=document.getElementById('services-picker-list');
+  if(!library.services.length){
+    list.innerHTML='<div class="picker-empty">אין שירותים בספריה.<br>הוסף בלשונית ספריה</div>';
+  }else{
+    list.innerHTML=library.services.map(s=>`
+      <div class="picker-item" onclick="selectService('${s.id}')">
+        <div class="picker-item-info">
+          <div class="picker-item-name">${esc(s.name)}</div>
+          ${s.desc?`<div class="picker-item-desc">${esc(s.desc)}</div>`:''}
+        </div>
+        <div class="picker-item-price">₪${Number(s.price).toLocaleString('he-IL')}</div>
+      </div>`).join('');
+  }
+  document.getElementById('services-modal').classList.add('show');
+}
+function selectService(id){
+  const s=library.services.find(x=>x.id===id);if(!s)return;
+  items.push({title:s.name,desc:s.desc||'',qty:1,price:Number(s.price)||0});
+  renderItems();updateSummary();
+  closeModal('services-modal');
+  toast(s.name+' נוסף','success');
+}
+function addCustomItem(){
+  const name=prompt('שם הפריט:');if(!name)return;
+  const price=parseFloat(prompt('מחיר (₪):'))||0;
+  items.push({title:name,desc:'',qty:1,price});
+  renderItems();updateSummary();
+  closeModal('services-modal');
+  toast('נוסף','success');
+}
+
+function openIncludesPicker(){
+  const list=document.getElementById('includes-picker-list');
+  if(!library.includes.length){
+    list.innerHTML='<div class="picker-empty">אין פריטים בספריה.<br>הוסף בלשונית ספריה</div>';
+  }else{
+    list.innerHTML=library.includes.map(inc=>{
+      const sel=includes.includes(inc.name);
+      return `<div class="picker-item ${sel?'selected':''}" onclick="toggleInclude('${inc.id}')">
+        <div class="picker-item-info">
+          <div class="picker-item-name">${esc(inc.name)}</div>
+        </div>
+        <div class="picker-check">${iconCheck}</div>
+      </div>`;
+    }).join('');
+  }
+  document.getElementById('includes-modal').classList.add('show');
+}
+function toggleInclude(id){
+  const inc=library.includes.find(x=>x.id===id);if(!inc)return;
+  const idx=includes.indexOf(inc.name);
+  if(idx>-1)includes.splice(idx,1);else includes.push(inc.name);
+  renderIncludes();openIncludesPicker();
+}
+function addCustomInclude(){
+  const name=prompt('שם הפריט:');if(!name)return;
+  includes.push(name);renderIncludes();
+  toast('נוסף','success');
+}
+
+function closeModal(id){document.getElementById(id).classList.remove('show')}
+
+function updateSummary(){
+  const sub=items.reduce((s,it)=>s+(it.qty*it.price),0);
+  const vat=Math.round(sub*VAT_RATE/100);
+  document.getElementById('sum-subtotal').textContent='₪'+sub.toLocaleString('he-IL');
+  document.getElementById('sum-vat').textContent='₪'+vat.toLocaleString('he-IL');
+  document.getElementById('sum-total').textContent='₪'+(sub+vat).toLocaleString('he-IL');
+}
+
+function loadSettings(){
+  try{settings=JSON.parse(localStorage.getItem('pm_settings')||'{}')}catch(e){settings={}}
+  document.getElementById('biz-name').value=settings.bizName||'';
+  document.getElementById('biz-email').value=settings.bizEmail||'';
+  document.getElementById('biz-phone').value=settings.bizPhone||'';
+  document.getElementById('biz-bank').value=settings.bizBank||'';
+  document.getElementById('webhook-send').value=settings.webhookSend||'';
+  document.getElementById('base-url').value=settings.baseUrl||'';
+  document.getElementById('default-terms').value=settings.defaultTerms||DEFAULT_TERMS;
+}
+function saveSettings(){
+  settings={
+    bizName:document.getElementById('biz-name').value,
+    bizEmail:document.getElementById('biz-email').value,
+    bizPhone:document.getElementById('biz-phone').value,
+    bizBank:document.getElementById('biz-bank').value,
+    webhookSend:document.getElementById('webhook-send').value,
+    baseUrl:document.getElementById('base-url').value,
+    defaultTerms:document.getElementById('default-terms').value
+  };
+  localStorage.setItem('pm_settings',JSON.stringify(settings));
+  toast('ההגדרות נשמרו','success');
+}
+
+function loadLibrary(){
+  try{
+    const saved=localStorage.getItem('pm_library');
+    if(saved)library=JSON.parse(saved);
+    else library={services:[...DEFAULT_SERVICES],includes:[...DEFAULT_INCLUDES_LIB]};
+  }catch(e){library={services:[...DEFAULT_SERVICES],includes:[...DEFAULT_INCLUDES_LIB]}}
+}
+function renderLibrary(){
+  const sEl=document.getElementById('services-library');
+  sEl.innerHTML=library.services.length?library.services.map((s,i)=>`
+    <div class="library-item">
+      <div class="library-item-header">
+        <span class="library-item-title">שירות ${i+1}</span>
+        <button class="icon-btn-danger" onclick="removeService(${i})">${iconTrash}</button>
+      </div>
+      <div class="library-item-fields">
+        <input type="text" placeholder="שם השירות" value="${esc(s.name)}" oninput="library.services[${i}].name=this.value">
+        <textarea placeholder="תיאור (אופציונלי)" oninput="library.services[${i}].desc=this.value">${esc(s.desc||'')}</textarea>
+        <div class="lib-price-row">
+          <span class="lib-price-label">מחיר ₪</span>
+          <input type="number" value="${s.price}" inputmode="decimal" oninput="library.services[${i}].price=parseFloat(this.value)||0">
+        </div>
+      </div>
+    </div>`).join(''):'<div class="empty-state"><div class="empty-state-icon"><svg class="icon"><use href="#i-tool"/></svg></div>אין שירותים בספריה</div>';
+
+  const iEl=document.getElementById('includes-library');
+  iEl.innerHTML=library.includes.length?library.includes.map((inc,i)=>`
+    <div class="list-item-row">
+      <input type="text" value="${esc(inc.name)}" oninput="library.includes[${i}].name=this.value">
+      <button class="icon-btn-danger" onclick="removeIncludeLib(${i})">${iconX}</button>
+    </div>`).join(''):'<div class="empty-state"><div class="empty-state-icon"><svg class="icon"><use href="#i-list"/></svg></div>אין פריטים בספריה</div>';
+}
+function addService(){library.services.push({id:'s'+Date.now(),name:'',desc:'',price:0});renderLibrary()}
+function removeService(i){if(!confirm('למחוק את השירות?'))return;library.services.splice(i,1);renderLibrary()}
+function addIncludeLib(){library.includes.push({id:'i'+Date.now(),name:''});renderLibrary()}
+function removeIncludeLib(i){library.includes.splice(i,1);renderLibrary()}
+function saveLibrary(){
+  library.services=library.services.filter(s=>s.name.trim());
+  library.includes=library.includes.filter(i=>i.name.trim());
+  localStorage.setItem('pm_library',JSON.stringify(library));
+  renderLibrary();
+  toast('הספריה נשמרה','success');
+}
+
+function getProposalData(){
+  const sub=items.reduce((s,it)=>s+(it.qty*it.price),0);
+  const vat=Math.round(sub*VAT_RATE/100);
+  return{
+    id:'prop_'+Date.now(),
+    clientName:document.getElementById('client-name').value.trim(),
+    clientPhone:document.getElementById('client-phone').value.trim(),
+    projectType:document.getElementById('project-type').value.trim(),
+    proposalNum:document.getElementById('proposal-num').value.trim(),
+    date:new Date().toISOString(),
+    processSteps:processSteps.filter(s=>s.trim()),
+    includes:includes.filter(s=>s.trim()),
+    items:items.filter(it=>it.title.trim()),
+    subtotal:sub,vat,vatRate:VAT_RATE,total:sub+vat,
+    terms:(settings.defaultTerms||DEFAULT_TERMS).split('\n').filter(t=>t.trim()),
+    biz:{name:settings.bizName||'',email:settings.bizEmail||'',phone:settings.bizPhone||'',bank:settings.bizBank||''},
+    status:'draft'
+  };
+}
+function validateProposal(d){
+  if(!d.clientName)return'יש למלא שם לקוח';
+  if(!d.clientPhone)return'יש למלא טלפון לקוח';
+  if(!d.items.length)return'יש להוסיף לפחות פריט אחד לתמחור';
+  if(!settings.webhookSend)return'יש להגדיר Webhook בהגדרות';
+  if(!settings.baseUrl)return'יש להגדיר כתובת בסיס בהגדרות';
+  return null;
+}
+function saveProposal(){
+  const d=getProposalData();
+  if(!d.clientName){toast('יש למלא שם לקוח','error');return}
+  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+  saved.unshift(d);
+  localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,50)));
+  toast('נשמר בהיסטוריה','success');
+}
+
+async function sendProposal(){
+  const d=getProposalData();
+  const err=validateProposal(d);
+  if(err){toast(err,'error');return}
+  const btn=document.getElementById('send-btn');
+  btn.disabled=true;btn.innerHTML='<svg class="icon"><use href="#i-send"/></svg>שולח...';
+  try{
+    const r=await fetch(settings.webhookSend,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+    if(!r.ok)throw new Error('fail');
+    d.status='sent';
+    const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+    saved.unshift(d);
+    localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,50)));
+    const url=settings.baseUrl.replace(/\/$/,'')+'/p/'+d.id;
+    document.getElementById('proposal-link').textContent=url;
+    document.getElementById('link-modal').classList.add('show');
+    toast('נשלח ללקוח!','success');
+    setTimeout(()=>{
+      document.getElementById('client-name').value='';
+      document.getElementById('client-phone').value='';
+      items=[];includes=[];
+      renderItems();renderIncludes();updateSummary();
+      document.getElementById('proposal-num').value=genNum();
+    },500);
+  }catch(e){
+    toast('שגיאה בשליחה','error');
+  }finally{
+    btn.disabled=false;btn.innerHTML='<svg class="icon"><use href="#i-send"/></svg>שלח ללקוח';
+  }
+}
+function copyLink(){
+  navigator.clipboard.writeText(document.getElementById('proposal-link').textContent);
+  toast('הועתק','success');
+}
+
+function renderSaved(){
+  const list=document.getElementById('saved-list');
+  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+  if(!saved.length){
+    list.innerHTML='<div class="empty-state"><div class="empty-state-icon"><svg class="icon"><use href="#i-clipboard"/></svg></div>אין הצעות שמורות עדיין</div>';
+    return;
+  }
+  list.innerHTML=saved.map(p=>`
+    <div class="saved-item">
+      <div class="saved-item-info">
+        <div class="saved-item-name">${esc(p.clientName)}${p.projectType?' · '+esc(p.projectType):''}</div>
+        <div class="saved-item-meta">
+          <span>${new Date(p.date).toLocaleDateString('he-IL')}</span>
+          <span class="saved-item-meta-dot"></span>
+          <span>₪${p.total.toLocaleString('he-IL')}</span>
+          <span class="saved-item-meta-dot"></span>
+          <span class="saved-status ${p.status==='sent'?'sent':'draft'}">${p.status==='sent'?'נשלח':'טיוטה'}</span>
+        </div>
+      </div>
+      <div class="saved-item-actions">
+        <button class="saved-btn" onclick="loadProposal('${p.id}')">פתח</button>
+        <button class="saved-btn danger" onclick="deleteProposal('${p.id}')">${iconTrash}</button>
+      </div>
+    </div>`).join('');
+}
+function loadProposal(id){
+  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+  const p=saved.find(x=>x.id===id);if(!p)return;
+  document.getElementById('client-name').value=p.clientName||'';
+  document.getElementById('client-phone').value=p.clientPhone||'';
+  document.getElementById('project-type').value=p.projectType||'';
+  document.getElementById('proposal-num').value=p.proposalNum||'';
+  processSteps=p.processSteps||[];includes=p.includes||[];items=p.items||[];
+  renderProcess();renderIncludes();renderItems();updateSummary();
+  switchTab('new');
+  toast('ההצעה נטענה','success');
+}
+function deleteProposal(id){
+  if(!confirm('למחוק את ההצעה?'))return;
+  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+  localStorage.setItem('pm_proposals',JSON.stringify(saved.filter(x=>x.id!==id)));
+  renderSaved();toast('נמחק','');
+}
+
+function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  let iconId='i-info';
+  if(type==='success')iconId='i-check-circle';
+  if(type==='error')iconId='i-alert-circle';
+  t.innerHTML=`<svg class="icon"><use href="#${iconId}"/></svg>${esc(msg)}`;
+  t.className='toast show '+(type||'');
+  setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,10 +1,11 @@
 Options -Indexes
 RewriteEngine On
+RewriteBase /price/
 
-# ניתוב /p/PROPOSAL_ID → p/index.html
+# ניתוב /price/p/PROPOSAL_ID → p/index.html
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule ^p/[^/]+/?$ /p/index.html [L]
+RewriteRule ^p/[^/]+/?$ p/index.html [L]
 
 # מניעת גישה ישירה לתיקיית data
 RewriteRule ^data/ - [F,L]

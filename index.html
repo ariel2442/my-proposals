@@ -1077,10 +1077,9 @@ async function serverLoad(){
       library=d.library;
       renderLibrary();
     }
-    if(d.settings){
-      const merged=Object.assign({},d.settings,JSON.parse(localStorage.getItem('pm_settings')||'{}'));
-      localStorage.setItem('pm_settings',JSON.stringify(merged));
-      settings=merged;
+    if(d.settings&&Object.keys(d.settings).length){
+      localStorage.setItem('pm_settings',JSON.stringify(d.settings));
+      settings=d.settings;
       loadSettings();
     }
     return true;

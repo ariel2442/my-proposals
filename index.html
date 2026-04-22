@@ -1054,12 +1054,13 @@ const BASE=window.location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'
 
 async function savePropFile(proposal){
   try{
-    await fetch(BASE+'/save.php',{
+    const r=await fetch(BASE+'/save.php',{
       method:'POST',
       headers:{'Content-Type':'application/json','X-Token':'4ae9a09533485edf7a5e8f6bd11862a5'},
       body:JSON.stringify(proposal)
     });
-  }catch(e){}
+    if(!r.ok){const t=await r.text();console.error('savePropFile failed:',r.status,t);}
+  }catch(e){console.error('savePropFile error:',e);}
 }
 
 async function serverLoad(){
@@ -1086,14 +1087,17 @@ async function serverLoad(){
   }catch(e){return false;}
 }
 
-async function serverSave(){
+async function serverSave(includeSettings){
   try{
     const proposals=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-    const s=JSON.parse(localStorage.getItem('pm_settings')||'{}');
+    const body={proposals,library};
+    if(includeSettings){
+      body.settings=JSON.parse(localStorage.getItem('pm_settings')||'{}');
+    }
     await fetch(BASE+'/proposals.php',{
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({proposals,library,settings:s})
+      body:JSON.stringify(body)
     });
   }catch(e){}
 }
@@ -1307,7 +1311,7 @@ function saveSettings(){
   };
   localStorage.setItem('pm_settings',JSON.stringify(settings));
   toast('ההגדרות נשמרו','success');
-  serverSave();
+  serverSave(true);
 }
 
 // ─── library ─────────────────────────────────────────────────

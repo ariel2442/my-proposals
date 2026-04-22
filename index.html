@@ -1063,7 +1063,7 @@ async function savePropFile(proposal){
   }catch(e){console.error('savePropFile error:',e);}
 }
 
-async function serverLoad(){
+async function serverLoad(initialLoad){
   try{
     const r=await fetch(BASE+'/proposals.php');
     if(!r.ok)return;
@@ -1084,7 +1084,7 @@ async function serverLoad(){
       library=d.library;
       renderLibrary();
     }
-    if(d.settings&&Object.keys(d.settings).length){
+    if(initialLoad&&d.settings&&Object.keys(d.settings).length){
       localStorage.setItem('pm_settings',JSON.stringify(d.settings));
       settings=d.settings;
       loadSettings();
@@ -1121,19 +1121,19 @@ async function init(){
   processSteps=[...DEFAULT_PROCESS];includes=[];items=[];
   document.getElementById('proposal-num').value=genNum();
   renderProcess();renderIncludes();renderItems();updateSummary();renderLibrary();
-  await serverLoad();
+  await serverLoad(true);
   renderSaved();renderStatusPanel();
 
-  // סנכרון אוטומטי כל 60 שניות
+  // סנכרון אוטומטי כל 5 שניות (ללא הגדרות)
   setInterval(async()=>{
-    await serverLoad();
+    await serverLoad(false);
     renderSaved();renderStatusPanel();
   },5000);
 
   // סנכרון כשחוזרים לאפליקציה (מובייל)
   document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState==='visible'){
-      await serverLoad();
+      await serverLoad(false);
       renderSaved();renderStatusPanel();
     }
   });

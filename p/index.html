@@ -513,6 +513,50 @@ body{
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important}
 }
+
+/* ========== SIGNED CONFIRMATION (מוצג במקום טופס החתימה) ========== */
+.signed-box{
+  background:rgba(16,185,129,0.1);
+  border:1px solid rgba(16,185,129,0.35);
+  border-radius:16px;padding:22px 20px;
+  text-align:center;
+}
+.signed-box-icon{
+  width:52px;height:52px;border-radius:14px;
+  background:linear-gradient(135deg,var(--success) 0%,#059669 100%);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;
+  box-shadow:0 8px 24px rgba(16,185,129,0.4);
+}
+.signed-box-icon .icon{width:26px;height:26px;stroke-width:2.5}
+.signed-box h3{font-size:18px;font-weight:800;color:white;margin-bottom:10px}
+.signed-box-meta{font-size:13px;color:var(--success-bright);line-height:2}
+
+/* ========== כפתור הדפסה ========== */
+.btn-print-copy{
+  margin-top:20px;
+  background:rgba(255,255,255,0.1);
+  border:1px solid rgba(255,255,255,0.25);
+  color:white;padding:14px 28px;border-radius:12px;
+  font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:all 0.2s;
+}
+.btn-print-copy:hover{background:rgba(255,255,255,0.18)}
+.btn-print-copy .icon{width:17px;height:17px}
+
+/* ========== PRINT ========== */
+@media print{
+  *{print-color-adjust:exact;-webkit-print-color-adjust:exact}
+  .modal-overlay,.success-screen,.loading-screen,.error-screen{display:none!important}
+  .sign-form-area{display:none!important}
+  .signed-box{display:block!important}
+  body{background:radial-gradient(ellipse at top,#0a2456 0%,#02132C 55%,#010918 100%)!important;min-height:auto}
+  .bg-effects{display:none}
+  .page{padding:20px 18px 40px}
+  .card{break-inside:avoid}
+  .total-pill-wrapper{break-inside:avoid}
+}
 </style>
 </head>
 <body>
@@ -615,28 +659,41 @@ body{
     <div class="sign-section">
       <p class="sign-intro">חתימה על ההצעה מהווה אישור לתנאים ולתחילת העבודה.</p>
 
-      <div class="sign-fields">
-        <div class="sign-field">
-          <label class="sign-label">שם מלא</label>
-          <input type="text" class="sign-input" id="signer-name" placeholder="השם שלך">
-        </div>
-        <div class="sign-field">
-          <label class="sign-label">חתימה</label>
-          <canvas id="signature-pad"></canvas>
-          <div class="sign-row-buttons">
-            <button type="button" class="btn-clear" id="clear-sign">
-              <svg class="icon"><use href="#i-edit"/></svg>
-              נקה חתימה
-            </button>
+      <!-- טופס חתימה — נסתר בהדפסה ואחרי חתימה -->
+      <div class="sign-form-area" id="sign-form-area">
+        <div class="sign-fields">
+          <div class="sign-field">
+            <label class="sign-label">שם מלא</label>
+            <input type="text" class="sign-input" id="signer-name" placeholder="השם שלך">
+          </div>
+          <div class="sign-field">
+            <label class="sign-label">חתימה</label>
+            <canvas id="signature-pad"></canvas>
+            <div class="sign-row-buttons">
+              <button type="button" class="btn-clear" id="clear-sign">
+                <svg class="icon"><use href="#i-edit"/></svg>
+                נקה חתימה
+              </button>
+            </div>
           </div>
         </div>
+        <button type="button" class="btn-approve" id="submit-btn">
+          <svg class="icon"><use href="#i-check"/></svg>
+          <span>אישור וחתימה על ההצעה</span>
+        </button>
+        <div class="status-msg" id="status"></div>
       </div>
 
-      <button type="button" class="btn-approve" id="submit-btn">
-        <svg class="icon"><use href="#i-check"/></svg>
-        <span>אישור וחתימה על ההצעה</span>
-      </button>
-      <div class="status-msg" id="status"></div>
+      <!-- אישור חתימה — מוצג אחרי חתימה ובהדפסה -->
+      <div class="signed-box" id="signed-box" style="display:none">
+        <div class="signed-box-icon"><svg class="icon"><use href="#i-check"/></svg></div>
+        <h3>ההצעה נחתמה</h3>
+        <div class="signed-box-meta">
+          <div>חתום על ידי: <strong id="signed-name-display">—</strong></div>
+          <div>תאריך: <strong id="signed-date-display">—</strong></div>
+          <div>אמצעי תשלום: <strong id="signed-pay-display">—</strong></div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -669,6 +726,10 @@ body{
   <h2>מעולה! הכל מוכן</h2>
   <p id="success-message">פרטי התשלום נשלחים אליך ב-WhatsApp ברגעים אלה</p>
   <div class="success-details" id="success-details"></div>
+  <button class="btn-print-copy" onclick="printCopy()">
+    <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    שמור עותק / הדפס
+  </button>
 </div>
 
 <script>
@@ -887,6 +948,15 @@ async function choosePayment(method){
     paymentMethod:method
   });
 
+  // הצג תיבת אישור חתימה (ותמלא נתונים להדפסה)
+  const payLabel=method==='credit'?'תשלום באשראי':'העברה בנקאית';
+  const dateStr=new Date().toLocaleDateString('he-IL')+' '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('signed-name-display').textContent=window._signerName||'—';
+  document.getElementById('signed-date-display').textContent=dateStr;
+  document.getElementById('signed-pay-display').textContent=payLabel;
+  document.getElementById('sign-form-area').style.display='none';
+  document.getElementById('signed-box').style.display='block';
+
   const payload={
     proposalId:proposalData.id,
     proposalNum:proposalData.proposalNum,
@@ -925,6 +995,11 @@ async function choosePayment(method){
       <li>${ic}נתחיל בעבודה מיד לאחר קבלת התשלום</li></ul>`;
   }
   document.getElementById('success-screen').classList.add('show');
+}
+
+function printCopy(){
+  document.getElementById('success-screen').classList.remove('show');
+  setTimeout(()=>window.print(),80);
 }
 
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}

@@ -1595,7 +1595,7 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 async function fabRefresh(){
   const btn=document.getElementById('fab-refresh');
   btn.classList.add('spinning');
-  const ok=await serverLoad();
+  const ok=await serverLoad(true);
   renderSaved();renderStatusPanel();
   setTimeout(()=>btn.classList.remove('spinning'),800);
   toast(ok?'עודכן':'לא מחובר — התחבר מחדש','');

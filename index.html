@@ -1068,9 +1068,15 @@ async function serverLoad(){
     const r=await fetch(BASE+'/proposals.php');
     if(!r.ok)return;
     const d=await r.json();
-    if(d.proposals&&d.proposals.length){
+    // מיזוג רשימת נמחקים
+    const serverDeleted=d.deletedIds||[];
+    const localDeleted=JSON.parse(localStorage.getItem('pm_deleted_ids')||'[]');
+    const allDeleted=[...new Set([...serverDeleted,...localDeleted])];
+    localStorage.setItem('pm_deleted_ids',JSON.stringify(allDeleted));
+
+    if(d.proposals){
       const local=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-      const merged=mergeById([...local,...d.proposals]);
+      const merged=mergeById([...local,...d.proposals]).filter(p=>!allDeleted.includes(p.id));
       localStorage.setItem('pm_proposals',JSON.stringify(merged));
     }
     if(d.library){
@@ -1090,7 +1096,8 @@ async function serverLoad(){
 async function serverSave(includeSettings){
   try{
     const proposals=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-    const body={proposals,library};
+    const deletedIds=JSON.parse(localStorage.getItem('pm_deleted_ids')||'[]');
+    const body={proposals,library,deletedIds};
     if(includeSettings){
       body.settings=JSON.parse(localStorage.getItem('pm_settings')||'{}');
     }
@@ -1541,6 +1548,9 @@ function deleteProposal(id){
   if(!confirm('למחוק את ההצעה?'))return;
   const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
   localStorage.setItem('pm_proposals',JSON.stringify(saved.filter(x=>x.id!==id)));
+  const deleted=JSON.parse(localStorage.getItem('pm_deleted_ids')||'[]');
+  if(!deleted.includes(id))deleted.push(id);
+  localStorage.setItem('pm_deleted_ids',JSON.stringify(deleted));
   renderSaved();renderStatusPanel();toast('נמחק','');
   serverSave();
 }

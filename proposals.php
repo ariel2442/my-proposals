@@ -32,11 +32,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = json_decode($body, true);
     if (!$data) { http_response_code(400); echo json_encode(['ok' => false, 'error' => 'Bad JSON']); exit; }
 
-    // שמור הגדרות קיימות אם הסנכרון הנוכחי לא מביא הגדרות
-    if (empty($data['settings']) && file_exists($file)) {
-        $existing = json_decode(file_get_contents($file), true);
-        if (!empty($existing['settings'])) {
+    // מיזוג עם נתונים קיימים בשרת
+    if (file_exists($file)) {
+        $existing = json_decode(file_get_contents($file), true) ?? [];
+        // שמור הגדרות קיימות אם לא הגיעו חדשות
+        if (empty($data['settings']) && !empty($existing['settings'])) {
             $data['settings'] = $existing['settings'];
+        }
+        // מזג רשימת נמחקים
+        $existingDeleted = $existing['deletedIds'] ?? [];
+        $newDeleted = $data['deletedIds'] ?? [];
+        $data['deletedIds'] = array_values(array_unique(array_merge($existingDeleted, $newDeleted)));
+        // הסר הצעות שנמחקו
+        if (!empty($data['deletedIds']) && !empty($data['proposals'])) {
+            $data['proposals'] = array_values(array_filter($data['proposals'], function($p) use ($data) {
+                return !in_array($p['id'], $data['deletedIds']);
+            }));
         }
     }
 

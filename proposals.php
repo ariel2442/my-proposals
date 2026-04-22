@@ -31,6 +31,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $body = file_get_contents('php://input');
     $data = json_decode($body, true);
     if (!$data) { http_response_code(400); echo json_encode(['ok' => false, 'error' => 'Bad JSON']); exit; }
+
+    // שמור הגדרות קיימות אם הסנכרון הנוכחי לא מביא הגדרות
+    if (empty($data['settings']) && file_exists($file)) {
+        $existing = json_decode(file_get_contents($file), true);
+        if (!empty($existing['settings'])) {
+            $data['settings'] = $existing['settings'];
+        }
+    }
+
     $data['ok'] = true;
     $data['updatedAt'] = time() * 1000;
     if (file_put_contents($file, json_encode($data)) === false) {

@@ -1063,7 +1063,7 @@ async function savePropFile(proposal){
   }catch(e){console.error('savePropFile error:',e);}
 }
 
-async function serverLoad(initialLoad){
+async function serverLoad(){
   try{
     const r=await fetch(BASE+'/proposals.php');
     if(!r.ok)return;
@@ -1084,10 +1084,15 @@ async function serverLoad(initialLoad){
       library=d.library;
       renderLibrary();
     }
-    if(initialLoad&&d.settings&&Object.keys(d.settings).length){
-      localStorage.setItem('pm_settings',JSON.stringify(d.settings));
-      settings=d.settings;
-      loadSettings();
+    if(d.settings&&Object.keys(d.settings).length){
+      const localSettings=JSON.parse(localStorage.getItem('pm_settings')||'{}');
+      const serverTime=d.settings._savedAt||0;
+      const localTime=localSettings._savedAt||0;
+      if(serverTime>localTime){
+        localStorage.setItem('pm_settings',JSON.stringify(d.settings));
+        settings=d.settings;
+        loadSettings();
+      }
     }
     return true;
   }catch(e){return false;}
@@ -1121,19 +1126,19 @@ async function init(){
   processSteps=[...DEFAULT_PROCESS];includes=[];items=[];
   document.getElementById('proposal-num').value=genNum();
   renderProcess();renderIncludes();renderItems();updateSummary();renderLibrary();
-  await serverLoad(true);
+  await serverLoad();
   renderSaved();renderStatusPanel();
 
-  // סנכרון אוטומטי כל 5 שניות (ללא הגדרות)
+  // סנכרון אוטומטי כל 5 שניות
   setInterval(async()=>{
-    await serverLoad(false);
+    await serverLoad();
     renderSaved();renderStatusPanel();
   },5000);
 
   // סנכרון כשחוזרים לאפליקציה (מובייל)
   document.addEventListener('visibilitychange',async()=>{
     if(document.visibilityState==='visible'){
-      await serverLoad(false);
+      await serverLoad();
       renderSaved();renderStatusPanel();
     }
   });
@@ -1314,7 +1319,8 @@ function saveSettings(){
     bizBank:document.getElementById('biz-bank').value,
     webhookSend:document.getElementById('webhook-send').value,
     baseUrl:document.getElementById('base-url').value,
-    defaultTerms:document.getElementById('default-terms').value
+    defaultTerms:document.getElementById('default-terms').value,
+    _savedAt:Date.now()
   };
   localStorage.setItem('pm_settings',JSON.stringify(settings));
   toast('ההגדרות נשמרו','success');
@@ -1595,7 +1601,7 @@ function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&l
 async function fabRefresh(){
   const btn=document.getElementById('fab-refresh');
   btn.classList.add('spinning');
-  const ok=await serverLoad(true);
+  const ok=await serverLoad();
   renderSaved();renderStatusPanel();
   setTimeout(()=>btn.classList.remove('spinning'),800);
   toast(ok?'עודכן':'לא מחובר — התחבר מחדש','');

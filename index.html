@@ -192,18 +192,18 @@ body{
 }
 .panel-header .icon{width:15px;height:15px}
 
-.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:14px 14px 10px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:14px 14px 10px}
 .stat-box{
   background:rgba(66,142,255,0.06);
   border:1px solid rgba(66,142,255,0.15);
   border-radius:var(--radius-sm);padding:10px 8px;text-align:center;
 }
 .stat-box.green{background:rgba(16,185,129,0.07);border-color:rgba(16,185,129,0.2)}
-.stat-box.yellow{background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.2)}
+.stat-box.orange{background:rgba(245,158,11,0.07);border-color:rgba(245,158,11,0.2)}
 .stat-num{font-size:22px;font-weight:900;line-height:1}
 .stat-box .stat-num{color:var(--blue-bright)}
 .stat-box.green .stat-num{color:var(--success-bright)}
-.stat-box.yellow .stat-num{color:var(--warning-bright)}
+.stat-box.orange .stat-num{color:var(--warning-bright)}
 .stat-label{font-size:10px;color:var(--text-dim);margin-top:3px;font-weight:600}
 
 .panel-section{padding:6px 14px 4px;font-size:11px;font-weight:700;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.8px}
@@ -374,8 +374,10 @@ body{
 .saved-item-meta{font-size:11px;color:var(--text-dim);display:flex;align-items:center;gap:6px}
 .saved-item-meta-dot{width:3px;height:3px;border-radius:50%;background:var(--text-dim)}
 .saved-status{padding:2px 8px;border-radius:100px;font-size:10px;font-weight:600}
-.saved-status.sent{background:rgba(16,185,129,0.15);color:var(--success-bright)}
 .saved-status.draft{background:rgba(148,163,184,0.15);color:var(--text-dim)}
+.saved-status.sent{background:rgba(66,142,255,0.15);color:var(--blue-bright)}
+.saved-status.opened{background:rgba(245,158,11,0.15);color:var(--warning-bright)}
+.saved-status.signed{background:rgba(16,185,129,0.15);color:var(--success-bright)}
 .saved-item-actions{display:flex;gap:5px;flex-shrink:0}
 .saved-btn{background:rgba(66,142,255,0.08);border:1px solid rgba(66,142,255,0.2);color:white;padding:7px 11px;font-size:12px;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .saved-btn:active{background:rgba(66,142,255,0.15);transform:scale(0.95)}
@@ -657,13 +659,17 @@ body{
         <div class="stat-num" id="stat-total">0</div>
         <div class="stat-label">סה"כ</div>
       </div>
-      <div class="stat-box green">
+      <div class="stat-box">
         <div class="stat-num" id="stat-sent">0</div>
         <div class="stat-label">נשלחו</div>
       </div>
-      <div class="stat-box yellow">
-        <div class="stat-num" id="stat-draft">0</div>
-        <div class="stat-label">טיוטות</div>
+      <div class="stat-box orange">
+        <div class="stat-num" id="stat-opened">0</div>
+        <div class="stat-label">נפתחו</div>
+      </div>
+      <div class="stat-box green">
+        <div class="stat-num" id="stat-signed">0</div>
+        <div class="stat-label">נחתמו</div>
       </div>
     </div>
 
@@ -1536,7 +1542,7 @@ function renderSaved(){
           <span class="saved-item-meta-dot"></span>
           <span>₪${p.total.toLocaleString('he-IL')}</span>
           <span class="saved-item-meta-dot"></span>
-          <span class="saved-status ${p.status==='sent'?'sent':'draft'}">${p.status==='sent'?'נשלח':'טיוטה'}</span>
+          <span class="saved-status ${['sent','opened','signed'].includes(p.status)?p.status:'draft'}">${{draft:'טיוטה',sent:'נשלח',opened:'נפתח',signed:'נחתם'}[p.status]||'טיוטה'}</span>
         </div>
       </div>
       <div class="saved-item-actions">
@@ -1572,11 +1578,13 @@ function renderStatusPanel(){
   const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
   const total=saved.length;
   const sent=saved.filter(p=>p.status==='sent').length;
-  const draft=saved.filter(p=>p.status==='draft').length;
+  const opened=saved.filter(p=>p.status==='opened').length;
+  const signed=saved.filter(p=>p.status==='signed').length;
 
   document.getElementById('stat-total').textContent=total;
   document.getElementById('stat-sent').textContent=sent;
-  document.getElementById('stat-draft').textContent=draft;
+  document.getElementById('stat-opened').textContent=opened;
+  document.getElementById('stat-signed').textContent=signed;
 
   const badge=document.getElementById('saved-count');
   if(total>0){badge.textContent=total;badge.classList.remove('hidden')}

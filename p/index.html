@@ -674,6 +674,16 @@ body{
 <script>
 let proposalData=null,hasSignature=false;
 
+async function trackEvent(action,id,extra={}){
+  if(!id||id==='demo')return;
+  try{
+    await fetch('/price/track.php',{
+      method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({action,id,...extra})
+    });
+  }catch(e){}
+}
+
 async function loadProposal(){
   const params=new URLSearchParams(window.location.search);
   let proposalId=params.get('id');
@@ -693,6 +703,7 @@ async function loadProposal(){
     if(!r.ok)throw new Error('not found');
     proposalData=await r.json();
     renderProposal();
+    trackEvent('open',proposalId);
   }catch(e){
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('error').classList.add('show');
@@ -868,6 +879,13 @@ function submitSignature(){
 
 async function choosePayment(method){
   document.getElementById('payment-modal').classList.remove('show');
+
+  // שמור חתימה לשרת
+  trackEvent('sign',proposalData.id,{
+    signerName:window._signerName,
+    signature:window._signatureData,
+    paymentMethod:method
+  });
 
   const payload={
     proposalId:proposalData.id,

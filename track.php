@@ -77,6 +77,22 @@ if ($action === 'sign') {
     // עדכן קובץ הניהול
     updateMainFile($dir, $id, $changes);
 
+    // מייל גיבוי לאדמין
+    $users       = require __DIR__ . '/users.php';
+    $adminEmail  = $users[0]['email'] ?? '';
+    if ($adminEmail) {
+        $proto      = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+        $viewUrl    = $proto . '://' . $_SERVER['HTTP_HOST'] . '/price/view-signed.php?id=' . $id;
+        $clientName = htmlspecialchars($proposal['clientName'] ?? '');
+        $total      = number_format($proposal['total'] ?? 0, 0, '.', ',');
+        $date       = date('d/m/Y H:i');
+        $pay        = $paymentMethod === 'credit' ? 'אשראי' : 'העברה בנקאית';
+        $subject    = '=?UTF-8?B?' . base64_encode("הצעת מחיר נחתמה — $clientName") . '?=';
+        $message    = "שלום,\n\nלקוח חתם על הצעת מחיר!\n\nלקוח: $clientName\nסכום: ₪$total\nתאריך: $date\nתשלום: $pay\nחתום על ידי: $signerName\n\nצפייה בהסכם:\n$viewUrl\n\nאריאל קוטס";
+        $headers    = "From: Quotes <noreply@ariel-azulay.co.il>\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8";
+        @mail($adminEmail, $subject, $message, $headers);
+    }
+
     echo json_encode(['ok'=>true]);
     exit;
 }

@@ -382,6 +382,7 @@ body{
 .saved-btn{background:rgba(66,142,255,0.08);border:1px solid rgba(66,142,255,0.2);color:white;padding:7px 11px;font-size:12px;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.2s;font-weight:500;display:inline-flex;align-items:center;justify-content:center;gap:4px}
 .saved-btn:active{background:rgba(66,142,255,0.15);transform:scale(0.95)}
 .saved-btn.danger{color:var(--danger-soft);border-color:rgba(239,68,68,0.25);background:rgba(239,68,68,0.08)}
+.saved-btn.green{color:var(--success-bright);border-color:rgba(16,185,129,0.25);background:rgba(16,185,129,0.08)}
 .saved-btn .icon{width:13px;height:13px;stroke-width:2.2}
 
 .empty-state{text-align:center;padding:50px 20px;color:var(--text-dim);font-size:14px;line-height:1.6}
@@ -1546,6 +1547,7 @@ function renderSaved(){
         </div>
       </div>
       <div class="saved-item-actions">
+        ${p.status==='signed'?`<button class="saved-btn green" onclick="window.open('${BASE}/view-signed.php?id=${p.id}','_blank')" title="צפה בהסכם החתום">הסכם</button>`:''}
         <button class="saved-btn" onclick="loadProposal('${p.id}')">פתח</button>
         <button class="saved-btn danger" onclick="deleteProposal('${p.id}')">${iconTrash}</button>
       </div>

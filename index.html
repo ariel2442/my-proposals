@@ -1396,7 +1396,6 @@ function validateProposal(d){
   if(!d.clientName)return'יש למלא שם לקוח';
   if(!d.clientPhone)return'יש למלא טלפון לקוח';
   if(!d.items.length)return'יש להוסיף לפחות פריט אחד לתמחור';
-  if(!settings.webhookSend)return'יש להגדיר Webhook בהגדרות';
   if(!settings.baseUrl)return'יש להגדיר כתובת בסיס בהגדרות';
   return null;
 }
@@ -1478,32 +1477,39 @@ async function sendProposal(prefilledData){
   if(err){toast(err,'error');return}
   const btns=[document.getElementById('send-btn'),document.getElementById('send-btn-mobile')];
   btns.forEach(b=>{if(b){b.disabled=true;b.innerHTML='<svg class="icon"><use href="#i-send"/></svg>שולח...'}});
-  try{
-    const r=await fetch(settings.webhookSend,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
-    if(!r.ok)throw new Error('fail');
-    d.status='sent';
-    const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-    saved.unshift(d);
-    localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,200)));
-    serverSave();
-    savePropFile(d);
-    const url=settings.baseUrl.replace(/\/$/,'')+'/p/'+d.id;
-    document.getElementById('proposal-link').textContent=url;
-    document.getElementById('link-modal').classList.add('show');
-    renderStatusPanel();
-    toast('נשלח ללקוח!','success');
-    setTimeout(()=>{
-      document.getElementById('client-name').value='';
-      document.getElementById('client-phone').value='';
-      items=[];includes=[];
-      renderItems();renderIncludes();updateSummary();
-      document.getElementById('proposal-num').value=genNum();
-    },500);
-  }catch(e){
-    toast('שגיאה בשליחה','error');
-  }finally{
-    btns.forEach(b=>{if(b){b.disabled=false;b.innerHTML='<svg class="icon"><use href="#i-send"/></svg>שלח ללקוח'}});
+
+  // שמור תמיד — לפני כל דבר אחר
+  d.status='sent';
+  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+  saved.unshift(d);
+  localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,200)));
+  serverSave();
+  savePropFile(d);
+
+  const url=settings.baseUrl.replace(/\/$/,'')+'/p/'+d.id;
+  document.getElementById('proposal-link').textContent=url;
+  document.getElementById('link-modal').classList.add('show');
+  renderStatusPanel();
+
+  // נסה webhook לWhatsApp — אם לא מוגדר או נכשל, לא חוסם
+  let webhookOk=false;
+  if(settings.webhookSend){
+    try{
+      const r=await fetch(settings.webhookSend,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
+      webhookOk=r.ok;
+    }catch(e){}
   }
+
+  toast(webhookOk?'נשלח ללקוח!':'ההצעה נוצרה! שלח את הלינק ידנית','success');
+  btns.forEach(b=>{if(b){b.disabled=false;b.innerHTML='<svg class="icon"><use href="#i-send"/></svg>שלח ללקוח'}});
+
+  setTimeout(()=>{
+    document.getElementById('client-name').value='';
+    document.getElementById('client-phone').value='';
+    items=[];includes=[];
+    renderItems();renderIncludes();updateSummary();
+    document.getElementById('proposal-num').value=genNum();
+  },500);
 }
 function copyLink(){
   navigator.clipboard.writeText(document.getElementById('proposal-link').textContent);

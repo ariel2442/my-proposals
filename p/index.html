@@ -689,7 +689,7 @@ async function loadProposal(){
   }
 
   try{
-    const r=await fetch(`/price/data/${proposalId}.json`);
+    const r=await fetch(`/price/get-proposal.php?id=${proposalId}`);
     if(!r.ok)throw new Error('not found');
     proposalData=await r.json();
     renderProposal();

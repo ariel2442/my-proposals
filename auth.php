@@ -38,13 +38,82 @@ if ($action === 'login') {
     $username = trim($body['username'] ?? '');
     $password = trim($body['password'] ?? '');
     $hash = hash('sha256', $password);
+
+    $pwFile = __DIR__ . '/data/passwords.json';
+    $pwOverrides = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
+
     foreach ($users as $user) {
-        if ($user['username'] === $username && $user['password_sha256'] === $hash) {
-            setSession($user);
-            ok(['name' => $user['name'], 'avatar' => $user['avatar']]);
+        if ($user['username'] === $username) {
+            $expected = $pwOverrides[$user['id']] ?? $user['password_sha256'];
+            if ($expected === $hash) {
+                setSession($user);
+                ok(['name' => $user['name'], 'avatar' => $user['avatar']]);
+            }
+            break;
         }
     }
     fail('שם משתמש או סיסמה שגויים');
+}
+
+// ─── reset-request ─────────────────────────────────────────
+if ($action === 'reset-request') {
+    $email = strtolower(trim($body['email'] ?? ''));
+    if (!$email) fail('חסר מייל');
+
+    $targetUser = null;
+    foreach ($users as $user) {
+        if (strtolower($user['email']) === $email) { $targetUser = $user; break; }
+    }
+    if (!$targetUser) fail('כתובת המייל לא נמצאה במערכת');
+
+    $token  = bin2hex(random_bytes(32));
+    $expiry = time() + 3600;
+    $dir    = __DIR__ . '/data/';
+    if (!is_dir($dir)) mkdir($dir, 0755, true);
+
+    $tokensFile = $dir . 'reset_tokens.json';
+    $tokens = file_exists($tokensFile) ? json_decode(file_get_contents($tokensFile), true) ?? [] : [];
+    $tokens = array_values(array_filter($tokens, fn($t) => $t['userId'] !== $targetUser['id']));
+    $tokens[] = ['token' => $token, 'userId' => $targetUser['id'], 'expiry' => $expiry];
+    file_put_contents($tokensFile, json_encode($tokens));
+
+    $proto    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
+    $resetUrl = $proto . '://' . $_SERVER['HTTP_HOST'] . '/price/login.html?reset=' . $token;
+    $subject  = '=?UTF-8?B?' . base64_encode('איפוס סיסמה - Quotes') . '?=';
+    $name     = $targetUser['name'];
+    $message  = "שלום $name,\n\nלחץ על הקישור הבא לאיפוס הסיסמה שלך:\n\n$resetUrl\n\nהקישור תקף לשעה אחת.\n\nאם לא ביקשת איפוס, אפשר להתעלם מהמייל הזה.";
+    $headers  = "From: Quotes <noreply@ariel-azulay.co.il>\r\nMIME-Version: 1.0\r\nContent-Type: text/plain; charset=UTF-8";
+
+    if (!@mail($email, $subject, $message, $headers)) fail('שגיאה בשליחת המייל');
+    ok();
+}
+
+// ─── reset-confirm ─────────────────────────────────────────
+if ($action === 'reset-confirm') {
+    $token    = trim($body['token'] ?? '');
+    $password = trim($body['password'] ?? '');
+    if (!$token || !$password) fail('חסרים פרטים');
+    if (strlen($password) < 6) fail('הסיסמה חייבת להכיל לפחות 6 תווים');
+
+    $dir        = __DIR__ . '/data/';
+    $tokensFile = $dir . 'reset_tokens.json';
+    if (!file_exists($tokensFile)) fail('קישור לא תקין');
+
+    $tokens = json_decode(file_get_contents($tokensFile), true) ?? [];
+    $found  = null;
+    foreach ($tokens as $t) {
+        if ($t['token'] === $token && $t['expiry'] > time()) { $found = $t; break; }
+    }
+    if (!$found) fail('הקישור פג תוקף או לא תקין');
+
+    $pwFile = $dir . 'passwords.json';
+    $pwData = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
+    $pwData[$found['userId']] = hash('sha256', $password);
+    if (file_put_contents($pwFile, json_encode($pwData)) === false) fail('שגיאה בשמירת הסיסמה');
+
+    $tokens = array_values(array_filter($tokens, fn($t) => $t['token'] !== $token));
+    file_put_contents($tokensFile, json_encode($tokens));
+    ok();
 }
 
 // ─── Google Sign-In ─────────────────────────────────────────

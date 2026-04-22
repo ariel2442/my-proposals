@@ -49,6 +49,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 return !in_array($p['id'], $data['deletedIds']);
             }));
         }
+        // שמור סטטוס מתקדם (opened/signed) — אל תדרוס חזרה ל-sent
+        $statusRank = ['draft'=>0,'sent'=>1,'opened'=>2,'signed'=>3];
+        $existingById = [];
+        foreach ($existing['proposals'] ?? [] as $p) {
+            $existingById[$p['id']] = $p;
+        }
+        foreach ($data['proposals'] as &$p) {
+            $eid = $p['id'] ?? '';
+            if (!isset($existingById[$eid])) continue;
+            $ex      = $existingById[$eid];
+            $inRank  = $statusRank[$p['status']  ?? 'draft'] ?? 0;
+            $exRank  = $statusRank[$ex['status'] ?? 'draft'] ?? 0;
+            if ($exRank > $inRank) {
+                $p['status'] = $ex['status'];
+                foreach (['openedAt','signedAt','signerName','paymentMethod'] as $field) {
+                    if (!empty($ex[$field])) $p[$field] = $ex[$field];
+                }
+            }
+        }
+        unset($p);
     }
 
     $data['ok'] = true;

@@ -1121,9 +1121,16 @@ async function serverSave(includeSettings){
   }catch(e){}
 }
 
+const STATUS_RANK={draft:0,sent:1,opened:2,signed:3};
 function mergeById(arr){
   const m=new Map();
-  arr.forEach(p=>{const ex=m.get(p.id);if(!ex||new Date(p.date)>new Date(ex.date))m.set(p.id,p);});
+  arr.forEach(p=>{
+    const ex=m.get(p.id);
+    if(!ex){m.set(p.id,p);return;}
+    const pr=STATUS_RANK[p.status]??0,er=STATUS_RANK[ex.status]??0;
+    if(pr>er)m.set(p.id,p);
+    else if(pr===er&&new Date(p.date)>new Date(ex.date))m.set(p.id,p);
+  });
   return[...m.values()].sort((a,b)=>new Date(b.date)-new Date(a.date)).slice(0,200);
 }
 // ─── end server sync ──────────────────────────────────────────

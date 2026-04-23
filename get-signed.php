@@ -7,10 +7,12 @@ if (!$id) { http_response_code(400); echo json_encode(['error' => 'Missing id'])
 
 require_once __DIR__ . '/db.php';
 
-$stmt = db()->prepare('SELECT data FROM proposals WHERE id = ?');
+$stmt = db()->prepare('SELECT data FROM signed_agreements WHERE proposal_id = ?');
 $stmt->execute([$id]);
 $row = $stmt->fetch();
 
 if (!$row) { http_response_code(404); echo json_encode(['error' => 'not_found']); exit; }
 
-echo $row['data'];
+$data = json_decode($row['data'], true) ?? [];
+// מחזיר רק את תמונת החתימה — לא מידע רגיש אחר
+echo json_encode(['ok' => true, 'signature' => $data['signature'] ?? null]);

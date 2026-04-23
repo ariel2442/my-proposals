@@ -597,6 +597,23 @@ body{
 .btn-print-copy:hover{background:rgba(255,255,255,0.18)}
 .btn-print-copy .icon{width:17px;height:17px}
 
+/* ========== ALREADY SIGNED BANNER ========== */
+.signed-already-banner{
+  background:rgba(16,185,129,0.12);
+  border:1px solid rgba(16,185,129,0.35);
+  border-radius:14px;padding:13px 18px;
+  display:flex;align-items:center;gap:12px;
+  font-size:14px;font-weight:600;color:var(--success-bright);
+  margin-bottom:24px;animation:fadeUp 0.5s 0.15s ease backwards;
+}
+.signed-already-banner svg{width:18px;height:18px;flex-shrink:0;stroke:var(--success);stroke-width:2.5;fill:none}
+.signed-sig-wrap{margin-top:14px}
+.signed-sig-img{
+  max-width:220px;max-height:90px;object-fit:contain;
+  background:rgba(255,255,255,0.95);border-radius:8px;
+  padding:6px;display:block;margin:0 auto;
+}
+
 /* ========== PRINT ========== */
 @media print{
   *{print-color-adjust:exact;-webkit-print-color-adjust:exact}
@@ -648,6 +665,12 @@ body{
 
 <!-- Main -->
 <div class="page" id="main-content" style="display:none">
+
+  <!-- Already Signed Banner (shown when proposal status = signed) -->
+  <div class="signed-already-banner" id="signed-already-banner" style="display:none">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    ההצעה כבר נחתמה — צפייה בלבד
+  </div>
 
   <!-- Top Header: Date + Proposal Number -->
   <div class="top-header">
@@ -744,6 +767,9 @@ body{
           <div>חתום על ידי: <strong id="signed-name-display">—</strong></div>
           <div>תאריך: <strong id="signed-date-display">—</strong></div>
           <div>אמצעי תשלום: <strong id="signed-pay-display">—</strong></div>
+        </div>
+        <div class="signed-sig-wrap" id="signed-sig-wrap" style="display:none">
+          <img class="signed-sig-img" id="signed-sig-img" alt="חתימה">
         </div>
       </div>
     </div>
@@ -958,7 +984,43 @@ function renderProposal(){
   document.getElementById('loading').classList.add('hidden');
   document.getElementById('main-content').style.display='block';
 
-  setupSignature();
+  if(proposalData.status==='signed'){
+    showAlreadySigned();
+  }else{
+    setupSignature();
+  }
+}
+
+async function showAlreadySigned(){
+  const d=proposalData;
+  const at=d.signedAt?new Date(d.signedAt):null;
+  const dateStr=at
+    ?at.toLocaleDateString('he-IL')+' '+at.toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'})
+    :'—';
+  const payLabel=d.paymentMethod==='credit'?'אשראי'
+    :d.paymentMethod==='bank'?'העברה בנקאית'
+    :d.paymentMethod||'—';
+
+  document.getElementById('signed-already-banner').style.display='flex';
+  document.getElementById('signed-name-display').textContent=d.signerName||'—';
+  document.getElementById('signed-date-display').textContent=dateStr;
+  document.getElementById('signed-pay-display').textContent=payLabel;
+  document.getElementById('sign-form-area').style.display='none';
+  document.getElementById('signed-box').style.display='block';
+
+  // טען תמונת חתימה מהשרת
+  if(d.id&&d.id!=='demo'){
+    try{
+      const r=await fetch(`/price/get-signed.php?id=${encodeURIComponent(d.id)}`);
+      if(r.ok){
+        const sig=await r.json();
+        if(sig.signature){
+          document.getElementById('signed-sig-img').src=sig.signature;
+          document.getElementById('signed-sig-wrap').style.display='block';
+        }
+      }
+    }catch(e){}
+  }
 }
 
 function setupSignature(){

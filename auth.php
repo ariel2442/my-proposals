@@ -4,11 +4,13 @@ header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type');
 
-$users = require __DIR__ . '/users.php';
+$users  = require __DIR__ . '/users.php';
 $action = $_GET['action'] ?? '';
-$body = json_decode(file_get_contents('php://input'), true) ?? [];
+$body   = json_decode(file_get_contents('php://input'), true) ?? [];
 
-// ─── helpers ───────────────────────────────────────────────
+require_once __DIR__ . '/db.php';
+
+// ─── helpers ───────────────────────────────────────────────────
 function setSession($user) {
     $_SESSION['auth'] = [
         'id'     => $user['id'],
@@ -21,30 +23,32 @@ function setSession($user) {
 function ok($data=[])  { echo json_encode(array_merge(['ok'=>true],  $data)); exit; }
 function fail($msg)    { http_response_code(401); echo json_encode(['ok'=>false,'error'=>$msg]); exit; }
 
-// ─── check ─────────────────────────────────────────────────
+// ─── check ─────────────────────────────────────────────────────
 if ($action === 'check') {
     echo json_encode(['ok' => !empty($_SESSION['auth']), 'user' => $_SESSION['auth'] ?? null]);
     exit;
 }
 
-// ─── logout ────────────────────────────────────────────────
+// ─── logout ────────────────────────────────────────────────────
 if ($action === 'logout') {
     session_destroy();
     ok();
 }
 
-// ─── login (username + password) ───────────────────────────
+// ─── login ─────────────────────────────────────────────────────
 if ($action === 'login') {
     $username = trim($body['username'] ?? '');
     $password = trim($body['password'] ?? '');
-    $hash = hash('sha256', $password);
-
-    $pwFile = __DIR__ . '/data/passwords.json';
-    $pwOverrides = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
+    $hash     = hash('sha256', $password);
 
     foreach ($users as $user) {
         if ($user['username'] === $username) {
-            $expected = $pwOverrides[$user['id']] ?? $user['password_sha256'];
+            // check DB override first, fall back to users.php
+            $stmt = db()->prepare('SELECT password_hash FROM user_passwords WHERE user_id = ?');
+            $stmt->execute([$user['id']]);
+            $row      = $stmt->fetch();
+            $expected = $row ? $row['password_hash'] : $user['password_sha256'];
+
             if ($expected === $hash) {
                 setSession($user);
                 ok(['name' => $user['name'], 'avatar' => $user['avatar']]);
@@ -55,7 +59,7 @@ if ($action === 'login') {
     fail('שם משתמש או סיסמה שגויים');
 }
 
-// ─── reset-request ─────────────────────────────────────────
+// ─── reset-request ─────────────────────────────────────────────
 if ($action === 'reset-request') {
     $email = strtolower(trim($body['email'] ?? ''));
     if (!$email) fail('חסר מייל');
@@ -68,14 +72,11 @@ if ($action === 'reset-request') {
 
     $token  = bin2hex(random_bytes(32));
     $expiry = time() + 3600;
-    $dir    = __DIR__ . '/data/';
-    if (!is_dir($dir)) mkdir($dir, 0755, true);
 
-    $tokensFile = $dir . 'reset_tokens.json';
-    $tokens = file_exists($tokensFile) ? json_decode(file_get_contents($tokensFile), true) ?? [] : [];
-    $tokens = array_values(array_filter($tokens, fn($t) => $t['userId'] !== $targetUser['id']));
-    $tokens[] = ['token' => $token, 'userId' => $targetUser['id'], 'expiry' => $expiry];
-    file_put_contents($tokensFile, json_encode($tokens));
+    // delete any existing token for this user, then insert new one
+    $pdo = db();
+    $pdo->prepare('DELETE FROM reset_tokens WHERE user_id = ?')->execute([$targetUser['id']]);
+    $pdo->prepare('INSERT INTO reset_tokens (token, user_id, expires_at) VALUES (?,?,?)')->execute([$token, $targetUser['id'], $expiry]);
 
     $proto    = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
     $resetUrl = $proto . '://' . $_SERVER['HTTP_HOST'] . '/price/login.html?reset=' . $token;
@@ -88,40 +89,32 @@ if ($action === 'reset-request') {
     ok();
 }
 
-// ─── reset-confirm ─────────────────────────────────────────
+// ─── reset-confirm ─────────────────────────────────────────────
 if ($action === 'reset-confirm') {
     $token    = trim($body['token'] ?? '');
     $password = trim($body['password'] ?? '');
     if (!$token || !$password) fail('חסרים פרטים');
     if (strlen($password) < 6) fail('הסיסמה חייבת להכיל לפחות 6 תווים');
 
-    $dir        = __DIR__ . '/data/';
-    $tokensFile = $dir . 'reset_tokens.json';
-    if (!file_exists($tokensFile)) fail('קישור לא תקין');
+    $pdo  = db();
+    $stmt = $pdo->prepare('SELECT user_id FROM reset_tokens WHERE token = ? AND expires_at > ?');
+    $stmt->execute([$token, time()]);
+    $row  = $stmt->fetch();
+    if (!$row) fail('הקישור פג תוקף או לא תקין');
 
-    $tokens = json_decode(file_get_contents($tokensFile), true) ?? [];
-    $found  = null;
-    foreach ($tokens as $t) {
-        if ($t['token'] === $token && $t['expiry'] > time()) { $found = $t; break; }
-    }
-    if (!$found) fail('הקישור פג תוקף או לא תקין');
-
-    $pwFile = $dir . 'passwords.json';
-    $pwData = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
-    $pwData[$found['userId']] = hash('sha256', $password);
-    if (file_put_contents($pwFile, json_encode($pwData)) === false) fail('שגיאה בשמירת הסיסמה');
-
-    $tokens = array_values(array_filter($tokens, fn($t) => $t['token'] !== $token));
-    file_put_contents($tokensFile, json_encode($tokens));
+    $uid = $row['user_id'];
+    $pdo->prepare('INSERT INTO user_passwords (user_id, password_hash) VALUES (?,?)
+        ON DUPLICATE KEY UPDATE password_hash=VALUES(password_hash)')->execute([$uid, hash('sha256', $password)]);
+    $pdo->prepare('DELETE FROM reset_tokens WHERE token = ?')->execute([$token]);
     ok();
 }
 
-// ─── Google Sign-In ─────────────────────────────────────────
+// ─── Google Sign-In ─────────────────────────────────────────────
 if ($action === 'google') {
     $token = $body['credential'] ?? '';
     if (!$token) fail('חסר טוקן');
 
-    $r = @file_get_contents("https://oauth2.googleapis.com/tokeninfo?id_token=$token");
+    $r    = @file_get_contents("https://oauth2.googleapis.com/tokeninfo?id_token=$token");
     $data = $r ? json_decode($r, true) : null;
     if (!$data || empty($data['email'])) fail('טוקן לא תקין');
 
@@ -135,43 +128,43 @@ if ($action === 'google') {
     fail('המייל הזה לא מורשה');
 }
 
-// ─── WebAuthn: get challenge ────────────────────────────────
+// ─── WebAuthn: get challenge ────────────────────────────────────
 if ($action === 'webauthn-challenge') {
     $challenge = base64_encode(random_bytes(32));
     $_SESSION['webauthn_challenge'] = $challenge;
     $userId = $body['userId'] ?? '1';
-    $stored = [];
-    $credFile = __DIR__ . '/data/webauthn_creds.json';
-    if (file_exists($credFile)) $stored = json_decode(file_get_contents($credFile), true) ?? [];
-    ok(['challenge' => $challenge, 'credentials' => array_column(array_filter($stored, fn($c)=>$c['userId']===$userId), 'credentialId')]);
+
+    $stmt = db()->prepare('SELECT credential_id FROM webauthn_creds WHERE user_id = ?');
+    $stmt->execute([$userId]);
+    $creds = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+    ok(['challenge' => $challenge, 'credentials' => $creds]);
 }
 
-// ─── WebAuthn: register ─────────────────────────────────────
+// ─── WebAuthn: register ─────────────────────────────────────────
 if ($action === 'webauthn-register') {
     if (empty($_SESSION['auth'])) fail('לא מחובר');
     $credId = $body['credentialId'] ?? '';
     if (!$credId) fail('חסר credential');
-    $credFile = __DIR__ . '/data/webauthn_creds.json';
-    $stored = file_exists($credFile) ? json_decode(file_get_contents($credFile), true) : [];
-    $stored[] = ['userId' => $_SESSION['auth']['id'], 'credentialId' => $credId, 'name' => $_SESSION['auth']['name']];
-    file_put_contents($credFile, json_encode($stored));
+
+    db()->prepare('INSERT INTO webauthn_creds (user_id, credential_id, name) VALUES (?,?,?)')->execute([
+        $_SESSION['auth']['id'], $credId, $_SESSION['auth']['name'],
+    ]);
     ok();
 }
 
-// ─── WebAuthn: verify ───────────────────────────────────────
+// ─── WebAuthn: verify ───────────────────────────────────────────
 if ($action === 'webauthn-verify') {
     $credId = $body['credentialId'] ?? '';
-    $credFile = __DIR__ . '/data/webauthn_creds.json';
-    if (!file_exists($credFile)) fail('לא נמצא');
-    $stored = json_decode(file_get_contents($credFile), true) ?? [];
-    foreach ($stored as $cred) {
-        if ($cred['credentialId'] === $credId) {
-            foreach ($users as $user) {
-                if ($user['id'] === $cred['userId']) {
-                    setSession($user);
-                    ok(['name' => $user['name'], 'avatar' => $user['avatar']]);
-                }
-            }
+    $stmt   = db()->prepare('SELECT user_id FROM webauthn_creds WHERE credential_id = ?');
+    $stmt->execute([$credId]);
+    $row = $stmt->fetch();
+    if (!$row) fail('לא מורשה');
+
+    foreach ($users as $user) {
+        if ($user['id'] === $row['user_id']) {
+            setSession($user);
+            ok(['name' => $user['name'], 'avatar' => $user['avatar']]);
         }
     }
     fail('לא מורשה');

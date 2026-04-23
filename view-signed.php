@@ -5,22 +5,29 @@ if (empty($_SESSION['auth'])) { header('Location: /price/login.html'); exit; }
 $id = preg_replace('/[^a-zA-Z0-9_\-]/', '', $_GET['id'] ?? '');
 if (!$id) { http_response_code(400); echo 'Missing id'; exit; }
 
-$dir         = __DIR__ . '/data/';
-$signedFile  = $dir . $id . '_signed.json';
-$proposalFile= $dir . $id . '.json';
+require_once __DIR__ . '/db.php';
+$pdo = db();
 
-if (!file_exists($signedFile)) {
+$stmt = $pdo->prepare('SELECT data FROM signed_agreements WHERE proposal_id = ?');
+$stmt->execute([$id]);
+$signedRow = $stmt->fetch();
+
+if (!$signedRow) {
     echo '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>לא נמצא</title></head><body style="font-family:sans-serif;text-align:center;padding:60px;color:#64748b">ההסכם החתום לא נמצא.</body></html>';
     exit;
 }
 
-$signed   = json_decode(file_get_contents($signedFile), true)   ?? [];
-$proposal = file_exists($proposalFile) ? json_decode(file_get_contents($proposalFile), true) ?? [] : [];
+$signed = json_decode($signedRow['data'], true) ?? [];
+
+$stmt = $pdo->prepare('SELECT data FROM proposals WHERE id = ?');
+$stmt->execute([$id]);
+$proposalRow = $stmt->fetch();
+$proposal = $proposalRow ? json_decode($proposalRow['data'], true) ?? [] : [];
 
 $signedDate = isset($signed['signedAt'])
     ? date('d/m/Y H:i', intval($signed['signedAt']) / 1000)
     : '—';
-$payLabel = $signed['paymentMethod'] === 'credit' ? 'תשלום באשראי' : 'העברה בנקאית';
+$payLabel = ($signed['paymentMethod'] ?? '') === 'credit' ? 'תשלום באשראי' : 'העברה בנקאית';
 ?>
 <!DOCTYPE html>
 <html lang="he" dir="rtl">

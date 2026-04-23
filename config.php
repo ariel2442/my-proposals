@@ -1,6 +1,10 @@
 <?php
-// ─── Database credentials ──────────────────────────────────────
-// Fill in before deploying. Keep this file out of version control.
+// ─── Switch ────────────────────────────────────────────────────
+// false = file-based storage (default, works immediately)
+// true  = MySQL (set after running setup-db.php and filling credentials below)
+define('USE_DB', false);
+
+// ─── Database credentials (only needed when USE_DB = true) ─────
 define('DB_HOST',    'localhost');
 define('DB_NAME',    'quotes_db');
 define('DB_USER',    'your_db_user');

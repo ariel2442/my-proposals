@@ -799,12 +799,21 @@ body{
           </div>
           <div class="section-card">
             <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>Make Webhooks
+              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>WhatsApp / Green API
             </div>
             <div class="field">
-              <label>Webhook #1 — שליחת הצעה</label>
-              <input type="url" id="webhook-send" placeholder="https://hook.eu2.make.com/...">
-              <div class="field-hint">מופעל כשלוחצים "שלח ללקוח"</div>
+              <label>Instance ID</label>
+              <input type="text" id="green-api-instance" placeholder="1234567890">
+              <div class="field-hint">מה-Green API dashboard שלך</div>
+            </div>
+            <div class="field">
+              <label>API Token</label>
+              <input type="text" id="green-api-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx">
+            </div>
+            <div class="field">
+              <label>הטלפון שלך (לקבלת התראות)</label>
+              <input type="tel" id="sales-rep-phone" placeholder="0521234567" inputmode="numeric">
+              <div class="field-hint">תקבל WhatsApp כשלקוח פותח הצעה</div>
             </div>
             <div class="field">
               <label>כתובת בסיס (הדומיין שלך)</label>
@@ -947,12 +956,40 @@ const DEFAULT_TERMS=`חתימת הלקוח תיחשב הסכמה סופית לפ
 הלקוח מאשר לספק לפנות אליו בכל אמצעי התקשורת הרלוונטים
 הספק שומר את הזכות להוסיף קרדיט שלו בתחתית הדף`;
 
+// ─── server state ─────────────────────────────────────────────
+let allProposals=[];
+
+function apiBase(){return window.location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'')}
+async function apiCall(method,action,body){
+  const url=apiBase()+'/api.php?action='+action;
+  const opts={method,headers:{'Content-Type':'application/json'}};
+  if(body)opts.body=JSON.stringify(body);
+  const r=await fetch(url,opts);
+  return r.json();
+}
+
+async function loadAllData(){
+  try{
+    const [sRes,pRes]=await Promise.all([
+      apiCall('GET','get-settings'),
+      apiCall('GET','list')
+    ]);
+    if(sRes.ok){settings={...settings,...sRes.settings};applySettings(settings);}
+    if(pRes.ok){allProposals=pRes.proposals||[];renderSaved();renderStatusPanel();}
+  }catch(e){
+    // fallback: localStorage
+    allProposals=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
+    renderSaved();renderStatusPanel();
+  }
+}
+
 function init(){
   loadSettings();loadLibrary();
   processSteps=[...DEFAULT_PROCESS];includes=[];items=[];
   document.getElementById('proposal-num').value=genNum();
   renderProcess();renderIncludes();renderItems();updateSummary();renderSaved();renderLibrary();
   renderStatusPanel();
+  loadAllData();
 }
 function genNum(){return new Date().getFullYear()+'-'+String(Math.floor(Math.random()*900)+100)}
 
@@ -1114,26 +1151,36 @@ function updateSummary(){
 // ─── settings ────────────────────────────────────────────────
 function loadSettings(){
   try{settings=JSON.parse(localStorage.getItem('pm_settings')||'{}')}catch(e){settings={}}
-  document.getElementById('biz-name').value=settings.bizName||'';
-  document.getElementById('biz-email').value=settings.bizEmail||'';
-  document.getElementById('biz-phone').value=settings.bizPhone||'';
-  document.getElementById('biz-bank').value=settings.bizBank||'';
-  document.getElementById('webhook-send').value=settings.webhookSend||'';
-  document.getElementById('base-url').value=settings.baseUrl||'';
-  document.getElementById('default-terms').value=settings.defaultTerms||DEFAULT_TERMS;
+  applySettings(settings);
 }
-function saveSettings(){
+function applySettings(s){
+  document.getElementById('biz-name').value=s.bizName||'';
+  document.getElementById('biz-email').value=s.bizEmail||'';
+  document.getElementById('biz-phone').value=s.bizPhone||'';
+  document.getElementById('biz-bank').value=s.bizBank||'';
+  document.getElementById('green-api-instance').value=s.greenApiInstance||'';
+  document.getElementById('green-api-token').value=s.greenApiToken||'';
+  document.getElementById('sales-rep-phone').value=s.salesRepPhone||'';
+  document.getElementById('base-url').value=s.baseUrl||'';
+  document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
+}
+async function saveSettings(){
   settings={
     bizName:document.getElementById('biz-name').value,
     bizEmail:document.getElementById('biz-email').value,
     bizPhone:document.getElementById('biz-phone').value,
     bizBank:document.getElementById('biz-bank').value,
-    webhookSend:document.getElementById('webhook-send').value,
+    greenApiInstance:document.getElementById('green-api-instance').value,
+    greenApiToken:document.getElementById('green-api-token').value,
+    salesRepPhone:document.getElementById('sales-rep-phone').value,
     baseUrl:document.getElementById('base-url').value,
     defaultTerms:document.getElementById('default-terms').value
   };
   localStorage.setItem('pm_settings',JSON.stringify(settings));
-  toast('ההגדרות נשמרו','success');
+  try{
+    const r=await apiCall('POST','save-settings',settings);
+    toast(r.ok?'ההגדרות נשמרו':'שגיאה בשמירה',r.ok?'success':'error');
+  }catch(e){toast('ההגדרות נשמרו (מקומי)','success');}
 }
 
 // ─── library ─────────────────────────────────────────────────
@@ -1191,31 +1238,36 @@ function getProposalData(){
     projectType:document.getElementById('project-type').value.trim(),
     proposalNum:document.getElementById('proposal-num').value.trim(),
     date:new Date().toISOString(),
+    createdAt:new Date().toISOString(),
     processSteps:processSteps.filter(s=>s.trim()),
     includes:includes.filter(s=>s.trim()),
     items:items.filter(it=>it.title.trim()),
     subtotal:sub,vat,vatRate:VAT_RATE,total:sub+vat,
     terms:(settings.defaultTerms||DEFAULT_TERMS).split('\n').filter(t=>t.trim()),
     biz:{name:settings.bizName||'',email:settings.bizEmail||'',phone:settings.bizPhone||'',bank:settings.bizBank||''},
-    status:'draft'
+    status:'draft',
+    totalViews:0,totalViewSeconds:0,views:[],
+    salesRepPhone:settings.salesRepPhone||''
   };
 }
 function validateProposal(d){
   if(!d.clientName)return'יש למלא שם לקוח';
   if(!d.clientPhone)return'יש למלא טלפון לקוח';
   if(!d.items.length)return'יש להוסיף לפחות פריט אחד לתמחור';
-  if(!settings.webhookSend)return'יש להגדיר Webhook בהגדרות';
   if(!settings.baseUrl)return'יש להגדיר כתובת בסיס בהגדרות';
   return null;
 }
-function saveProposal(){
+async function saveProposal(){
   const d=getProposalData();
   if(!d.clientName){toast('יש למלא שם לקוח','error');return}
-  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-  saved.unshift(d);
-  localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,50)));
-  renderStatusPanel();
-  toast('נשמר בהיסטוריה','success');
+  try{
+    const r=await apiCall('POST','save',d);
+    if(r.ok){
+      allProposals=[r.proposal,...allProposals.filter(p=>p.id!==d.id)];
+      renderStatusPanel();
+      toast('נשמר כטיוטה','success');
+    }
+  }catch(e){toast('שגיאה בשמירה','error');}
 }
 
 async function sendProposal(){
@@ -1225,13 +1277,10 @@ async function sendProposal(){
   const btns=[document.getElementById('send-btn'),document.getElementById('send-btn-mobile')];
   btns.forEach(b=>{if(b){b.disabled=true;b.innerHTML='<svg class="icon"><use href="#i-send"/></svg>שולח...'}});
   try{
-    const r=await fetch(settings.webhookSend,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(d)});
-    if(!r.ok)throw new Error('fail');
-    d.status='sent';
-    const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-    saved.unshift(d);
-    localStorage.setItem('pm_proposals',JSON.stringify(saved.slice(0,50)));
-    const url=settings.baseUrl.replace(/\/$/,'')+'/p/'+d.id;
+    const r=await apiCall('POST','send',d);
+    if(!r.ok)throw new Error(r.error||'שגיאה');
+    allProposals=[r.proposal,...allProposals.filter(p=>p.id!==d.id)];
+    const url=(settings.baseUrl||'').replace(/\/$/,'')+'/p/?id='+d.id;
     document.getElementById('proposal-link').textContent=url;
     document.getElementById('link-modal').classList.add('show');
     renderStatusPanel();
@@ -1255,37 +1304,40 @@ function copyLink(){
 }
 
 // ─── saved list ───────────────────────────────────────────────
+const STATUS_LABELS={draft:'טיוטה',sent:'נשלח',viewed:'נפתח',signed:'נחתם',expired:'פג תוקף'};
+const STATUS_CLASS ={draft:'draft',sent:'sent',viewed:'opened',signed:'signed',expired:'draft'};
+
 function renderSaved(){
   const list=document.getElementById('saved-list');
-  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
   const badge=document.getElementById('saved-count');
-  if(saved.length>0){badge.textContent=saved.length;badge.classList.remove('hidden')}
-  else{badge.classList.add('hidden')}
-  if(!saved.length){
+  if(allProposals.length>0){badge.textContent=allProposals.length;badge.classList.remove('hidden')}
+  else badge.classList.add('hidden');
+  if(!allProposals.length){
     list.innerHTML='<div class="empty-state"><div class="empty-state-icon"><svg class="icon"><use href="#i-clipboard"/></svg></div>אין הצעות שמורות עדיין</div>';
     return;
   }
-  list.innerHTML=saved.map(p=>`
+  list.innerHTML=allProposals.map(p=>`
     <div class="saved-item">
       <div class="saved-item-info">
         <div class="saved-item-name">${esc(p.clientName)}${p.projectType?' · '+esc(p.projectType):''}</div>
         <div class="saved-item-meta">
-          <span>${new Date(p.date).toLocaleDateString('he-IL')}</span>
+          <span>${new Date(p.date||p.createdAt).toLocaleDateString('he-IL')}</span>
           <span class="saved-item-meta-dot"></span>
           <span>₪${p.total.toLocaleString('he-IL')}</span>
           <span class="saved-item-meta-dot"></span>
-          <span class="saved-status ${p.status==='sent'?'sent':'draft'}">${p.status==='sent'?'נשלח':'טיוטה'}</span>
+          <span class="saved-status ${STATUS_CLASS[p.status]||'draft'}">${STATUS_LABELS[p.status]||'טיוטה'}</span>
+          ${p.totalViews>0?`<span class="saved-item-meta-dot"></span><span>👁 ${p.totalViews}</span>`:''}
         </div>
       </div>
       <div class="saved-item-actions">
         <button class="saved-btn" onclick="loadProposal('${p.id}')">פתח</button>
+        <button class="saved-btn" onclick="duplicateProposal('${p.id}')" title="שכפל">⎘</button>
         <button class="saved-btn danger" onclick="deleteProposal('${p.id}')">${iconTrash}</button>
       </div>
     </div>`).join('');
 }
 function loadProposal(id){
-  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-  const p=saved.find(x=>x.id===id);if(!p)return;
+  const p=allProposals.find(x=>x.id===id);if(!p)return;
   document.getElementById('client-name').value=p.clientName||'';
   document.getElementById('client-phone').value=p.clientPhone||'';
   document.getElementById('project-type').value=p.projectType||'';
@@ -1294,19 +1346,30 @@ function loadProposal(id){
   renderProcess();renderIncludes();renderItems();updateSummary();
   switchTab('new');toast('ההצעה נטענה','success');
 }
-function deleteProposal(id){
+async function deleteProposal(id){
   if(!confirm('למחוק את ההצעה?'))return;
-  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-  localStorage.setItem('pm_proposals',JSON.stringify(saved.filter(x=>x.id!==id)));
-  renderSaved();renderStatusPanel();toast('נמחק','');
+  try{
+    await apiCall('POST','delete',{id});
+    allProposals=allProposals.filter(x=>x.id!==id);
+    renderSaved();renderStatusPanel();toast('נמחק','');
+  }catch(e){toast('שגיאה במחיקה','error');}
+}
+async function duplicateProposal(id){
+  try{
+    const r=await apiCall('POST','duplicate',{id});
+    if(r.ok){
+      allProposals=[r.proposal,...allProposals];
+      renderSaved();renderStatusPanel();toast('שוכפל בהצלחה!','success');
+    }
+  }catch(e){toast('שגיאה בשכפול','error');}
 }
 
-// ─── status panel ─────────────────────────────────────────────
+// ─── status panel + analytics ─────────────────────────────────
 function renderStatusPanel(){
-  const saved=JSON.parse(localStorage.getItem('pm_proposals')||'[]');
-  const total=saved.length;
-  const sent=saved.filter(p=>p.status==='sent').length;
-  const draft=saved.filter(p=>p.status==='draft').length;
+  const total  = allProposals.length;
+  const sent   = allProposals.filter(p=>['sent','viewed','signed'].includes(p.status)).length;
+  const viewed = allProposals.filter(p=>['viewed','signed'].includes(p.status)).length;
+  const draft  = allProposals.filter(p=>p.status==='draft').length;
 
   document.getElementById('stat-total').textContent=total;
   document.getElementById('stat-sent').textContent=sent;
@@ -1317,22 +1380,21 @@ function renderStatusPanel(){
   else badge.classList.add('hidden');
 
   const container=document.getElementById('panel-proposals');
-  if(!saved.length){
+  if(!allProposals.length){
     container.innerHTML='<div class="panel-empty">אין הצעות עדיין.<br>צור הצעה חדשה!</div>';
     return;
   }
 
-  const statusLabels={draft:'טיוטה',sent:'נשלח',opened:'נפתח',signed:'נחתם'};
-  container.innerHTML=saved.slice(0,8).map(p=>`
+  container.innerHTML=allProposals.slice(0,8).map(p=>`
     <div class="panel-proposal" onclick="loadProposal('${p.id}')">
       <div class="panel-proposal-name">${esc(p.clientName)}${p.projectType?' · '+esc(p.projectType):''}</div>
       <div class="panel-proposal-meta">
         <span class="panel-proposal-amount">₪${p.total.toLocaleString('he-IL')}</span>
-        <span class="status-badge ${p.status||'draft'}">
-          <span class="status-dot"></span>${statusLabels[p.status]||'טיוטה'}
+        <span class="status-badge ${STATUS_CLASS[p.status]||'draft'}">
+          <span class="status-dot"></span>${STATUS_LABELS[p.status]||'טיוטה'}
         </span>
       </div>
-      <div class="panel-proposal-date">${new Date(p.date).toLocaleDateString('he-IL')}</div>
+      <div class="panel-proposal-date">${new Date(p.date||p.createdAt).toLocaleDateString('he-IL')}${p.totalViews>0?' · 👁 '+p.totalViews:''}</div>
     </div>`).join('');
 }
 

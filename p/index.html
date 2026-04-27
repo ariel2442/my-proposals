@@ -672,13 +672,15 @@ body{
 </div>
 
 <script>
-let proposalData=null,hasSignature=false;
+let proposalData=null,hasSignature=false,_viewStart=Date.now();
+
+function apiBase(){return window.location.pathname.replace(/\/p\/.*$/,'').replace(/\/$/,'')}
 
 async function loadProposal(){
   const params=new URLSearchParams(window.location.search);
   let proposalId=params.get('id');
   if(!proposalId){
-    const match=window.location.pathname.match(/\/p\/([^\/]+)/);
+    const match=window.location.pathname.match(/\/p\/([^\/?\s]+)/);
     if(match)proposalId=match[1];
   }
 
@@ -689,15 +691,34 @@ async function loadProposal(){
   }
 
   try{
-    const r=await fetch(`/price/data/${proposalId}.json`);
+    const r=await fetch(apiBase()+'/api.php?action=get&id='+encodeURIComponent(proposalId));
     if(!r.ok)throw new Error('not found');
-    proposalData=await r.json();
+    const data=await r.json();
+    if(!data.ok)throw new Error('not found');
+    proposalData=data.proposal;
     renderProposal();
+    // track view (fire-and-forget)
+    trackView(proposalId,0);
   }catch(e){
     document.getElementById('loading').classList.add('hidden');
     document.getElementById('error').classList.add('show');
   }
 }
+
+function trackView(id,durationSeconds){
+  navigator.sendBeacon
+    ? navigator.sendBeacon(apiBase()+'/track.php', JSON.stringify({id,durationSeconds}))
+    : fetch(apiBase()+'/track.php',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,durationSeconds}),keepalive:true}).catch(()=>{});
+}
+
+// Track duration on page leave
+document.addEventListener('visibilitychange',()=>{
+  if(document.visibilityState==='hidden'&&proposalData?.id){
+    const dur=Math.round((Date.now()-_viewStart)/1000);
+    trackView(proposalData.id,dur);
+    _viewStart=Date.now();
+  }
+});
 
 function getDemoData(){
   return{

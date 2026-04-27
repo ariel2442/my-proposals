@@ -97,7 +97,7 @@ h1{text-align:center;font-size:24px;font-weight:900;letter-spacing:-0.02em;margi
   color:white;border:none;border-radius:var(--radius-md);
   font-size:15px;font-weight:700;font-family:inherit;cursor:pointer;
   box-shadow:0 4px 20px rgba(66,142,255,0.5),inset 0 1px 0 rgba(255,255,255,0.25);
-  transition:all 0.2s;position:relative;
+  transition:all 0.2s;
 }
 .btn-login:active{transform:scale(0.98)}
 .btn-login:disabled{opacity:0.6;cursor:not-allowed}
@@ -139,6 +139,26 @@ h1{text-align:center;font-size:24px;font-weight:900;letter-spacing:-0.02em;margi
 }
 .error-msg.show{display:block;animation:fadeUp 0.25s}
 
+.ok-msg{
+  background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.3);
+  color:#6ee7b7;padding:11px 14px;border-radius:10px;
+  font-size:13px;font-weight:500;margin-top:14px;
+  display:none;text-align:center;
+}
+.ok-msg.show{display:block;animation:fadeUp 0.25s}
+
+.forgot-link{text-align:left;margin-top:-2px;margin-bottom:10px}
+.forgot-link a{font-size:12px;color:var(--text-dim);text-decoration:none;cursor:pointer;transition:color 0.2s}
+.forgot-link a:hover{color:var(--blue-soft)}
+
+.back-btn{
+  background:none;border:none;color:var(--text-dim);font-size:13px;
+  font-family:inherit;cursor:pointer;padding:0;margin-bottom:20px;
+  display:flex;align-items:center;gap:6px;transition:color 0.2s;
+}
+.back-btn:hover{color:var(--text)}
+.back-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+
 .hidden{display:none!important}
 </style>
 </head>
@@ -152,46 +172,93 @@ h1{text-align:center;font-size:24px;font-weight:900;letter-spacing:-0.02em;margi
   <div class="logo">
     <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
   </div>
-  <h1>ברוך הבא</h1>
-  <p class="subtitle">Quotes · מערכת הצעות מחיר</p>
 
-  <div class="field">
-    <label>שם משתמש</label>
-    <input type="text" id="username" placeholder="ariel" autocomplete="username" autocorrect="off" autocapitalize="off">
+  <!-- ── כניסה ── -->
+  <div id="view-login">
+    <h1>ברוך הבא</h1>
+    <p class="subtitle">Quotes · מערכת הצעות מחיר</p>
+
+    <div class="field">
+      <label>שם משתמש</label>
+      <input type="text" id="username" placeholder="ariel" autocomplete="username" autocorrect="off" autocapitalize="off">
+    </div>
+    <div class="field">
+      <label>סיסמה</label>
+      <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <div class="forgot-link"><a onclick="showView('forgot');return false">שכחתי סיסמה</a></div>
+    <button class="btn-login" id="login-btn" onclick="doLogin()">כניסה</button>
+
+    <div class="divider">או</div>
+
+    <button class="btn-google" id="google-btn" onclick="doGoogle()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+        <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+        <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+        <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+      </svg>
+      התחבר עם Google
+    </button>
+
+    <button class="btn-biometric hidden" id="biometric-btn" onclick="doBiometric()">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12 1C6.48 1 2 5.48 2 11s4.48 10 10 10 10-4.48 10-10S17.52 1 12 1zm-1 14H9V9h2v6zm4 0h-2V9h2v6z"/>
+      </svg>
+      <span id="biometric-label">Face ID / Touch ID</span>
+    </button>
   </div>
-  <div class="field">
-    <label>סיסמה</label>
-    <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+
+  <!-- ── שכחתי סיסמה ── -->
+  <div id="view-forgot" class="hidden">
+    <button class="back-btn" onclick="showView('login')">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      חזרה
+    </button>
+    <h1>איפוס סיסמה</h1>
+    <p class="subtitle">נשלח קישור לאיפוס לכתובת המייל שלך</p>
+    <div class="field">
+      <label>כתובת מייל</label>
+      <input type="email" id="reset-email" placeholder="your@email.com" autocomplete="email">
+    </div>
+    <button class="btn-login" id="reset-req-btn" onclick="doResetRequest()">שלח קישור לאיפוס</button>
+    <div class="ok-msg" id="reset-sent-msg">נשלח! בדוק את תיבת הדואר שלך</div>
   </div>
-  <button class="btn-login" id="login-btn" onclick="doLogin()">כניסה</button>
 
-  <div class="divider">או</div>
-
-  <!-- Google -->
-  <button class="btn-google" id="google-btn" onclick="doGoogle()">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-      <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-      <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-      <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
-    </svg>
-    התחבר עם Google
-  </button>
-
-  <!-- Face ID / Touch ID -->
-  <button class="btn-biometric hidden" id="biometric-btn" onclick="doBiometric()">
-    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 1C6.48 1 2 5.48 2 11s4.48 10 10 10 10-4.48 10-10S17.52 1 12 1zm-1 14H9V9h2v6zm4 0h-2V9h2v6z"/>
-    </svg>
-    <span id="biometric-label">Face ID / Touch ID</span>
-  </button>
+  <!-- ── סיסמה חדשה ── -->
+  <div id="view-reset" class="hidden">
+    <h1>סיסמה חדשה</h1>
+    <p class="subtitle">הגדר סיסמה חדשה לחשבון שלך</p>
+    <div class="field">
+      <label>סיסמה חדשה</label>
+      <input type="password" id="new-password" placeholder="לפחות 6 תווים" autocomplete="new-password">
+    </div>
+    <div class="field">
+      <label>אימות סיסמה</label>
+      <input type="password" id="confirm-password" placeholder="הזן שוב" autocomplete="new-password">
+    </div>
+    <button class="btn-login" id="reset-conf-btn" onclick="doResetConfirm()">שמור סיסמה חדשה</button>
+  </div>
 
   <div class="error-msg" id="error-msg"></div>
+  <div class="ok-msg" id="ok-msg"></div>
 </div>
 
 <script>
 const BASE = window.location.pathname.replace(/\/login\.html$/, '') || '/price';
 const GOOGLE_CLIENT_ID = 'YOUR_GOOGLE_CLIENT_ID';
+
+// ─── views ─────────────────────────────────────────────────
+const VIEWS = ['login','forgot','reset'];
+function showView(name) {
+  VIEWS.forEach(v => document.getElementById('view-'+v).classList.toggle('hidden', v !== name));
+  document.getElementById('error-msg').classList.remove('show');
+  document.getElementById('ok-msg').classList.remove('show');
+}
+
+// Check URL for reset token
+const resetToken = new URLSearchParams(location.search).get('reset');
+if (resetToken) showView('reset');
 
 // ─── check already logged in ───────────────────────────────
 async function checkAuth() {
@@ -222,8 +289,71 @@ async function doLogin() {
   finally { setLoading(false); }
 }
 
-// Enter key
-document.addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+// Enter key per view
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const active = VIEWS.find(v => !document.getElementById('view-'+v).classList.contains('hidden'));
+  if (active === 'login') doLogin();
+  else if (active === 'forgot') doResetRequest();
+  else if (active === 'reset') doResetConfirm();
+});
+
+// ─── forgot password ───────────────────────────────────────
+async function doResetRequest() {
+  const email = document.getElementById('reset-email').value.trim();
+  if (!email) return showError('הכנס כתובת מייל');
+  const btn = document.getElementById('reset-req-btn');
+  btn.disabled = true; btn.textContent = 'שולח...';
+  try {
+    const r = await fetch(BASE + '/auth.php?action=reset-request', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({email})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      document.getElementById('reset-sent-msg').classList.add('show');
+      btn.textContent = 'נשלח ✓';
+    } else {
+      showError(d.error);
+      btn.disabled = false; btn.textContent = 'שלח קישור לאיפוס';
+    }
+  } catch(e) {
+    showError('שגיאת חיבור');
+    btn.disabled = false; btn.textContent = 'שלח קישור לאיפוס';
+  }
+}
+
+// ─── reset confirm ─────────────────────────────────────────
+async function doResetConfirm() {
+  const password = document.getElementById('new-password').value;
+  const confirm  = document.getElementById('confirm-password').value;
+  if (!password || password.length < 6) return showError('הסיסמה חייבת להכיל לפחות 6 תווים');
+  if (password !== confirm) return showError('הסיסמאות אינן תואמות');
+  const btn = document.getElementById('reset-conf-btn');
+  btn.disabled = true; btn.textContent = 'שומר...';
+  try {
+    const r = await fetch(BASE + '/auth.php?action=reset-confirm', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({token: resetToken, password})
+    });
+    const d = await r.json();
+    if (d.ok) {
+      history.replaceState(null, '', location.pathname);
+      showView('login');
+      const ok = document.getElementById('ok-msg');
+      ok.textContent = 'הסיסמה עודכנה בהצלחה! אפשר להתחבר';
+      ok.classList.add('show');
+    } else {
+      showError(d.error);
+      btn.disabled = false; btn.textContent = 'שמור סיסמה חדשה';
+    }
+  } catch(e) {
+    showError('שגיאת חיבור');
+    btn.disabled = false; btn.textContent = 'שמור סיסמה חדשה';
+  }
+}
 
 // ─── Google Sign-In ────────────────────────────────────────
 function initGoogle() {

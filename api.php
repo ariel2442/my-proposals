@@ -130,6 +130,16 @@ if ($action === 'duplicate') {
     jsonOk(['proposal' => $copy]);
 }
 
+// ─── get signed agreement ──────────────────────────────────────
+if ($action === 'get-signed') {
+    $id = $_GET['id'] ?? $body['id'] ?? '';
+    if (!$id) jsonFail('חסר ID');
+    $file = DATA_DIR . safeId($id) . '_signed.json';
+    if (!file_exists($file)) jsonFail('לא נמצא', 404);
+    $signed = json_decode(file_get_contents($file), true) ?? [];
+    jsonOk(['signed' => $signed]);
+}
+
 // ─── settings ──────────────────────────────────────────────────
 if ($action === 'get-settings') {
     requireAuth();

@@ -5,7 +5,7 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Headers: Content-Type');
 
 require_once __DIR__ . '/config.php';
-$users  = require __DIR__ . '/users.php';
+$users  = getUsersList();
 $action = $_GET['action'] ?? '';
 $body   = json_decode(file_get_contents('php://input'), true) ?? [];
 
@@ -21,32 +21,6 @@ function setSession($user) {
 }
 function ok($data=[])  { echo json_encode(array_merge(['ok'=>true],  $data)); exit; }
 function fail($msg)    { http_response_code(401); echo json_encode(['ok'=>false,'error'=>$msg]); exit; }
-
-function getPasswordHash($userId) {
-    if (USE_DB) {
-        require_once __DIR__ . '/db.php';
-        $stmt = db()->prepare('SELECT password_hash FROM user_passwords WHERE user_id = ?');
-        $stmt->execute([$userId]);
-        $row = $stmt->fetch();
-        return $row ? $row['password_hash'] : null;
-    }
-    $pwFile = __DIR__ . '/data/passwords.json';
-    $pw = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
-    return $pw[$userId] ?? null;
-}
-
-function savePasswordHash($userId, $hash) {
-    if (USE_DB) {
-        require_once __DIR__ . '/db.php';
-        db()->prepare('INSERT INTO user_passwords (user_id, password_hash) VALUES (?,?) ON DUPLICATE KEY UPDATE password_hash=VALUES(password_hash)')
-            ->execute([$userId, $hash]);
-    } else {
-        $pwFile = __DIR__ . '/data/passwords.json';
-        $pw = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
-        $pw[$userId] = $hash;
-        file_put_contents($pwFile, json_encode($pw));
-    }
-}
 
 // ─── check ─────────────────────────────────────────────────────
 if ($action === 'check') {

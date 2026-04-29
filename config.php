@@ -90,6 +90,54 @@ function ensureDataDir(): void {
     if (!is_dir(DATA_DIR)) mkdir(DATA_DIR, 0755, true);
 }
 
+// ─── Users (dynamic management) ──────────────────────────────
+function getUsersList(): array {
+    if (USE_DB) {
+        require_once __DIR__ . '/db.php';
+        try {
+            $rows = db()->query('SELECT * FROM users ORDER BY CAST(id AS UNSIGNED)')->fetchAll(PDO::FETCH_ASSOC);
+            return $rows ?: [];
+        } catch (Exception $e) { return require __DIR__ . '/users.php'; }
+    }
+    $usersFile = DATA_DIR . 'users.json';
+    if (file_exists($usersFile)) {
+        return json_decode(file_get_contents($usersFile), true) ?? [];
+    }
+    return require __DIR__ . '/users.php';
+}
+
+function saveUsersList(array $users): void {
+    ensureDataDir();
+    file_put_contents(DATA_DIR . 'users.json', json_encode(array_values($users), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
+}
+
+function getPasswordHash(string $userId): ?string {
+    if (USE_DB) {
+        require_once __DIR__ . '/db.php';
+        $stmt = db()->prepare('SELECT password_hash FROM user_passwords WHERE user_id = ?');
+        $stmt->execute([$userId]);
+        $row = $stmt->fetch();
+        return $row ? $row['password_hash'] : null;
+    }
+    $pwFile = DATA_DIR . 'passwords.json';
+    $pw = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
+    return $pw[$userId] ?? null;
+}
+
+function savePasswordHash(string $userId, string $hash): void {
+    if (USE_DB) {
+        require_once __DIR__ . '/db.php';
+        db()->prepare('INSERT INTO user_passwords (user_id, password_hash) VALUES (?,?) ON DUPLICATE KEY UPDATE password_hash=VALUES(password_hash)')
+            ->execute([$userId, $hash]);
+    } else {
+        ensureDataDir();
+        $pwFile = DATA_DIR . 'passwords.json';
+        $pw = file_exists($pwFile) ? json_decode(file_get_contents($pwFile), true) ?? [] : [];
+        $pw[$userId] = $hash;
+        file_put_contents($pwFile, json_encode($pw));
+    }
+}
+
 // ─── WhatsApp via Green API ────────────────────────────────────
 function normalizePhone(string $phone): string {
     $digits = preg_replace('/[^0-9]/', '', $phone);

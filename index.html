@@ -641,6 +641,10 @@ body{
           <div class="user-role">מנהל</div>
         </div>
       </div>
+      <button class="btn-logout" id="btn-admin" onclick="window.open('/price/admin.php','_blank')" style="display:none;margin-bottom:6px;background:rgba(66,142,255,0.07);border-color:rgba(66,142,255,0.2);color:rgba(148,163,184,0.8)">
+        <svg class="icon"><use href="#i-settings"/></svg>
+        ניהול משתמשים
+      </button>
       <button class="btn-logout" onclick="logout()">
         <svg class="icon"><use href="#i-log-out"/></svg>
         התנתקות
@@ -1017,8 +1021,12 @@ body{
     if(d.user){
       const fn=d.user.name.split(' ')[0];
       document.getElementById('sidebar-name').textContent=fn;
-      document.getElementById('sidebar-avatar').textContent=fn.charAt(0);
+      document.getElementById('sidebar-avatar').textContent=d.user.avatar||fn.charAt(0);
       document.getElementById('header-sub').textContent='שלום, '+fn;
+      if(d.user.role==='admin'){
+        const adminBtn=document.getElementById('btn-admin');
+        if(adminBtn) adminBtn.style.display='';
+      }
     }
   }catch(e){}
 })();

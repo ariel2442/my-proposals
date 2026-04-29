@@ -750,6 +750,10 @@ body{
               <input type="tel" id="client-phone" placeholder="972501234567" inputmode="numeric">
               <div class="field-hint">לדוגמה: 972501234567</div>
             </div>
+            <div class="field">
+              <label>ח.פ / ע.מ (אופציונלי)</label>
+              <input type="text" id="client-vat-id" placeholder="515XXXXXXX" inputmode="numeric">
+            </div>
           </div>
 
           <!-- Project -->
@@ -903,6 +907,16 @@ body{
             <div class="field">
               <label>כתובת בסיס (הדומיין שלך)</label>
               <input type="url" id="base-url" placeholder="https://crm.ariel-azulay.co.il/price">
+            </div>
+          </div>
+          <div class="section-card form-grid-full">
+            <div class="section-title">
+              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>Make · אוטומציית תשלום GROW
+            </div>
+            <div class="field">
+              <label>Make Webhook URL</label>
+              <input type="url" id="make-webhook-url" placeholder="https://hook.eu2.make.com/xxxxxxxxx">
+              <div class="field-hint">כשלקוח חותם ← נשלח webhook ל-Make עם כל פרטי ההצעה → Make יוצר לינק GROW ושולח ללקוח</div>
             </div>
           </div>
           <div class="section-card form-grid-full">
@@ -1279,6 +1293,7 @@ function applySettings(s){
   document.getElementById('green-api-token').value=s.greenApiToken||'';
   document.getElementById('sales-rep-phone').value=s.salesRepPhone||'';
   document.getElementById('base-url').value=s.baseUrl||'';
+  document.getElementById('make-webhook-url').value=s.makeWebhookUrl||'';
   document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
 }
 async function saveSettings(){
@@ -1291,6 +1306,7 @@ async function saveSettings(){
     greenApiToken:document.getElementById('green-api-token').value,
     salesRepPhone:document.getElementById('sales-rep-phone').value,
     baseUrl:document.getElementById('base-url').value,
+    makeWebhookUrl:document.getElementById('make-webhook-url').value,
     defaultTerms:document.getElementById('default-terms').value,
     _savedAt:Date.now()
   };
@@ -1353,6 +1369,7 @@ function getProposalData(){
     id:'prop_'+Date.now(),
     clientName:document.getElementById('client-name').value.trim(),
     clientPhone:document.getElementById('client-phone').value.trim(),
+    clientVatId:document.getElementById('client-vat-id').value.trim(),
     projectType:document.getElementById('project-type').value.trim(),
     proposalNum:document.getElementById('proposal-num').value.trim(),
     date:new Date().toISOString(),
@@ -1365,7 +1382,8 @@ function getProposalData(){
     biz:{name:settings.bizName||'',email:settings.bizEmail||'',phone:settings.bizPhone||'',bank:settings.bizBank||''},
     status:'draft',
     totalViews:0,totalViewSeconds:0,views:[],
-    salesRepPhone:settings.salesRepPhone||''
+    salesRepPhone:settings.salesRepPhone||'',
+    makeWebhookUrl:settings.makeWebhookUrl||''
   };
 }
 function validateProposal(d){
@@ -1466,6 +1484,7 @@ async function sendProposal(prefilledData){
     setTimeout(()=>{
       document.getElementById('client-name').value='';
       document.getElementById('client-phone').value='';
+      document.getElementById('client-vat-id').value='';
       items=[];includes=[];
       renderItems();renderIncludes();updateSummary();
       document.getElementById('proposal-num').value=genNum();
@@ -1523,6 +1542,7 @@ function loadProposal(id){
   const p=allProposals.find(x=>x.id===id);if(!p)return;
   document.getElementById('client-name').value=p.clientName||'';
   document.getElementById('client-phone').value=p.clientPhone||'';
+  document.getElementById('client-vat-id').value=p.clientVatId||'';
   document.getElementById('project-type').value=p.projectType||'';
   document.getElementById('proposal-num').value=p.proposalNum||'';
   processSteps=p.processSteps||[];includes=p.includes||[];items=p.items||[];

@@ -90,6 +90,38 @@ if ($action === 'sign') {
     ];
     file_put_contents(DATA_DIR . safeId($id) . '_signed.json', json_encode($signed, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
+    // ─── Make webhook → GROW payment link ─────────────────────
+    $s              = getSettings();
+    $makeWebhookUrl = $s['makeWebhookUrl'] ?? '';
+    if ($makeWebhookUrl) {
+        $makePayload = [
+            'event'         => 'proposal_signed',
+            'proposal_id'   => $id,
+            'proposal_num'  => $p['proposalNum']  ?? '',
+            'client_name'   => $p['clientName']   ?? '',
+            'client_phone'  => $p['clientPhone']  ?? '',
+            'client_vat_id' => $p['clientVatId']  ?? '',
+            'amount'        => $p['total']         ?? 0,
+            'subtotal'      => $p['subtotal']      ?? 0,
+            'vat'           => $p['vat']           ?? 0,
+            'project_type'  => $p['projectType']  ?? '',
+            'signer_name'   => $signerName,
+            'payment_method'=> $paymentMethod,
+            'signed_at'     => date('c', intval($signedAt / 1000)),
+            'biz_name'      => $p['biz']['name']  ?? '',
+        ];
+        $ch = curl_init($makeWebhookUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => json_encode($makePayload, JSON_UNESCAPED_UNICODE),
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
+        ]);
+        curl_exec($ch);
+        curl_close($ch);
+    }
+
     // מייל לאדמין
     $usersFile  = __DIR__ . '/users.php';
     $users      = file_exists($usersFile) ? (require $usersFile) : [];

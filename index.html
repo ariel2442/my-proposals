@@ -1486,7 +1486,10 @@ function renderSaved(){
     list.innerHTML='<div class="empty-state"><div class="empty-state-icon"><svg class="icon"><use href="#i-clipboard"/></svg></div>אין הצעות שמורות עדיין</div>';
     return;
   }
-  list.innerHTML=allProposals.map(p=>`
+  list.innerHTML=allProposals.map(p=>{
+    const openedStr=p.firstViewedAt?`<span class="saved-item-meta-dot"></span><span>👁 נפתח ${new Date(p.firstViewedAt).toLocaleDateString('he-IL')}${p.totalViews>1?' ('+p.totalViews+' פעמים)':''}</span>`:(p.totalViews>0?`<span class="saved-item-meta-dot"></span><span>👁 ${p.totalViews} צפיות</span>`:'');
+    const signedStr=p.signerName?`<span class="saved-item-meta-dot"></span><span>✍️ חתם: ${esc(p.signerName)}</span>`:'';
+    return`
     <div class="saved-item">
       <div class="saved-item-info">
         <div class="saved-item-name">${esc(p.clientName)}${p.projectType?' · '+esc(p.projectType):''}</div>
@@ -1496,7 +1499,7 @@ function renderSaved(){
           <span>₪${p.total.toLocaleString('he-IL')}</span>
           <span class="saved-item-meta-dot"></span>
           <span class="saved-status ${STATUS_CLASS[p.status]||'draft'}">${STATUS_LABELS[p.status]||'טיוטה'}</span>
-          ${p.totalViews>0?`<span class="saved-item-meta-dot"></span><span>👁 ${p.totalViews}</span>`:''}
+          ${openedStr}${signedStr}
         </div>
       </div>
       <div class="saved-item-actions">
@@ -1505,7 +1508,8 @@ function renderSaved(){
         <button class="saved-btn" onclick="duplicateProposal('${p.id}')" title="שכפל">⎘</button>
         <button class="saved-btn danger" onclick="deleteProposal('${p.id}')">${iconTrash}</button>
       </div>
-    </div>`).join('');
+    </div>`;
+  }).join('');
 }
 function loadProposal(id){
   const p=allProposals.find(x=>x.id===id);if(!p)return;
@@ -1566,7 +1570,8 @@ function renderStatusPanel(){
           <span class="status-dot"></span>${STATUS_LABELS[p.status]||'טיוטה'}
         </span>
       </div>
-      <div class="panel-proposal-date">${new Date(p.date||p.createdAt).toLocaleDateString('he-IL')}${p.totalViews>0?' · 👁 '+p.totalViews:''}</div>
+      <div class="panel-proposal-date">${new Date(p.date||p.createdAt).toLocaleDateString('he-IL')}${p.firstViewedAt?' · 👁 '+new Date(p.firstViewedAt).toLocaleDateString('he-IL'):p.totalViews>0?' · 👁 '+p.totalViews:''}</div>
+      ${p.signerName?`<div class="panel-proposal-date" style="color:var(--success-bright)">✍️ ${esc(p.signerName)}</div>`:''}
     </div>`).join('');
 }
 

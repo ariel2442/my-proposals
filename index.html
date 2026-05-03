@@ -26,6 +26,7 @@ html,body{height:100%;overscroll-behavior:none}
   --glass-highlight:rgba(255,255,255,0.12);
   --sidebar-w:240px;--panel-w:280px;
   --radius-sm:10px;--radius-md:14px;--radius-lg:18px;--radius-xl:24px;
+  --bnav-h:64px;
 }
 
 body{
@@ -264,13 +265,13 @@ body{
 .status-dot-pulse::before{content:'';position:absolute;inset:-3px;border-radius:50%;background:var(--success);opacity:0.4;animation:pulse 2s ease-in-out infinite}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:0.4}50%{transform:scale(1.8);opacity:0}}
 
-.tabs-bar{display:flex;gap:3px;background:rgba(66,142,255,0.05);padding:4px;border-radius:12px;border:1px solid rgba(66,142,255,0.15)}
+.tabs-bar{display:none}
 .tab{flex:1;padding:9px 6px;font-size:11px;font-weight:600;color:var(--text-dim);background:transparent;border:none;border-radius:9px;cursor:pointer;font-family:inherit;transition:all 0.25s ease;display:flex;align-items:center;justify-content:center;gap:5px}
 .tab .icon{width:14px;height:14px}
 .tab.active{background:linear-gradient(135deg,rgba(66,142,255,0.2) 0%,rgba(64,75,242,0.15) 100%);color:white;box-shadow:0 2px 8px rgba(66,142,255,0.2),inset 0 1px 0 rgba(255,255,255,0.1);border:1px solid rgba(66,142,255,0.3)}
 
 /* ── PAGE CONTENT ───────────────────────── */
-.content{padding:16px 20px 140px;flex:1}
+.content{padding:16px 20px calc(var(--bnav-h) + env(safe-area-inset-bottom) + 90px);flex:1}
 .fade-in{animation:fadeUp 0.5s ease backwards}
 @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
 
@@ -358,7 +359,31 @@ body{
 .info-tag-icon .icon{width:12px;height:12px;stroke-width:2.2}
 
 /* ── ACTION BAR (mobile) ────────────────── */
-.action-bar{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:14px 20px;padding-bottom:calc(14px + env(safe-area-inset-bottom));background:rgba(1,9,24,0.85);backdrop-filter:blur(30px) saturate(140%);border-top:1px solid rgba(66,142,255,0.2);display:flex;gap:8px;box-shadow:0 -10px 40px rgba(0,0,0,0.3)}
+/* ── BOTTOM NAV (mobile app-like) ───────── */
+.bottom-nav{
+  display:flex;position:fixed;
+  bottom:0;left:0;right:0;z-index:99;
+  background:rgba(1,9,24,0.96);
+  backdrop-filter:blur(30px) saturate(160%);
+  -webkit-backdrop-filter:blur(30px) saturate(160%);
+  border-top:1px solid rgba(66,142,255,0.2);
+  padding-bottom:env(safe-area-inset-bottom);
+  box-shadow:0 -8px 32px rgba(0,0,0,0.5);
+}
+.bnav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  padding:10px 4px 8px;background:transparent;border:none;cursor:pointer;
+  font-family:inherit;color:rgba(148,163,184,0.55);font-size:10px;font-weight:600;
+  transition:color 0.2s ease;position:relative;
+}
+.bnav-item .icon{width:22px;height:22px;transition:all 0.2s ease}
+.bnav-item.active{color:var(--blue-bright)}
+.bnav-item.active .icon{filter:drop-shadow(0 0 6px rgba(96,165,250,0.5))}
+.bnav-item.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;border-radius:0 0 3px 3px;background:linear-gradient(90deg,var(--blue-primary),var(--blue-bright));box-shadow:0 0 8px rgba(66,142,255,0.6)}
+.bnav-badge{position:absolute;top:6px;right:calc(50% - 16px);background:var(--blue-primary);color:white;font-size:9px;font-weight:700;border-radius:8px;padding:1px 5px;min-width:16px;text-align:center;line-height:14px}
+
+/* ── ACTION BAR: floats above bottom-nav ── */
+.action-bar{position:fixed;bottom:calc(var(--bnav-h) + env(safe-area-inset-bottom));left:0;right:0;z-index:100;padding:12px 20px;background:rgba(1,9,24,0.92);backdrop-filter:blur(30px) saturate(140%);border-top:1px solid rgba(66,142,255,0.15);display:flex;gap:8px;box-shadow:0 -4px 20px rgba(0,0,0,0.3)}
 .btn{padding:14px 16px;border-radius:var(--radius-md);font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:7px;-webkit-appearance:none;transition:all 0.2s ease;letter-spacing:0.01em}
 .btn .icon{width:16px;height:16px;stroke-width:2.2}
 .btn-primary{background:linear-gradient(135deg,var(--blue-primary) 0%,var(--indigo) 100%);color:white;flex:2;position:relative;box-shadow:0 4px 20px rgba(66,142,255,0.5),0 0 0 1px rgba(66,142,255,0.3),inset 0 1px 0 rgba(255,255,255,0.3)}
@@ -482,10 +507,28 @@ body{
 /* ═══════════════════════════════════════
    DESKTOP OVERRIDES (≥ 1024px)
 ═══════════════════════════════════════ */
+/* ── AUTOMATION CARDS ───────────────────── */
+.auto-card{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-xl);padding:18px 20px;margin-bottom:12px;backdrop-filter:blur(20px);transition:border-color 0.2s}
+.auto-card:focus-within{border-color:var(--glass-border-hover)}
+.auto-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.auto-info{flex:1}
+.auto-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px}
+.auto-desc{font-size:12px;color:var(--text-dim);line-height:1.4}
+.auto-settings{margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.06)}
+.toggle{position:relative;display:inline-block;width:46px;height:26px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,0.12);border-radius:26px;cursor:pointer;transition:0.3s;border:1px solid rgba(255,255,255,0.15)}
+.toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:2px;bottom:2px;background:rgba(148,163,184,0.7);border-radius:50%;transition:0.3s}
+.toggle input:checked+.toggle-slider{background:rgba(66,142,255,0.3);border-color:var(--blue-primary)}
+.toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:var(--blue-bright);box-shadow:0 0 8px rgba(66,142,255,0.6)}
+
 @media (min-width:1024px){
   body{padding-top:0}
 
   .app-layout{height:100vh;overflow:hidden}
+
+  /* hide bottom nav on desktop */
+  .bottom-nav{display:none !important}
 
   /* show sidebar */
   .sidebar{display:flex}
@@ -510,7 +553,7 @@ body{
   .desktop-page-title{display:block}
 
   /* content padding */
-  .content{padding:20px 28px 40px}
+  .content{padding:20px 28px 40px;padding-bottom:40px}
 
   /* two-column form on desktop */
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
@@ -633,6 +676,10 @@ body{
       <button class="nav-item" id="snav-library" onclick="switchTab('library')">
         <svg class="icon"><use href="#i-book"/></svg>
         <span>ספריית שירותים</span>
+      </button>
+      <button class="nav-item" id="snav-automations" onclick="switchTab('automations')">
+        <svg class="icon"><use href="#i-zap"/></svg>
+        <span>אוטומציות</span>
       </button>
       <button class="nav-item" id="snav-settings" onclick="switchTab('settings')">
         <svg class="icon"><use href="#i-settings"/></svg>
@@ -898,57 +945,6 @@ body{
               <textarea id="biz-bank" rows="4" placeholder="בנק: XX&#10;סניף: XXX&#10;חשבון: XXXXXX&#10;שם בעל החשבון: XXX"></textarea>
             </div>
           </div>
-          <div class="section-card">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>WhatsApp / Green API
-            </div>
-            <div class="field">
-              <label>Instance ID</label>
-              <input type="text" id="green-api-instance" placeholder="1234567890">
-              <div class="field-hint">מה-Green API dashboard שלך</div>
-            </div>
-            <div class="field">
-              <label>API Token</label>
-              <input type="text" id="green-api-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx">
-            </div>
-            <div class="field">
-              <label>הטלפון שלך (לקבלת התראות)</label>
-              <input type="tel" id="sales-rep-phone" placeholder="0521234567" inputmode="numeric">
-              <div class="field-hint">תקבל WhatsApp כשלקוח פותח הצעה</div>
-            </div>
-            <div class="field">
-              <label>כתובת בסיס (הדומיין שלך)</label>
-              <input type="url" id="base-url" placeholder="https://crm.ariel-azulay.co.il/price">
-            </div>
-          </div>
-          <div class="section-card form-grid-full">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-diamond"/></svg></div>GROW · לינק תשלום אוטומטי
-            </div>
-            <div class="field">
-              <label>GROW API URL</label>
-              <input type="url" id="grow-api-url" placeholder="https://api.grow.co.il/v1/payment-links">
-              <div class="field-hint">כתובת ה-API ליצירת לינק תשלום — תמצא בחשבון GROW שלך</div>
-            </div>
-            <div class="field">
-              <label>GROW API Key</label>
-              <input type="text" id="grow-api-key" placeholder="sk_live_xxxxxxxxxxxxxxxx">
-            </div>
-            <div class="field-hint" style="margin-top:4px">לאחר חתימה באשראי — הלינק נוצר ישירות ונשלח ללקוח ב-WhatsApp. ללא Make.</div>
-          </div>
-          <div class="section-card form-grid-full">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-folder"/></svg></div>Google Drive · שמירת הסכמים חתומים
-            </div>
-            <div class="field">
-              <label>Drive Folder ID</label>
-              <input type="text" id="drive-folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
-              <div class="field-hint">העתק את ה-ID מהURL של התיקיה ב-Drive: drive.google.com/drive/folders/<strong>זה-ה-ID</strong></div>
-            </div>
-            <div class="field-hint" style="margin-top:6px">
-              להפעלה: העלה את קובץ ה-service account של Google Cloud לנתיב <code>data/google-service-account.json</code> ושתף את התיקיה עם כתובת ה-service account.
-            </div>
-          </div>
           <div class="section-card form-grid-full">
             <div class="section-title">
               <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>הצהרות והתחייבויות
@@ -965,8 +961,133 @@ body{
       </div>
     </div>
 
+    <!-- AUTOMATIONS -->
+    <div id="screen-automations" class="hidden fade-in">
+      <div class="desktop-page-title">אוטומציות <span>חיבורים ושליחות אוטומטיות</span></div>
+      <div class="content">
+
+        <!-- Green API credentials -->
+        <div class="section-card">
+          <div class="section-title">
+            <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>WhatsApp · Green API
+          </div>
+          <div class="field">
+            <label>Instance ID</label>
+            <input type="text" id="green-api-instance" placeholder="1234567890">
+            <div class="field-hint">מה-Green API dashboard שלך</div>
+          </div>
+          <div class="field">
+            <label>API Token</label>
+            <input type="text" id="green-api-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx">
+          </div>
+          <div class="field">
+            <label>הטלפון שלך (לקבלת התראות)</label>
+            <input type="tel" id="sales-rep-phone" placeholder="0521234567" inputmode="numeric">
+          </div>
+          <div class="field">
+            <label>כתובת בסיס (הדומיין שלך)</label>
+            <input type="url" id="base-url" placeholder="https://crm.ariel-azulay.co.il/price">
+          </div>
+        </div>
+
+        <!-- Auto 1: rep notified on view -->
+        <div class="auto-card">
+          <div class="auto-header">
+            <div class="auto-info">
+              <div class="auto-title">📬 התראה כשלקוח פתח הצעה</div>
+              <div class="auto-desc">WhatsApp אוטומטי אליך ברגע שלקוח פותח את ההצעה</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="auto-rep-view" checked><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- Auto 2: rep notified on sign -->
+        <div class="auto-card">
+          <div class="auto-header">
+            <div class="auto-info">
+              <div class="auto-title">✍️ התראה כשלקוח חתם</div>
+              <div class="auto-desc">WhatsApp אוטומטי אליך עם פרטי החתימה והסכום</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="auto-rep-sign" checked><span class="toggle-slider"></span></label>
+          </div>
+        </div>
+
+        <!-- Auto 3: GROW link to client -->
+        <div class="auto-card">
+          <div class="auto-header">
+            <div class="auto-info">
+              <div class="auto-title">💳 לינק תשלום ללקוח אחרי חתימה</div>
+              <div class="auto-desc">יצירת לינק GROW ושליחה ב-WhatsApp ללקוח</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="auto-client-payment" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="auto-settings">
+            <div class="field">
+              <label>GROW API URL</label>
+              <input type="url" id="grow-api-url" placeholder="https://api.grow.co.il/v1/payment-links">
+              <div class="field-hint">תמצא בחשבון GROW שלך</div>
+            </div>
+            <div class="field">
+              <label>GROW API Key</label>
+              <input type="text" id="grow-api-key" placeholder="sk_live_xxxxxxxxxxxxxxxx">
+            </div>
+          </div>
+        </div>
+
+        <!-- Auto 4: Google Drive -->
+        <div class="auto-card">
+          <div class="auto-header">
+            <div class="auto-info">
+              <div class="auto-title">📁 שמירת הסכמים ב-Google Drive</div>
+              <div class="auto-desc">כל חוזה חתום מועלה אוטומטית לתיקיה בדרייב</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="auto-drive"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="auto-settings">
+            <div class="field">
+              <label>Drive Folder ID</label>
+              <input type="text" id="drive-folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
+              <div class="field-hint">העתק מה-URL: drive.google.com/drive/folders/<strong>ID</strong></div>
+            </div>
+            <div class="field-hint" style="margin-top:4px">
+              להפעלה: העלה <code>data/google-service-account.json</code> ושתף התיקיה עם כתובת ה-service account.
+            </div>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top:6px;" onclick="saveSettings()">
+          <svg class="icon"><use href="#i-save"/></svg>שמור הגדרות
+        </button>
+      </div>
+    </div>
+
   </div><!-- /main-wrapper -->
 </div><!-- /app-layout -->
+
+<!-- ══ BOTTOM NAV (mobile) ══ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bnav-item active" id="bnav-new" onclick="switchTab('new')">
+    <svg class="icon"><use href="#i-sparkles"/></svg>
+    <span>חדש</span>
+  </button>
+  <button class="bnav-item" id="bnav-saved" onclick="switchTab('saved')">
+    <svg class="icon"><use href="#i-clipboard"/></svg>
+    <span>היסטוריה</span>
+    <span class="bnav-badge hidden" id="bnav-saved-count">0</span>
+  </button>
+  <button class="bnav-item" id="bnav-library" onclick="switchTab('library')">
+    <svg class="icon"><use href="#i-book"/></svg>
+    <span>ספריה</span>
+  </button>
+  <button class="bnav-item" id="bnav-automations" onclick="switchTab('automations')">
+    <svg class="icon"><use href="#i-zap"/></svg>
+    <span>אוטומציות</span>
+  </button>
+  <button class="bnav-item" id="bnav-settings" onclick="switchTab('settings')">
+    <svg class="icon"><use href="#i-settings"/></svg>
+    <span>הגדרות</span>
+  </button>
+</nav>
 
 <!-- Mobile Action Bar -->
 <div class="action-bar" id="action-bar">
@@ -1073,12 +1194,12 @@ let currentUserRole='agent';
         const adminBtn=document.getElementById('btn-admin');
         if(adminBtn) adminBtn.style.display='';
       } else {
-        // הסתר היסטוריה והגדרות ממשתמשים שאינם מנהל
-        ['snav-saved','snav-settings'].forEach(id=>{
+        // הסתר היסטוריה, הגדרות ואוטומציות ממשתמשים שאינם מנהל
+        ['snav-saved','snav-settings','snav-automations'].forEach(id=>{
           const el=document.getElementById(id);
           if(el) el.style.display='none';
         });
-        ['tab-saved','tab-settings'].forEach(id=>{
+        ['bnav-saved','bnav-settings','bnav-automations'].forEach(id=>{
           const el=document.getElementById(id);
           if(el) el.style.display='none';
         });
@@ -1172,11 +1293,11 @@ async function init(){
 
 // ─── tab switching ────────────────────────────────────────────
 function switchTab(tab){
-  if(currentUserRole!=='admin' && (tab==='saved'||tab==='settings')) return;
-  // mobile tabs
-  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  const mobileTab=document.getElementById('tab-'+tab);
-  if(mobileTab)mobileTab.classList.add('active');
+  if(currentUserRole!=='admin' && (tab==='saved'||tab==='settings'||tab==='automations')) return;
+  // bottom nav
+  document.querySelectorAll('.bnav-item').forEach(t=>t.classList.remove('active'));
+  const bnavEl=document.getElementById('bnav-'+tab);
+  if(bnavEl)bnavEl.classList.add('active');
 
   // sidebar nav
   document.querySelectorAll('.nav-item').forEach(t=>t.classList.remove('active'));
@@ -1184,7 +1305,7 @@ function switchTab(tab){
   if(snavEl)snavEl.classList.add('active');
 
   // screens
-  ['new','saved','library','settings'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
+  ['new','saved','library','settings','automations'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
   const screen=document.getElementById('screen-'+tab);
   screen.classList.remove('hidden');screen.classList.remove('fade-in');
   void screen.offsetWidth;screen.classList.add('fade-in');
@@ -1300,6 +1421,11 @@ function applySettings(s){
   document.getElementById('grow-api-key').value=s.growApiKey||'';
   document.getElementById('drive-folder-id').value=s.driveFolderId||'';
   document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
+  // automation toggles (default on unless explicitly false)
+  document.getElementById('auto-rep-view').checked    = s.autoRepView    !== false;
+  document.getElementById('auto-rep-sign').checked    = s.autoRepSign    !== false;
+  document.getElementById('auto-client-payment').checked = s.autoClientPayment !== false;
+  document.getElementById('auto-drive').checked       = s.autoDrive      !== false;
 }
 async function saveSettings(){
   settings={
@@ -1315,6 +1441,10 @@ async function saveSettings(){
     growApiKey:document.getElementById('grow-api-key').value,
     driveFolderId:document.getElementById('drive-folder-id').value,
     defaultTerms:document.getElementById('default-terms').value,
+    autoRepView:document.getElementById('auto-rep-view').checked,
+    autoRepSign:document.getElementById('auto-rep-sign').checked,
+    autoClientPayment:document.getElementById('auto-client-payment').checked,
+    autoDrive:document.getElementById('auto-drive').checked,
     _savedAt:Date.now()
   };
   localStorage.setItem('pm_settings',JSON.stringify(settings));

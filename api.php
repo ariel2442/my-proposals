@@ -165,7 +165,8 @@ if ($action === 'save-settings') {
     requireAuth();
     $allowed = ['bizName','bizEmail','bizPhone','bizBank','baseUrl','defaultTerms',
                 'greenApiInstance','greenApiToken','salesRepPhone','driveFolderId',
-                'growApiUrl','growApiKey'];
+                'growApiUrl','growApiKey',
+                'autoRepView','autoRepSign','autoClientPayment','autoDrive'];
     $s = getSettings();
     foreach ($allowed as $k) {
         if (isset($body[$k])) $s[$k] = $body[$k];

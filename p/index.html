@@ -708,6 +708,12 @@ body{
     <ul class="includes-list" id="includes-container"></ul>
   </div>
 
+  <!-- Notes Card -->
+  <div class="card" id="notes-card" style="display:none">
+    <h2 class="card-title">הערות</h2>
+    <p id="notes-text" style="font-size:14px;color:var(--text-muted);line-height:1.8;white-space:pre-wrap"></p>
+  </div>
+
   <!-- Pricing Card -->
   <div class="card" id="pricing-card">
     <h2 class="card-title">פירוט תמחור</h2>
@@ -907,7 +913,7 @@ function getDemoData(){
     items:[
       {title:'דף נחיתה מלא',desc:'עיצוב ובנייה כולל התקנה',qty:1,price:3135}
     ],
-    subtotal:3135,vat:565,total:3700,
+    subtotal:3135,vat:565,total:3700,notes:'',
     terms:[
       'חתימת הלקוח תיחשב הסכמה סופית לפרטי ההזמנה ולתנאים הנוספים',
       'אין כל יחסי עובד מעביד בין הצדדים אלא יחסי ספק ולקוח',
@@ -966,6 +972,12 @@ function renderProposal(){
         </div>
         <div class="price-amount">₪${(it.qty*it.price).toLocaleString('he-IL')}</div>
       </div>`).join('');
+  }
+
+  // Notes
+  if(d.notes){
+    document.getElementById('notes-text').textContent=d.notes;
+    document.getElementById('notes-card').style.display='block';
   }
 
   document.getElementById('subtotal').textContent='₪'+d.subtotal.toLocaleString('he-IL');

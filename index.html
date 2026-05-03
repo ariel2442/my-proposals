@@ -349,6 +349,8 @@ body{
 .total-input::-webkit-outer-spin-button,.total-input::-webkit-inner-spin-button{-webkit-appearance:none}
 .total-input::placeholder{color:rgba(255,255,255,0.2)}
 .total-input:focus{outline:none;border-color:var(--blue-primary);background:rgba(66,142,255,0.06)}
+.total-preview{margin-top:10px;font-size:13px;color:var(--text-muted);display:flex;flex-direction:column;gap:4px}
+.total-preview-final{font-size:15px;font-weight:700;color:var(--blue-bright);margin-top:2px}
 
 /* ── INFO TAG ───────────────────────────── */
 .info-tag{background:linear-gradient(135deg,rgba(16,185,129,0.1) 0%,rgba(16,185,129,0.05) 100%);border:1px solid rgba(16,185,129,0.25);color:var(--success-bright);padding:14px 16px;border-radius:var(--radius-md);font-size:12px;line-height:1.6;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;backdrop-filter:blur(10px)}
@@ -804,15 +806,27 @@ body{
 
         </div>
 
-        <!-- Total -->
-        <div class="total-input-box">
-          <label class="total-input-label">סכום סופי (כולל מע"מ) ₪</label>
-          <input type="number" id="proposal-total" placeholder="0" inputmode="decimal" min="0" class="total-input">
-        </div>
+        <!-- Notes + Total -->
+        <div class="form-grid" style="margin-top:16px">
+          <div class="section-card">
+            <div class="section-title">
+              <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>הערות ללקוח
+            </div>
+            <div class="field">
+              <textarea id="proposal-notes" rows="4" placeholder="הערות נוספות שיופיעו בהצעה ללקוח..."></textarea>
+            </div>
+          </div>
 
-        <div class="info-tag">
-          <div class="info-tag-icon"><svg class="icon"><use href="#i-zap"/></svg></div>
-          <div>לאחר שהלקוח יחתום ויבחר "תשלום באשראי" — האוטומציה ב-Make תיצור קישור Grow אוטומטית עם הסכום הסופי ותשלח לו ב-WhatsApp.</div>
+          <div class="section-card">
+            <div class="section-title">
+              <div class="section-title-icon"><svg class="icon"><use href="#i-diamond"/></svg></div>תמחור
+            </div>
+            <div class="field">
+              <label class="total-input-label" style="font-size:12px;margin-bottom:6px">סכום לפני מע"מ ₪</label>
+              <input type="number" id="proposal-total" placeholder="0" inputmode="decimal" min="0" class="total-input" oninput="updateTotalPreview()" style="font-size:22px;padding:10px 14px;text-align:right">
+              <div id="total-preview" class="total-preview"></div>
+            </div>
+          </div>
         </div>
 
         <!-- Desktop action buttons -->
@@ -1221,6 +1235,15 @@ function renderIncludes(){
 }
 function removeInclude(i){includes.splice(i,1);renderIncludes()}
 
+// ─── total preview ───────────────────────────────────────────
+function updateTotalPreview(){
+  const sub=parseFloat(document.getElementById('proposal-total').value)||0;
+  const el=document.getElementById('total-preview');
+  if(!sub){el.innerHTML='';return}
+  const vat=Math.round(sub*VAT_RATE/100);
+  el.innerHTML=`<span>מע"מ ${VAT_RATE}%: ₪${vat.toLocaleString('he-IL')}</span><span class="total-preview-final">סה"כ לתשלום: ₪${(sub+vat).toLocaleString('he-IL')}</span>`;
+}
+
 // ─── project type ─────────────────────────────────────────────
 function setProjectType(type){
   projectType=type;
@@ -1347,7 +1370,8 @@ function saveLibrary(){
 
 // ─── proposal data ────────────────────────────────────────────
 function getProposalData(){
-  const total=parseFloat(document.getElementById('proposal-total').value)||0;
+  const sub=parseFloat(document.getElementById('proposal-total').value)||0;
+  const vat=Math.round(sub*VAT_RATE/100);
   return{
     id:'prop_'+Date.now(),
     clientName:document.getElementById('client-name').value.trim(),
@@ -1355,12 +1379,13 @@ function getProposalData(){
     clientVatId:document.getElementById('client-vat-id').value.trim(),
     projectType:projectType,
     proposalNum:document.getElementById('proposal-num').value.trim(),
+    notes:document.getElementById('proposal-notes').value.trim(),
     date:new Date().toISOString(),
     createdAt:new Date().toISOString(),
     processSteps:processSteps.filter(s=>s.trim()),
     includes:includes.filter(s=>s.trim()),
     items:[],
-    subtotal:Math.round(total/1.18),vat:Math.round(total-total/1.18),vatRate:VAT_RATE,total,
+    subtotal:sub,vat,vatRate:VAT_RATE,total:sub+vat,
     terms:(settings.defaultTerms||DEFAULT_TERMS).split('\n').filter(t=>t.trim()),
     biz:{name:settings.bizName||'',email:settings.bizEmail||'',phone:settings.bizPhone||'',bank:settings.bizBank||''},
     status:'draft',
@@ -1521,9 +1546,11 @@ function loadProposal(id){
   document.getElementById('client-phone').value=p.clientPhone||'';
   document.getElementById('client-vat-id').value=p.clientVatId||'';
   document.getElementById('proposal-num').value=p.proposalNum||'';
-  document.getElementById('proposal-total').value=p.total||'';
+  document.getElementById('proposal-total').value=p.subtotal||'';
+  document.getElementById('proposal-notes').value=p.notes||'';
   processSteps=p.processSteps||[];includes=p.includes||[];
   setProjectType(p.projectType||'');
+  updateTotalPreview();
   renderProcess();renderIncludes();
   switchTab('new');toast('ההצעה נטענה','success');
 }

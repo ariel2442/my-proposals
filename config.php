@@ -138,6 +138,14 @@ function savePasswordHash(string $userId, string $hash): void {
     }
 }
 
+// ─── message template helper ──────────────────────────────────
+function fillTemplate(string $tpl, array $vars): string {
+    foreach ($vars as $k => $v) {
+        $tpl = str_replace('{' . $k . '}', (string)$v, $tpl);
+    }
+    return $tpl;
+}
+
 // ─── GROW payment link ────────────────────────────────────────
 function createGrowPaymentLink(array $p): ?string {
     $s      = getSettings();

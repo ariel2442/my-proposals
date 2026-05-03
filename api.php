@@ -70,12 +70,15 @@ if ($action === 'send') {
     writeProposal($p);
 
     // WhatsApp to client
-    if (!empty($p['clientPhone']) && $baseUrl) {
+    if (!empty($p['clientPhone']) && $baseUrl && ($s['autoSendClient'] ?? true)) {
         $link = $baseUrl . '/p/?id=' . $p['id'];
-        $name = $p['clientName'] ?? 'לקוח יקר';
-        sendWhatsapp($p['clientPhone'],
-            "שלום {$name} 👋\n\nהצעת המחיר שלך מוכנה לצפייה:\n🔗 {$link}\n\nלכל שאלה — אשמח לעזור!"
-        );
+        $tpl  = $s['msgSendClient'] ?? "שלום {name} 👋\n\nהצעת המחיר שלך מוכנה לצפייה:\n🔗 {link}\n\nלכל שאלה — אשמח לעזור!";
+        $msg  = fillTemplate($tpl, [
+            'name' => $p['clientName'] ?? 'לקוח יקר',
+            'num'  => $p['proposalNum'] ?? '',
+            'link' => $link,
+        ]);
+        sendWhatsapp($p['clientPhone'], $msg);
     }
 
     jsonOk(['proposal' => $p]);
@@ -166,7 +169,9 @@ if ($action === 'save-settings') {
     $allowed = ['bizName','bizEmail','bizPhone','bizBank','baseUrl','defaultTerms',
                 'greenApiInstance','greenApiToken','salesRepPhone','driveFolderId',
                 'growApiUrl','growApiKey',
-                'autoRepView','autoRepSign','autoClientPayment','autoDrive'];
+                'autoSendClient','autoRepView','autoRepSign','autoClientPayment','autoDrive',
+                'msgSendClient','msgViewFirst','msgViewReturn','msgSignRep',
+                'msgSignCredit','msgSignNoLink','msgSignBank'];
     $s = getSettings();
     foreach ($allowed as $k) {
         if (isset($body[$k])) $s[$k] = $body[$k];

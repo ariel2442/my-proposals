@@ -42,19 +42,15 @@ if ($action === 'view' || $action === 'open') {
     $s = getSettings();
 
     if ($shouldNotify && !empty($p['salesRepPhone']) && ($s['autoRepView'] ?? true)) {
-        $clientName = $p['clientName'] ?? 'לקוח';
-        $s          = getSettings();
-        $baseUrl    = rtrim($s['baseUrl'] ?? '', '/');
-        $link       = $baseUrl ? $baseUrl . '/p/?id=' . $p['id'] : '';
-        $propNum    = $p['proposalNum'] ?? '';
+        $baseUrl = rtrim($s['baseUrl'] ?? '', '/');
+        $link    = $baseUrl ? $baseUrl . '/p/?id=' . $p['id'] : '';
+        $vars    = ['name' => $p['clientName'] ?? 'לקוח', 'num' => $p['proposalNum'] ?? '', 'link' => $link];
 
-        $msg = $lastNotified
-            ? "👀 {$clientName} חזר/ה לראות את ההצעה!\n\n📄 הצעה #{$propNum}"
-                . ($link ? "\n🔗 {$link}" : '') . "\n\nגלוי עניין מחודש 🔥"
-            : "🎉 {$clientName} פתח/ה את הצעת המחיר!\n\n📄 הצעה #{$propNum}"
-                . ($link ? "\n🔗 {$link}" : '') . "\n\nזה הזמן לסגור 💪";
+        $tpl = $lastNotified
+            ? ($s['msgViewReturn'] ?? "👀 {name} חזר/ה לראות את ההצעה!\n\n📄 הצעה #{num}\n🔗 {link}\n\nגלוי עניין מחודש 🔥")
+            : ($s['msgViewFirst']  ?? "🎉 {name} פתח/ה את הצעת המחיר!\n\n📄 הצעה #{num}\n🔗 {link}\n\nזה הזמן לסגור 💪");
 
-        if (sendWhatsapp($p['salesRepPhone'], $msg)) {
+        if (sendWhatsapp($p['salesRepPhone'], fillTemplate($tpl, $vars))) {
             $p['lastNotifiedAt'] = $now;
             writeProposal($p);
         }
@@ -98,42 +94,42 @@ if ($action === 'sign') {
     $total3       = number_format($p['total'] ?? 0, 0, '.', ',');
 
     if ($clientPhone3 && ($s3['autoClientPayment'] ?? true)) {
+        $clientVars = ['name' => $clientName3, 'num' => $p['proposalNum'] ?? '', 'total' => $total3];
         if ($paymentMethod === 'credit') {
             $growLink = createGrowPaymentLink($p);
             if ($growLink) {
-                sendWhatsapp($clientPhone3,
-                    "שלום {$clientName3} 👋\n\nתודה על חתימתך!\n\nלתשלום לחץ על הקישור:\n🔗 {$growLink}\n\nסכום לתשלום: ₪{$total3}"
-                );
+                $tpl = $s3['msgSignCredit'] ?? "שלום {name} 👋\n\nתודה על חתימתך!\n\nלתשלום לחץ על הקישור:\n🔗 {payLink}\n\nסכום לתשלום: ₪{total}";
+                sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars + ['payLink' => $growLink]));
             } else {
-                sendWhatsapp($clientPhone3,
-                    "שלום {$clientName3} 👋\n\nתודה על חתימתך! ✍️\n\nלינק התשלום יישלח אליך בקרוב."
-                );
+                $tpl = $s3['msgSignNoLink'] ?? "שלום {name} 👋\n\nתודה על חתימתך! ✍️\n\nלינק התשלום יישלח אליך בקרוב.";
+                sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars));
             }
         } else {
             $bank = $p['biz']['bank'] ?? ($s3['bizBank'] ?? '');
-            sendWhatsapp($clientPhone3,
-                "שלום {$clientName3} 👋\n\nתודה על חתימתך! ✍️\n\nלהעברה בנקאית:\n{$bank}\n\nסכום: ₪{$total3}\nנא לציין בהעברה: הצעה #{$p['proposalNum']}"
-            );
+            $tpl  = $s3['msgSignBank'] ?? "שלום {name} 👋\n\nתודה על חתימתך! ✍️\n\nלהעברה בנקאית:\n{bank}\n\nסכום: ₪{total}\nנא לציין בהעברה: הצעה #{num}";
+            sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars + ['bank' => $bank]));
         }
     }
 
     // ─── WhatsApp לנציג מכירות על חתימה ──────────────────────────
-    $s2          = $s3;
-    $repPhone    = $p['salesRepPhone'] ?? $s2['salesRepPhone'] ?? '';
-    $clientName2 = $p['clientName']   ?? 'לקוח';
-    $propNum2    = $p['proposalNum']  ?? '';
-    $total2      = number_format($p['total'] ?? 0, 0, '.', ',');
-    $payLabel    = $paymentMethod === 'credit' ? 'אשראי 💳' : 'העברה בנקאית 🏦';
-    $baseUrl2    = rtrim($s2['baseUrl'] ?? '', '/');
-    $viewUrl2    = $baseUrl2 ? $baseUrl2 . '/price/view-signed.php?id=' . $id : '';
+    $s2       = $s3;
+    $repPhone = $p['salesRepPhone'] ?? $s2['salesRepPhone'] ?? '';
+    $propNum2 = $p['proposalNum']  ?? '';
+    $total2   = number_format($p['total'] ?? 0, 0, '.', ',');
+    $payLabel = $paymentMethod === 'credit' ? 'אשראי 💳' : 'העברה בנקאית 🏦';
+    $baseUrl2 = rtrim($s2['baseUrl'] ?? '', '/');
+    $viewUrl2 = $baseUrl2 ? $baseUrl2 . '/price/view-signed.php?id=' . $id : '';
 
     if ($repPhone && ($s2['autoRepSign'] ?? true)) {
-        $waMsg = "✅ {$clientName2} חתמ/ה על הצעת המחיר!\n\n"
-               . "📄 הצעה #{$propNum2}\n"
-               . "💰 סכום: ₪{$total2}\n"
-               . "💳 תשלום: {$payLabel}\n"
-               . "✍️ חתם/ה: {$signerName}"
-               . ($viewUrl2 ? "\n\n🔗 {$viewUrl2}" : '');
+        $tpl   = $s2['msgSignRep'] ?? "✅ {name} חתמ/ה על הצעת המחיר!\n\n📄 הצעה #{num}\n💰 סכום: ₪{total}\n💳 תשלום: {payMethod}\n✍️ חתם/ה: {signerName}\n\n🔗 {link}";
+        $waMsg = fillTemplate($tpl, [
+            'name'       => $p['clientName'] ?? 'לקוח',
+            'num'        => $propNum2,
+            'total'      => $total2,
+            'payMethod'  => $payLabel,
+            'signerName' => $signerName,
+            'link'       => $viewUrl2,
+        ]);
         sendWhatsapp($repPhone, $waMsg);
     }
 

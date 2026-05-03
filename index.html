@@ -521,6 +521,16 @@ body{
 .toggle-slider::before{content:'';position:absolute;width:20px;height:20px;left:2px;bottom:2px;background:rgba(148,163,184,0.7);border-radius:50%;transition:0.3s}
 .toggle input:checked+.toggle-slider{background:rgba(66,142,255,0.3);border-color:var(--blue-primary)}
 .toggle input:checked+.toggle-slider::before{transform:translateX(20px);background:var(--blue-bright);box-shadow:0 0 8px rgba(66,142,255,0.6)}
+.auto-msg{margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06)}
+.auto-msg>summary{cursor:pointer;font-size:12px;font-weight:600;color:rgba(148,163,184,0.55);list-style:none;display:flex;align-items:center;gap:6px;user-select:none;transition:color 0.2s;padding:2px 0}
+.auto-msg>summary::-webkit-details-marker{display:none}
+.auto-msg[open]>summary{color:var(--blue-bright)}
+.auto-msg-body{margin-top:12px;display:flex;flex-direction:column;gap:14px}
+.auto-msg-vars{display:flex;flex-wrap:wrap;gap:4px;margin-top:6px}
+.auto-msg-var{background:rgba(66,142,255,0.1);border:1px solid rgba(66,142,255,0.2);color:var(--blue-soft);font-size:10px;font-family:monospace;border-radius:4px;padding:2px 7px;cursor:pointer;transition:background 0.15s;white-space:nowrap}
+.auto-msg-var:hover{background:rgba(66,142,255,0.22)}
+.auto-msg .field label{font-size:11px;margin-bottom:5px}
+.auto-msg textarea{min-height:80px;resize:vertical;font-size:12px;line-height:1.6;direction:rtl;font-family:inherit}
 
 @media (min-width:1024px){
   body{padding-top:0}
@@ -990,6 +1000,32 @@ body{
           </div>
         </div>
 
+        <!-- Auto 0: send proposal to client -->
+        <div class="auto-card">
+          <div class="auto-header">
+            <div class="auto-info">
+              <div class="auto-title">📤 שליחת הצעה ללקוח</div>
+              <div class="auto-desc">הודעת WhatsApp ללקוח כשאתה לוחץ "שלח ללקוח"</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="auto-send-client" checked><span class="toggle-slider"></span></label>
+          </div>
+          <details class="auto-msg">
+            <summary>✏️ עריכת הודעה</summary>
+            <div class="auto-msg-body">
+              <div class="field">
+                <label>הודעה ללקוח</label>
+                <textarea id="msg-send-client" rows="4"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-send-client','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-send-client','{num}')">{num}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-send-client','{link}')">{link}</span>
+                </div>
+                <div class="field-hint">{name} שם לקוח · {num} מספר הצעה · {link} קישור להצעה</div>
+              </div>
+            </div>
+          </details>
+        </div>
+
         <!-- Auto 1: rep notified on view -->
         <div class="auto-card">
           <div class="auto-header">
@@ -999,6 +1035,29 @@ body{
             </div>
             <label class="toggle"><input type="checkbox" id="auto-rep-view" checked><span class="toggle-slider"></span></label>
           </div>
+          <details class="auto-msg">
+            <summary>✏️ עריכת הודעות</summary>
+            <div class="auto-msg-body">
+              <div class="field">
+                <label>צפייה ראשונה</label>
+                <textarea id="msg-view-first" rows="4"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-view-first','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-view-first','{num}')">{num}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-view-first','{link}')">{link}</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>חזרה לצפייה (אחרי 3 שעות)</label>
+                <textarea id="msg-view-return" rows="4"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-view-return','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-view-return','{num}')">{num}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-view-return','{link}')">{link}</span>
+                </div>
+              </div>
+            </div>
+          </details>
         </div>
 
         <!-- Auto 2: rep notified on sign -->
@@ -1010,14 +1069,32 @@ body{
             </div>
             <label class="toggle"><input type="checkbox" id="auto-rep-sign" checked><span class="toggle-slider"></span></label>
           </div>
+          <details class="auto-msg">
+            <summary>✏️ עריכת הודעה</summary>
+            <div class="auto-msg-body">
+              <div class="field">
+                <label>הודעה אליך על חתימה</label>
+                <textarea id="msg-sign-rep" rows="5"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{num}')">{num}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{total}')">{total}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{payMethod}')">{payMethod}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{signerName}')">{signerName}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{link}')">{link}</span>
+                </div>
+                <div class="field-hint">{total} סכום · {payMethod} שיטת תשלום · {signerName} שם חותם</div>
+              </div>
+            </div>
+          </details>
         </div>
 
-        <!-- Auto 3: GROW link to client -->
+        <!-- Auto 3: payment message to client -->
         <div class="auto-card">
           <div class="auto-header">
             <div class="auto-info">
-              <div class="auto-title">💳 לינק תשלום ללקוח אחרי חתימה</div>
-              <div class="auto-desc">יצירת לינק GROW ושליחה ב-WhatsApp ללקוח</div>
+              <div class="auto-title">💳 הודעת תשלום ללקוח אחרי חתימה</div>
+              <div class="auto-desc">WhatsApp ללקוח עם לינק GROW או פרטי העברה בנקאית</div>
             </div>
             <label class="toggle"><input type="checkbox" id="auto-client-payment" checked><span class="toggle-slider"></span></label>
           </div>
@@ -1032,6 +1109,39 @@ body{
               <input type="text" id="grow-api-key" placeholder="sk_live_xxxxxxxxxxxxxxxx">
             </div>
           </div>
+          <details class="auto-msg">
+            <summary>✏️ עריכת הודעות</summary>
+            <div class="auto-msg-body">
+              <div class="field">
+                <label>אשראי — עם לינק תשלום GROW</label>
+                <textarea id="msg-sign-credit" rows="4"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{total}')">{total}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{payLink}')">{payLink}</span>
+                </div>
+                <div class="field-hint">{payLink} = לינק תשלום מ-GROW</div>
+              </div>
+              <div class="field">
+                <label>אשראי — ללא לינק (כשל-GROW נכשל)</label>
+                <textarea id="msg-sign-no-link" rows="3"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-no-link','{name}')">{name}</span>
+                </div>
+              </div>
+              <div class="field">
+                <label>העברה בנקאית</label>
+                <textarea id="msg-sign-bank" rows="5"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{num}')">{num}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{total}')">{total}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{bank}')">{bank}</span>
+                </div>
+                <div class="field-hint">{bank} = פרטי חשבון בנק</div>
+              </div>
+            </div>
+          </details>
         </div>
 
         <!-- Auto 4: Google Drive -->
@@ -1219,6 +1329,14 @@ let processSteps=[],includes=[],settings={},library={services:[],includes:[]};
 let projectType='';
 const VAT_RATE=18;
 
+const MSG_SEND_CLIENT  = "שלום {name} 👋\n\nהצעת המחיר שלך מוכנה לצפייה:\n🔗 {link}\n\nלכל שאלה — אשמח לעזור!";
+const MSG_VIEW_FIRST   = "🎉 {name} פתח/ה את הצעת המחיר!\n\n📄 הצעה #{num}\n🔗 {link}\n\nזה הזמן לסגור 💪";
+const MSG_VIEW_RETURN  = "👀 {name} חזר/ה לראות את ההצעה!\n\n📄 הצעה #{num}\n🔗 {link}\n\nגלוי עניין מחודש 🔥";
+const MSG_SIGN_REP     = "✅ {name} חתמ/ה על הצעת המחיר!\n\n📄 הצעה #{num}\n💰 סכום: ₪{total}\n💳 תשלום: {payMethod}\n✍️ חתם/ה: {signerName}\n\n🔗 {link}";
+const MSG_SIGN_CREDIT  = "שלום {name} 👋\n\nתודה על חתימתך!\n\nלתשלום לחץ על הקישור:\n🔗 {payLink}\n\nסכום לתשלום: ₪{total}";
+const MSG_SIGN_NOLINK  = "שלום {name} 👋\n\nתודה על חתימתך! ✍️\n\nלינק התשלום יישלח אליך בקרוב.";
+const MSG_SIGN_BANK    = "שלום {name} 👋\n\nתודה על חתימתך! ✍️\n\nלהעברה בנקאית:\n{bank}\n\nסכום: ₪{total}\nנא לציין בהעברה: הצעה #{num}";
+
 const DEFAULT_PROCESS=['פגישה ראשונית לאפיון בזום','העברת כל החומרים לתיקיה משותפת','עבודה על עיצוב וסקיצה ראשונית','פגישה שניה לסבב תיקונים','הדרכה לתפעול וניהול','סוף הפרויקט'];
 const DEFAULT_SERVICES=[
   {id:'s1',name:'עיצוב עמוד בית',desc:'עיצוב מקורי ב-Figma כולל מובייל',price:3500},
@@ -1402,6 +1520,13 @@ function addCustomInclude(){
 
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 
+function insertVar(fieldId,v){
+  const el=document.getElementById(fieldId);if(!el)return;
+  const s=el.selectionStart,e=el.selectionEnd;
+  el.value=el.value.slice(0,s)+v+el.value.slice(e);
+  el.selectionStart=el.selectionEnd=s+v.length;el.focus();
+}
+
 
 // ─── settings ────────────────────────────────────────────────
 function loadSettings(){
@@ -1422,10 +1547,19 @@ function applySettings(s){
   document.getElementById('drive-folder-id').value=s.driveFolderId||'';
   document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
   // automation toggles (default on unless explicitly false)
-  document.getElementById('auto-rep-view').checked    = s.autoRepView    !== false;
-  document.getElementById('auto-rep-sign').checked    = s.autoRepSign    !== false;
+  document.getElementById('auto-send-client').checked    = s.autoSendClient    !== false;
+  document.getElementById('auto-rep-view').checked       = s.autoRepView       !== false;
+  document.getElementById('auto-rep-sign').checked       = s.autoRepSign       !== false;
   document.getElementById('auto-client-payment').checked = s.autoClientPayment !== false;
-  document.getElementById('auto-drive').checked       = s.autoDrive      !== false;
+  document.getElementById('auto-drive').checked          = s.autoDrive         !== false;
+  // message templates
+  document.getElementById('msg-send-client').value  = s.msgSendClient  || MSG_SEND_CLIENT;
+  document.getElementById('msg-view-first').value   = s.msgViewFirst   || MSG_VIEW_FIRST;
+  document.getElementById('msg-view-return').value  = s.msgViewReturn  || MSG_VIEW_RETURN;
+  document.getElementById('msg-sign-rep').value     = s.msgSignRep     || MSG_SIGN_REP;
+  document.getElementById('msg-sign-credit').value  = s.msgSignCredit  || MSG_SIGN_CREDIT;
+  document.getElementById('msg-sign-no-link').value = s.msgSignNoLink  || MSG_SIGN_NOLINK;
+  document.getElementById('msg-sign-bank').value    = s.msgSignBank    || MSG_SIGN_BANK;
 }
 async function saveSettings(){
   settings={
@@ -1441,10 +1575,18 @@ async function saveSettings(){
     growApiKey:document.getElementById('grow-api-key').value,
     driveFolderId:document.getElementById('drive-folder-id').value,
     defaultTerms:document.getElementById('default-terms').value,
+    autoSendClient:document.getElementById('auto-send-client').checked,
     autoRepView:document.getElementById('auto-rep-view').checked,
     autoRepSign:document.getElementById('auto-rep-sign').checked,
     autoClientPayment:document.getElementById('auto-client-payment').checked,
     autoDrive:document.getElementById('auto-drive').checked,
+    msgSendClient:document.getElementById('msg-send-client').value,
+    msgViewFirst:document.getElementById('msg-view-first').value,
+    msgViewReturn:document.getElementById('msg-view-return').value,
+    msgSignRep:document.getElementById('msg-sign-rep').value,
+    msgSignCredit:document.getElementById('msg-sign-credit').value,
+    msgSignNoLink:document.getElementById('msg-sign-no-link').value,
+    msgSignBank:document.getElementById('msg-sign-bank').value,
     _savedAt:Date.now()
   };
   localStorage.setItem('pm_settings',JSON.stringify(settings));

@@ -1099,25 +1099,31 @@ body{
           </details>
         </div>
 
+        <!-- GROW credentials -->
+        <div class="section-card">
+          <div class="section-title">
+            <div class="section-title-icon"><svg class="icon"><use href="#i-diamond"/></svg></div>GROW · לינק תשלום אשראי
+          </div>
+          <div class="field">
+            <label>GROW API URL</label>
+            <input type="url" id="grow-api-url" placeholder="https://api.grow.co.il/v1/payment-links">
+            <div class="field-hint">תמצא בחשבון GROW שלך תחת Settings → API</div>
+          </div>
+          <div class="field">
+            <label>GROW API Key</label>
+            <input type="text" id="grow-api-key" placeholder="sk_live_xxxxxxxxxxxxxxxx">
+            <div class="field-hint">המפתח מתחיל ב-sk_live_ או sk_test_</div>
+          </div>
+        </div>
+
         <!-- Auto 3: payment message to client -->
         <div class="auto-card">
           <div class="auto-header">
             <div class="auto-info">
               <div class="auto-title">💳 הודעת תשלום ללקוח אחרי חתימה</div>
-              <div class="auto-desc">WhatsApp ללקוח עם לינק GROW או פרטי העברה בנקאית</div>
+              <div class="auto-desc">WhatsApp ללקוח עם לינק GROW (אשראי) או פרטי העברה בנקאית</div>
             </div>
             <label class="toggle"><input type="checkbox" id="auto-client-payment" checked><span class="toggle-slider"></span></label>
-          </div>
-          <div class="auto-settings">
-            <div class="field">
-              <label>GROW API URL</label>
-              <input type="url" id="grow-api-url" placeholder="https://api.grow.co.il/v1/payment-links">
-              <div class="field-hint">תמצא בחשבון GROW שלך</div>
-            </div>
-            <div class="field">
-              <label>GROW API Key</label>
-              <input type="text" id="grow-api-key" placeholder="sk_live_xxxxxxxxxxxxxxxx">
-            </div>
           </div>
           <details class="auto-msg">
             <summary>✏️ עריכת הודעות</summary>

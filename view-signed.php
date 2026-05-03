@@ -1,28 +1,19 @@
 <?php
-session_start();
+require_once __DIR__ . '/config.php';
 if (empty($_SESSION['auth'])) { header('Location: /price/login.html'); exit; }
 
-$id = preg_replace('/[^a-zA-Z0-9_\-]/', '', $_GET['id'] ?? '');
+$id = safeId($_GET['id'] ?? '');
 if (!$id) { http_response_code(400); echo 'Missing id'; exit; }
 
-require_once __DIR__ . '/db.php';
-$pdo = db();
-
-$stmt = $pdo->prepare('SELECT data FROM signed_agreements WHERE proposal_id = ?');
-$stmt->execute([$id]);
-$signedRow = $stmt->fetch();
-
-if (!$signedRow) {
+// Read from file storage
+$signedFile = DATA_DIR . $id . '_signed.json';
+if (!file_exists($signedFile)) {
     echo '<!DOCTYPE html><html lang="he" dir="rtl"><head><meta charset="UTF-8"><title>לא נמצא</title></head><body style="font-family:sans-serif;text-align:center;padding:60px;color:#64748b">ההסכם החתום לא נמצא.</body></html>';
     exit;
 }
 
-$signed = json_decode($signedRow['data'], true) ?? [];
-
-$stmt = $pdo->prepare('SELECT data FROM proposals WHERE id = ?');
-$stmt->execute([$id]);
-$proposalRow = $stmt->fetch();
-$proposal = $proposalRow ? json_decode($proposalRow['data'], true) ?? [] : [];
+$signed   = json_decode(file_get_contents($signedFile), true) ?? [];
+$proposal = readProposal($id) ?? [];
 
 $signedDate = isset($signed['signedAt'])
     ? date('d/m/Y H:i', intval($signed['signedAt']) / 1000)
@@ -56,10 +47,6 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b;di
 .field-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 .field label{display:block;font-size:11px;color:#94a3b8;font-weight:600;margin-bottom:3px}
 .field .val{font-size:15px;font-weight:600;color:#1e293b}
-.items-table{width:100%;border-collapse:collapse;margin-top:4px}
-.items-table th{text-align:right;font-size:11px;color:#94a3b8;font-weight:700;padding:6px 0;border-bottom:1px solid #e2e8f0}
-.items-table td{padding:10px 0;font-size:14px;border-bottom:1px solid #f8fafc;vertical-align:top}
-.items-table td:last-child{text-align:left;font-weight:700;white-space:nowrap}
 .total-row{display:flex;justify-content:space-between;padding:7px 0;font-size:14px;color:#64748b}
 .total-final{font-size:18px;font-weight:900;color:#1e293b}
 .sig-box{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:18px;margin-top:10px}
@@ -110,26 +97,26 @@ body{font-family:'Segoe UI',Arial,sans-serif;background:#f1f5f9;color:#1e293b;di
     </div>
   </div>
 
-  <?php if (!empty($proposal['items'])): ?>
   <div class="section">
-    <div class="section-title">פירוט תמחור</div>
-    <table class="items-table">
-      <thead><tr><th>פריט</th><th>כמות</th><th>סה"כ</th></tr></thead>
-      <tbody>
-      <?php foreach ($proposal['items'] as $it): ?>
-        <tr>
-          <td><?= htmlspecialchars($it['title'] ?? '') ?><?= !empty($it['desc']) ? '<div style="font-size:12px;color:#94a3b8;margin-top:2px">'.htmlspecialchars($it['desc']).'</div>' : '' ?></td>
-          <td><?= intval($it['qty'] ?? 1) ?></td>
-          <td>₪<?= number_format(($it['qty'] ?? 1) * ($it['price'] ?? 0), 0, '.', ',') ?></td>
-        </tr>
-      <?php endforeach; ?>
-      </tbody>
-    </table>
-    <div style="margin-top:16px;border-top:1px solid #f1f5f9;padding-top:12px">
-      <div class="total-row"><span>סכום ביניים</span><span>₪<?= number_format($proposal['subtotal'] ?? 0, 0, '.', ',') ?></span></div>
-      <div class="total-row"><span>מע"מ</span><span>₪<?= number_format($proposal['vat'] ?? 0, 0, '.', ',') ?></span></div>
-      <div class="total-row total-final"><span>סה"כ לתשלום</span><span>₪<?= number_format($proposal['total'] ?? 0, 0, '.', ',') ?></span></div>
+    <div class="section-title">סכום ותשלום</div>
+    <div style="padding-top:4px">
+      <?php
+        $subtotal = $proposal['subtotal'] ?? $proposal['total'] ?? 0;
+        $vat      = $proposal['vat']      ?? 0;
+        $total    = $proposal['total']    ?? ($subtotal + $vat);
+      ?>
+      <?php if ($vat > 0): ?>
+      <div class="total-row"><span>סכום לפני מע"מ</span><span>₪<?= number_format($subtotal, 0, '.', ',') ?></span></div>
+      <div class="total-row"><span>מע"מ (18%)</span><span>₪<?= number_format($vat, 0, '.', ',') ?></span></div>
+      <?php endif; ?>
+      <div class="total-row total-final"><span>סה"כ לתשלום</span><span>₪<?= number_format($total, 0, '.', ',') ?></span></div>
     </div>
+  </div>
+
+  <?php if (!empty($proposal['notes'])): ?>
+  <div class="section">
+    <div class="section-title">הערות</div>
+    <div style="font-size:14px;line-height:1.7;color:#334155;white-space:pre-wrap"><?= htmlspecialchars($proposal['notes']) ?></div>
   </div>
   <?php endif; ?>
 

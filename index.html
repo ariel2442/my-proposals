@@ -531,6 +531,16 @@ body{
 .auto-msg-var:hover{background:rgba(66,142,255,0.22)}
 .auto-msg .field label{font-size:11px;margin-bottom:5px}
 .auto-msg textarea{min-height:80px;resize:vertical;font-size:12px;line-height:1.6;direction:rtl;font-family:inherit}
+.auto-hours{display:flex;align-items:center;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06)}
+.auto-hours>label{font-size:12px;color:var(--text-dim);flex:1}
+.auto-hours>input{width:68px;text-align:center;font-size:15px;font-weight:700;padding:7px 8px}
+.auto-hours>span{font-size:12px;color:var(--text-dim);white-space:nowrap}
+.auto-run-btn{margin-top:12px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;border:1px solid rgba(66,142,255,0.25);background:rgba(66,142,255,0.08);color:var(--blue-bright);cursor:pointer;font-family:inherit;transition:all 0.2s;display:inline-flex;align-items:center;gap:6px}
+.auto-run-btn:hover{background:rgba(66,142,255,0.18);border-color:rgba(66,142,255,0.5)}
+.auto-run-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auto-run-btn .icon{width:13px;height:13px}
+.cron-box{background:rgba(0,0,0,0.35);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;font-family:monospace;font-size:11px;color:var(--text-muted);word-break:break-all;cursor:pointer;transition:border-color 0.2s;line-height:1.5;direction:ltr;text-align:left}
+.cron-box:hover{border-color:rgba(66,142,255,0.3);color:var(--text)}
 
 @media (min-width:1024px){
   body{padding-top:0}
@@ -1144,6 +1154,104 @@ body{
           </details>
         </div>
 
+        <!-- Reminder 1: sent but not opened -->
+        <div class="auto-card">
+          <div class="auto-header">
+            <div class="auto-info">
+              <div class="auto-title">📨 תזכורת — לא פתח הצעה</div>
+              <div class="auto-desc">WhatsApp ללקוח שקיבל הצעה אבל לא פתח אותה</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="reminder-not-open-enabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="auto-hours">
+            <label>שלח תזכורת אחרי</label>
+            <input type="number" id="reminder-not-open-hours" value="24" min="1" max="720" inputmode="numeric">
+            <span>שעות מהשליחה</span>
+          </div>
+          <details class="auto-msg">
+            <summary>✏️ עריכת הודעה</summary>
+            <div class="auto-msg-body">
+              <div class="field">
+                <label>הודעה ללקוח</label>
+                <textarea id="msg-reminder-not-open" rows="4"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-open','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-open','{num}')">{num}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-open','{link}')">{link}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-open','{hours}')">{hours}</span>
+                </div>
+                <div class="field-hint">{hours} = מספר שעות שעברו מהשליחה</div>
+              </div>
+            </div>
+          </details>
+          <button class="auto-run-btn" onclick="triggerReminders('not-open',this)">
+            <svg class="icon"><use href="#i-refresh"/></svg>הרץ עכשיו
+          </button>
+        </div>
+
+        <!-- Reminder 2: viewed but not signed -->
+        <div class="auto-card">
+          <div class="auto-header">
+            <div class="auto-info">
+              <div class="auto-title">👁️ תזכורת — פתח אבל לא חתם</div>
+              <div class="auto-desc">WhatsApp ללקוח שצפה בהצעה אבל עדיין לא חתם</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="reminder-not-signed-enabled"><span class="toggle-slider"></span></label>
+          </div>
+          <div class="auto-hours">
+            <label>שלח תזכורת אחרי</label>
+            <input type="number" id="reminder-not-signed-hours" value="48" min="1" max="720" inputmode="numeric">
+            <span>שעות מהפתיחה</span>
+          </div>
+          <details class="auto-msg">
+            <summary>✏️ עריכת הודעה</summary>
+            <div class="auto-msg-body">
+              <div class="field">
+                <label>הודעה ללקוח</label>
+                <textarea id="msg-reminder-not-signed" rows="4"></textarea>
+                <div class="auto-msg-vars">
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-signed','{name}')">{name}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-signed','{num}')">{num}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-signed','{link}')">{link}</span>
+                  <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-signed','{hours}')">{hours}</span>
+                </div>
+                <div class="field-hint">{hours} = מספר שעות שעברו מהצפייה הראשונה</div>
+              </div>
+            </div>
+          </details>
+          <button class="auto-run-btn" onclick="triggerReminders('not-signed',this)">
+            <svg class="icon"><use href="#i-refresh"/></svg>הרץ עכשיו
+          </button>
+        </div>
+
+        <!-- Cron setup -->
+        <div class="section-card">
+          <div class="section-title">
+            <div class="section-title-icon"><svg class="icon"><use href="#i-zap"/></svg></div>הפעלה אוטומטית (Cron Job)
+          </div>
+          <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.7">
+            כדי שהתזכורות יישלחו אוטומטית בלי לחיצה ידנית,<br>הגדר Cron Job בשרת שלך (cPanel / SSH) עם ה-URL הבא:
+          </p>
+          <div class="field">
+            <label>URL לקריאת Cron</label>
+            <div style="display:flex;gap:6px;align-items:stretch">
+              <div class="cron-box" id="cron-url-display" onclick="copyCronUrl()" style="flex:1;min-height:36px"></div>
+              <button class="btn btn-secondary" style="padding:8px 12px;min-width:40px" onclick="copyCronUrl()" title="העתק">
+                <svg class="icon"><use href="#i-copy"/></svg>
+              </button>
+            </div>
+            <div class="field-hint">לחץ להעתקה · מומלץ להגדיר לרוץ כל 30 דקות</div>
+          </div>
+          <div class="field">
+            <label>פקודת Cron (crontab / SSH)</label>
+            <div class="cron-box" id="cron-cmd-display" onclick="copyCronCmd()"></div>
+            <div class="field-hint">לחץ להעתקה · מריץ כל 30 דקות</div>
+          </div>
+          <button class="auto-run-btn" style="margin-top:6px" onclick="triggerReminders('all',this)">
+            <svg class="icon"><use href="#i-refresh"/></svg>הרץ את כל התזכורות עכשיו
+          </button>
+        </div>
+
         <!-- Auto 4: Google Drive -->
         <div class="auto-card">
           <div class="auto-header">
@@ -1329,7 +1437,9 @@ let processSteps=[],includes=[],settings={},library={services:[],includes:[]};
 let projectType='';
 const VAT_RATE=18;
 
-const MSG_SEND_CLIENT  = "שלום {name} 👋\n\nהצעת המחיר שלך מוכנה לצפייה:\n🔗 {link}\n\nלכל שאלה — אשמח לעזור!";
+const MSG_SEND_CLIENT         = "שלום {name} 👋\n\nהצעת המחיר שלך מוכנה לצפייה:\n🔗 {link}\n\nלכל שאלה — אשמח לעזור!";
+const MSG_REMINDER_NOT_OPEN   = "שלום {name} 👋\n\nשלחתי לך הצעת מחיר לפני {hours} שעות 📄\n\nהצעה #{num} עדיין מחכה לצפייה שלך:\n🔗 {link}\n\nלכל שאלה — אשמח לעזור!";
+const MSG_REMINDER_NOT_SIGNED = "שלום {name} 👋\n\nראיתי שצפית בהצעת המחיר שלנו ☺️\n\nנשמח לענות על כל שאלה ולסגור יחד!\n\n📄 הצעה #{num}\n🔗 {link}";
 const MSG_VIEW_FIRST   = "🎉 {name} פתח/ה את הצעת המחיר!\n\n📄 הצעה #{num}\n🔗 {link}\n\nזה הזמן לסגור 💪";
 const MSG_VIEW_RETURN  = "👀 {name} חזר/ה לראות את ההצעה!\n\n📄 הצעה #{num}\n🔗 {link}\n\nגלוי עניין מחודש 🔥";
 const MSG_SIGN_REP     = "✅ {name} חתמ/ה על הצעת המחיר!\n\n📄 הצעה #{num}\n💰 סכום: ₪{total}\n💳 תשלום: {payMethod}\n✍️ חתם/ה: {signerName}\n\n🔗 {link}";
@@ -1527,6 +1637,34 @@ function insertVar(fieldId,v){
   el.selectionStart=el.selectionEnd=s+v.length;el.focus();
 }
 
+function updateCronUrl(){
+  const base=(settings.baseUrl||'').replace(/\/$/,'');
+  const token=settings.cronToken||'';
+  const url=token?`${base}/reminders.php?token=${token}`:'(שמור הגדרות כדי לקבל URL)';
+  const cmd=token?`*/30 * * * * curl -s "${base}/reminders.php?token=${token}"`:'-';
+  const d1=document.getElementById('cron-url-display');
+  const d2=document.getElementById('cron-cmd-display');
+  if(d1)d1.textContent=url;
+  if(d2)d2.textContent=cmd;
+}
+function copyCronUrl(){
+  const t=document.getElementById('cron-url-display')?.textContent||'';
+  navigator.clipboard?.writeText(t).then(()=>toast('URL הועתק','success'));
+}
+function copyCronCmd(){
+  const t=document.getElementById('cron-cmd-display')?.textContent||'';
+  navigator.clipboard?.writeText(t).then(()=>toast('פקודה הועתקה','success'));
+}
+async function triggerReminders(type,btn){
+  if(btn){btn.disabled=true;btn.style.opacity='0.5';}
+  try{
+    const r=await apiCall('POST','run-reminders',{type});
+    if(r.ok) toast(`נשלחו ${r.sent} תזכורות (${r.processed} הצעות נבדקו)`,'success');
+    else toast(r.error||'שגיאה','error');
+  }catch(e){toast('שגיאה בהרצת התזכורות','error');}
+  if(btn){btn.disabled=false;btn.style.opacity='';}
+}
+
 
 // ─── settings ────────────────────────────────────────────────
 function loadSettings(){
@@ -1560,6 +1698,17 @@ function applySettings(s){
   document.getElementById('msg-sign-credit').value  = s.msgSignCredit  || MSG_SIGN_CREDIT;
   document.getElementById('msg-sign-no-link').value = s.msgSignNoLink  || MSG_SIGN_NOLINK;
   document.getElementById('msg-sign-bank').value    = s.msgSignBank    || MSG_SIGN_BANK;
+  // reminder toggles + hours
+  document.getElementById('reminder-not-open-enabled').checked   = !!s.reminderNotOpenEnabled;
+  document.getElementById('reminder-not-open-hours').value       = s.reminderNotOpenHours   || 24;
+  document.getElementById('reminder-not-signed-enabled').checked = !!s.reminderNotSignedEnabled;
+  document.getElementById('reminder-not-signed-hours').value     = s.reminderNotSignedHours || 48;
+  // reminder message templates
+  document.getElementById('msg-reminder-not-open').value   = s.msgReminderNotOpen   || MSG_REMINDER_NOT_OPEN;
+  document.getElementById('msg-reminder-not-signed').value = s.msgReminderNotSigned || MSG_REMINDER_NOT_SIGNED;
+  // generate cron token if missing
+  if(!s.cronToken) s.cronToken=[...Array(24)].map(()=>(Math.random()*16|0).toString(16)).join('');
+  updateCronUrl();
 }
 async function saveSettings(){
   settings={
@@ -1587,6 +1736,13 @@ async function saveSettings(){
     msgSignCredit:document.getElementById('msg-sign-credit').value,
     msgSignNoLink:document.getElementById('msg-sign-no-link').value,
     msgSignBank:document.getElementById('msg-sign-bank').value,
+    reminderNotOpenEnabled:document.getElementById('reminder-not-open-enabled').checked,
+    reminderNotOpenHours:parseFloat(document.getElementById('reminder-not-open-hours').value)||24,
+    reminderNotSignedEnabled:document.getElementById('reminder-not-signed-enabled').checked,
+    reminderNotSignedHours:parseFloat(document.getElementById('reminder-not-signed-hours').value)||48,
+    msgReminderNotOpen:document.getElementById('msg-reminder-not-open').value,
+    msgReminderNotSigned:document.getElementById('msg-reminder-not-signed').value,
+    cronToken:settings.cronToken||'',
     _savedAt:Date.now()
   };
   localStorage.setItem('pm_settings',JSON.stringify(settings));

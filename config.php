@@ -138,6 +138,75 @@ function savePasswordHash(string $userId, string $hash): void {
     }
 }
 
+// ─── reminders engine ─────────────────────────────────────────
+function runReminders(string $type, array $s): array {
+    $idx       = getProposalIndex();
+    $now       = time();
+    $sent      = 0;
+    $processed = 0;
+    $baseUrl   = rtrim($s['baseUrl'] ?? '', '/');
+
+    foreach ($idx['ids'] as $id) {
+        $p = readProposal($id);
+        if (!$p) continue;
+        $processed++;
+
+        $clientPhone = $p['clientPhone'] ?? '';
+        if (!$clientPhone) continue;
+        $status = $p['status'] ?? 'draft';
+
+        // ── Reminder 1: sent but not yet opened ────────────────
+        if (in_array($type, ['all', 'not-open'], true) && ($s['reminderNotOpenEnabled'] ?? false)) {
+            if ($status === 'sent' && !empty($p['sentAt']) && empty($p['reminderNotOpenSentAt'])) {
+                $hoursSince    = ($now - strtotime($p['sentAt'])) / 3600;
+                $requiredHours = (float)($s['reminderNotOpenHours'] ?? 24);
+                if ($hoursSince >= $requiredHours) {
+                    $link = $baseUrl ? $baseUrl . '/p/?id=' . $p['id'] : '';
+                    $tpl  = $s['msgReminderNotOpen']
+                        ?? "שלום {name} 👋\n\nשלחתי לך הצעת מחיר לפני {hours} שעות 📄\n\nהצעה #{num} עדיין מחכה לצפייה שלך:\n🔗 {link}\n\nלכל שאלה — אשמח לעזור!";
+                    $msg  = fillTemplate($tpl, [
+                        'name'  => $p['clientName']   ?? 'לקוח',
+                        'num'   => $p['proposalNum']  ?? '',
+                        'link'  => $link,
+                        'hours' => (int)floor($hoursSince),
+                    ]);
+                    if (sendWhatsapp($clientPhone, $msg)) {
+                        $p['reminderNotOpenSentAt'] = date('c');
+                        writeProposal($p);
+                        $sent++;
+                    }
+                }
+            }
+        }
+
+        // ── Reminder 2: viewed but not signed ──────────────────
+        if (in_array($type, ['all', 'not-signed'], true) && ($s['reminderNotSignedEnabled'] ?? false)) {
+            if ($status === 'viewed' && !empty($p['firstViewedAt']) && empty($p['reminderNotSignedSentAt'])) {
+                $hoursSince    = ($now - strtotime($p['firstViewedAt'])) / 3600;
+                $requiredHours = (float)($s['reminderNotSignedHours'] ?? 48);
+                if ($hoursSince >= $requiredHours) {
+                    $link = $baseUrl ? $baseUrl . '/p/?id=' . $p['id'] : '';
+                    $tpl  = $s['msgReminderNotSigned']
+                        ?? "שלום {name} 👋\n\nראיתי שצפית בהצעת המחיר שלנו ☺️\n\nנשמח לענות על כל שאלה ולסגור יחד!\n\n📄 הצעה #{num}\n🔗 {link}";
+                    $msg  = fillTemplate($tpl, [
+                        'name'  => $p['clientName']   ?? 'לקוח',
+                        'num'   => $p['proposalNum']  ?? '',
+                        'link'  => $link,
+                        'hours' => (int)floor($hoursSince),
+                    ]);
+                    if (sendWhatsapp($clientPhone, $msg)) {
+                        $p['reminderNotSignedSentAt'] = date('c');
+                        writeProposal($p);
+                        $sent++;
+                    }
+                }
+            }
+        }
+    }
+
+    return ['sent' => $sent, 'processed' => $processed];
+}
+
 // ─── message template helper ──────────────────────────────────
 function fillTemplate(string $tpl, array $vars): string {
     foreach ($vars as $k => $v) {

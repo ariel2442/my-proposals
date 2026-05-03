@@ -171,13 +171,25 @@ if ($action === 'save-settings') {
                 'growApiUrl','growApiKey',
                 'autoSendClient','autoRepView','autoRepSign','autoClientPayment','autoDrive',
                 'msgSendClient','msgViewFirst','msgViewReturn','msgSignRep',
-                'msgSignCredit','msgSignNoLink','msgSignBank'];
+                'msgSignCredit','msgSignNoLink','msgSignBank',
+                'reminderNotOpenEnabled','reminderNotOpenHours',
+                'reminderNotSignedEnabled','reminderNotSignedHours',
+                'msgReminderNotOpen','msgReminderNotSigned','cronToken'];
     $s = getSettings();
     foreach ($allowed as $k) {
         if (isset($body[$k])) $s[$k] = $body[$k];
     }
     saveSettingsFile($s);
     jsonOk();
+}
+
+// ─── run reminders (manual trigger) ──────────────────────────
+if ($action === 'run-reminders') {
+    requireAuth();
+    $type = $body['type'] ?? 'all';
+    $s    = getSettings();
+    $result = runReminders($type, $s);
+    jsonOk($result);
 }
 
 jsonFail('פעולה לא מוכרת');

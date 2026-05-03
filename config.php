@@ -138,6 +138,34 @@ function savePasswordHash(string $userId, string $hash): void {
     }
 }
 
+// ─── GROW payment link ────────────────────────────────────────
+function createGrowPaymentLink(array $p): ?string {
+    $s      = getSettings();
+    $apiKey = $s['growApiKey'] ?? '';
+    $apiUrl = $s['growApiUrl'] ?? '';
+    if (!$apiKey || !$apiUrl) return null;
+
+    $ch = curl_init($apiUrl);
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => json_encode([
+            'amount'          => (float)($p['total'] ?? 0),
+            'customer_name'   => $p['clientName']  ?? '',
+            'customer_phone'  => $p['clientPhone'] ?? '',
+            'vat_id'          => $p['clientVatId'] ?? '',
+            'description'     => 'הצעה מס\' ' . ($p['proposalNum'] ?? ''),
+            'project_type'    => $p['projectType'] ?? '',
+        ], JSON_UNESCAPED_UNICODE),
+        CURLOPT_HTTPHEADER     => ['Content-Type: application/json', 'Authorization: Bearer ' . $apiKey],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 15,
+    ]);
+    $res  = curl_exec($ch);
+    unset($ch);
+    $data = json_decode($res, true);
+    return $data['payment_url'] ?? $data['paymentUrl'] ?? $data['link'] ?? $data['url'] ?? null;
+}
+
 // ─── Google Drive upload (service account) ────────────────────
 function uploadToDrive(string $filename, string $content, string $mimeType = 'text/plain'): ?string {
     $s        = getSettings();
@@ -168,7 +196,7 @@ function uploadToDrive(string $filename, string $content, string $mimeType = 'te
     curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10,
         CURLOPT_POSTFIELDS => http_build_query(['grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion' => $jwt])]);
     $token = json_decode(curl_exec($ch), true)['access_token'] ?? '';
-    curl_close($ch);
+    unset($ch);
     if (!$token) return null;
 
     $boundary = 'drv_' . uniqid();
@@ -181,7 +209,7 @@ function uploadToDrive(string $filename, string $content, string $mimeType = 'te
         CURLOPT_POSTFIELDS => $body,
         CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token, 'Content-Type: multipart/related; boundary=' . $boundary]]);
     $fileData = json_decode(curl_exec($ch), true);
-    curl_close($ch);
+    unset($ch);
     return $fileData['id'] ?? null;
 }
 
@@ -216,6 +244,6 @@ function sendWhatsapp(string $phone, string $message): bool {
         CURLOPT_TIMEOUT        => 10,
     ]);
     $result = curl_exec($ch);
-    curl_close($ch);
+    unset($ch);
     return $result !== false;
 }

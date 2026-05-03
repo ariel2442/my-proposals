@@ -909,13 +909,18 @@ body{
           </div>
           <div class="section-card form-grid-full">
             <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>Make · אוטומציית תשלום GROW
+              <div class="section-title-icon"><svg class="icon"><use href="#i-diamond"/></svg></div>GROW · לינק תשלום אוטומטי
             </div>
             <div class="field">
-              <label>Make Webhook URL</label>
-              <input type="url" id="make-webhook-url" placeholder="https://hook.eu2.make.com/xxxxxxxxx">
-              <div class="field-hint">כשלקוח חותם ← נשלח webhook ל-Make עם כל פרטי ההצעה → Make יוצר לינק GROW ושולח ללקוח</div>
+              <label>GROW API URL</label>
+              <input type="url" id="grow-api-url" placeholder="https://api.grow.co.il/v1/payment-links">
+              <div class="field-hint">כתובת ה-API ליצירת לינק תשלום — תמצא בחשבון GROW שלך</div>
             </div>
+            <div class="field">
+              <label>GROW API Key</label>
+              <input type="text" id="grow-api-key" placeholder="sk_live_xxxxxxxxxxxxxxxx">
+            </div>
+            <div class="field-hint" style="margin-top:4px">לאחר חתימה באשראי — הלינק נוצר ישירות ונשלח ללקוח ב-WhatsApp. ללא Make.</div>
           </div>
           <div class="section-card form-grid-full">
             <div class="section-title">
@@ -1268,7 +1273,8 @@ function applySettings(s){
   document.getElementById('green-api-token').value=s.greenApiToken||'';
   document.getElementById('sales-rep-phone').value=s.salesRepPhone||'';
   document.getElementById('base-url').value=s.baseUrl||'';
-  document.getElementById('make-webhook-url').value=s.makeWebhookUrl||'';
+  document.getElementById('grow-api-url').value=s.growApiUrl||'';
+  document.getElementById('grow-api-key').value=s.growApiKey||'';
   document.getElementById('drive-folder-id').value=s.driveFolderId||'';
   document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
 }
@@ -1282,7 +1288,8 @@ async function saveSettings(){
     greenApiToken:document.getElementById('green-api-token').value,
     salesRepPhone:document.getElementById('sales-rep-phone').value,
     baseUrl:document.getElementById('base-url').value,
-    makeWebhookUrl:document.getElementById('make-webhook-url').value,
+    growApiUrl:document.getElementById('grow-api-url').value,
+    growApiKey:document.getElementById('grow-api-key').value,
     driveFolderId:document.getElementById('drive-folder-id').value,
     defaultTerms:document.getElementById('default-terms').value,
     _savedAt:Date.now()

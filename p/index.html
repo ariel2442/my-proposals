@@ -803,34 +803,18 @@ body{
   <div class="success-icon-big"><svg class="icon"><use href="#i-check"/></svg></div>
   <h2>ההצעה נחתמה בהצלחה!</h2>
   <p style="font-size:15px;color:var(--text-muted);margin-bottom:4px">תודה, <strong id="success-signer-name" style="color:white"></strong></p>
-  <p style="font-size:13px;color:var(--text-dim);margin-bottom:0">סה"כ לתשלום: <strong id="success-total" style="color:var(--blue-bright)"></strong></p>
+  <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px">סה"כ לתשלום: <strong id="success-total" style="color:var(--blue-bright)"></strong></p>
 
-  <!-- תשלום מהיר -->
-  <div id="qp-wrap" style="display:flex;flex-direction:column;align-items:center;width:100%;max-width:340px">
-    <button class="btn-quick-pay" id="qp-btn" onclick="showPaymentForm()">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
-      לתשלום מהיר
-    </button>
-
-    <div class="qp-form" id="qp-form" style="display:none">
-      <div class="qp-field">
-        <label>טלפון לקבלת הלינק</label>
-        <input type="tel" id="qp-phone" placeholder="050-0000000" inputmode="numeric">
-      </div>
-      <div class="qp-field">
-        <label>ת.ז / ח.פ</label>
-        <input type="text" id="qp-id" placeholder="000000000" inputmode="numeric">
-      </div>
-      <div class="qp-error" id="qp-error" style="display:none"></div>
-      <button class="qp-submit" id="qp-submit" onclick="submitPayment()">שלח לינק לתשלום</button>
-    </div>
-
-    <div class="qp-sent" id="qp-sent" style="display:none">
-      ✓ הקישור נשלח לוואטסאפ שלך!
-    </div>
+  <div id="success-whatsapp-msg" style="display:none;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);border-radius:14px;padding:16px 20px;text-align:center;font-size:14px;color:var(--success-bright);max-width:320px;margin-bottom:16px">
+    <div style="font-size:22px;margin-bottom:6px">📲</div>
+    <strong>לינק לתשלום נשלח אליך ב-WhatsApp!</strong>
+  </div>
+  <div id="success-bank-msg" style="display:none;background:rgba(66,142,255,0.1);border:1px solid rgba(66,142,255,0.3);border-radius:14px;padding:16px 20px;text-align:center;font-size:14px;color:var(--blue-soft);max-width:320px;margin-bottom:16px">
+    <div style="font-size:22px;margin-bottom:6px">🏦</div>
+    <strong>פרטי ההעברה נשלחו אליך ב-WhatsApp!</strong>
   </div>
 
-  <button class="btn-print-copy" onclick="printCopy()" style="margin-top:20px">
+  <button class="btn-print-copy" onclick="printCopy()" style="margin-top:4px">
     <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
     שמור עותק / הדפס
   </button>
@@ -1095,90 +1079,39 @@ function submitSignature(){
   const canvas=document.getElementById('signature-pad');
   window._signatureData=canvas.toDataURL('image/png');
   window._signerName=name;
-  doSign();
+
+  // הצג מודל בחירת תשלום
+  document.getElementById('payment-modal').style.display='flex';
 }
 
-async function doSign(){
-  const dateStr=new Date().toLocaleDateString('he-IL')+' '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+function choosePayment(method){
+  document.getElementById('payment-modal').style.display='none';
+  window._paymentMethod=method;
+  doSign(method);
+}
 
-  // הצג תיבת אישור חתימה
+async function doSign(method){
+  const dateStr=new Date().toLocaleDateString('he-IL')+' '+new Date().toLocaleTimeString('he-IL',{hour:'2-digit',minute:'2-digit'});
+  const payLabel=method==='credit'?'אשראי (Grow)':'העברה בנקאית';
+
   document.getElementById('signed-name-display').textContent=window._signerName||'—';
   document.getElementById('signed-date-display').textContent=dateStr;
-  document.getElementById('signed-pay-display').textContent='—';
+  document.getElementById('signed-pay-display').textContent=payLabel;
   document.getElementById('sign-form-area').style.display='none';
   document.getElementById('signed-box').style.display='block';
 
-  // שמור לשרת
-  trackEvent('sign',proposalData.id,{
+  // שמור לשרת — השרת יוצר לינק GROW ושולח WhatsApp אוטומטית
+  await trackEvent('sign',proposalData.id,{
     signerName:window._signerName,
     signature:window._signatureData,
-    paymentMethod:''
+    paymentMethod:method
   });
 
-  // שלח webhook
-  if(window.PROPOSAL_WEBHOOK&&window.PROPOSAL_WEBHOOK!=='YOUR_MAKE_WEBHOOK_2_URL_HERE'){
-    try{
-      await fetch(window.PROPOSAL_WEBHOOK,{
-        method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({
-          proposalId:proposalData.id,proposalNum:proposalData.proposalNum,
-          clientName:proposalData.clientName,clientPhone:proposalData.clientPhone,
-          signerName:window._signerName,signature:window._signatureData,
-          total:proposalData.total,signedAt:new Date().toISOString(),
-          fullProposal:proposalData
-        })
-      });
-    }catch(e){}
-  }
-
-  // עדכן מסך הצלחה
   document.getElementById('success-signer-name').textContent=window._signerName||'';
   document.getElementById('success-total').textContent='₪'+(proposalData.total||0).toLocaleString('he-IL');
-  // מלא טלפון מראש
-  document.getElementById('qp-phone').value=proposalData.clientPhone||'';
+  if(method==='credit') document.getElementById('success-whatsapp-msg').style.display='block';
+  else document.getElementById('success-bank-msg').style.display='block';
   document.getElementById('success-screen').classList.add('show');
-}
-
-function showPaymentForm(){
-  document.getElementById('qp-btn').style.display='none';
-  document.getElementById('qp-form').style.display='block';
-  document.getElementById('qp-phone').focus();
-}
-
-async function submitPayment(){
-  const phone=document.getElementById('qp-phone').value.trim();
-  const idNum=document.getElementById('qp-id').value.trim();
-  const errEl=document.getElementById('qp-error');
-  errEl.style.display='none';
-  if(!phone){errEl.textContent='נא למלא מספר טלפון';errEl.style.display='block';return}
-  if(!idNum){errEl.textContent='נא למלא ת.ז / ח.פ';errEl.style.display='block';return}
-
-  const btn=document.getElementById('qp-submit');
-  btn.disabled=true;btn.textContent='שולח...';
-
-  try{
-    await fetch(window.PAYMENT_WEBHOOK||window.PROPOSAL_WEBHOOK,{
-      method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        type:'payment_request',
-        phone,idNumber:idNum,
-        proposalId:proposalData.id,
-        proposalNum:proposalData.proposalNum,
-        clientName:proposalData.clientName,
-        total:proposalData.total,
-        signerName:window._signerName,
-        signedAt:new Date().toISOString()
-      })
-    });
-    document.getElementById('qp-form').style.display='none';
-    document.getElementById('qp-sent').style.display='block';
-    // עדכן תיבת החתימה עם אמצעי תשלום
-    document.getElementById('signed-pay-display').textContent='תשלום מהיר';
-  }catch(e){
-    errEl.textContent='שגיאה בשליחה, נסה שוב';
-    errEl.style.display='block';
-    btn.disabled=false;btn.textContent='שלח לינק לתשלום';
-  }
 }
 
 function printCopy(){
@@ -1188,8 +1121,6 @@ function printCopy(){
 
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 
-window.PROPOSAL_WEBHOOK='YOUR_MAKE_WEBHOOK_2_URL_HERE';
-window.PAYMENT_WEBHOOK='YOUR_PAYMENT_WEBHOOK_URL_HERE';
 loadProposal();
 </script>
 

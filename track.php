@@ -96,10 +96,13 @@ if ($action === 'sign') {
     if ($clientPhone3 && ($s3['autoClientPayment'] ?? true)) {
         $clientVars = ['name' => $clientName3, 'num' => $p['proposalNum'] ?? '', 'total' => $total3];
         if ($paymentMethod === 'credit') {
-            $growLink = createGrowPaymentLink($p);
-            if ($growLink) {
+            // proposal-level link takes priority; fall back to GROW API
+            $payLink = !empty($p['paymentLink'])
+                ? $p['paymentLink']
+                : createGrowPaymentLink($p);
+            if ($payLink) {
                 $tpl = $s3['msgSignCredit'] ?? "שלום {name} 👋\n\nתודה על חתימתך!\n\nלתשלום לחץ על הקישור:\n🔗 {payLink}\n\nסכום לתשלום: ₪{total}";
-                sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars + ['payLink' => $growLink]));
+                sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars + ['payLink' => $payLink]));
             } else {
                 $tpl = $s3['msgSignNoLink'] ?? "שלום {name} 👋\n\nתודה על חתימתך! ✍️\n\nלינק התשלום יישלח אליך בקרוב.";
                 sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars));

@@ -104,12 +104,27 @@ if ($action === 'delete') {
     jsonOk();
 }
 
+// ─── next proposal number (atomic counter) ────────────────────
+if ($action === 'next-num') {
+    requireAuth();
+    $file = DATA_DIR . 'proposal_counter.json';
+    $data = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
+    $num  = max(350, (int)($data['next'] ?? 350));
+    file_put_contents($file, json_encode(['next' => $num + 1]), LOCK_EX);
+    jsonOk(['num' => $num]);
+}
+
 // ─── duplicate ─────────────────────────────────────────────────
 if ($action === 'duplicate') {
     requireAuth();
     $id       = $body['id'] ?? '';
     $original = $id ? readProposal($id) : null;
     if (!$original) jsonFail('הצעה לא נמצאה', 404);
+
+    $counterFile = DATA_DIR . 'proposal_counter.json';
+    $counterData = file_exists($counterFile) ? json_decode(file_get_contents($counterFile), true) : [];
+    $nextNum     = max(350, (int)($counterData['next'] ?? 350));
+    file_put_contents($counterFile, json_encode(['next' => $nextNum + 1]), LOCK_EX);
 
     $copy = array_merge($original, [
         'id'              => 'prop_' . time() . '_' . rand(100, 999),
@@ -124,7 +139,7 @@ if ($action === 'duplicate') {
         'totalViewSeconds'=> 0,
         'views'           => [],
         'clientName'      => ($original['clientName'] ?? '') . ' (העתק)',
-        'proposalNum'     => date('Y') . '-' . rand(100, 999),
+        'proposalNum'     => (string)$nextNum,
     ]);
     writeProposal($copy);
     jsonOk(['proposal' => $copy]);
@@ -149,7 +164,7 @@ if ($action === 'get-settings') {
 if ($action === 'save-settings') {
     requireAuth();
     $allowed = ['bizName','bizEmail','bizPhone','bizBank','baseUrl','defaultTerms',
-                'greenApiInstance','greenApiToken','salesRepPhone'];
+                'greenApiInstance','greenApiToken','salesRepPhone','makeWebhookUrl','driveFolderId'];
     $s = getSettings();
     foreach ($allowed as $k) {
         if (isset($body[$k])) $s[$k] = $body[$k];

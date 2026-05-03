@@ -122,6 +122,44 @@ if ($action === 'sign') {
         curl_close($ch);
     }
 
+    // ─── WhatsApp לנציג מכירות על חתימה ──────────────────────────
+    $s2          = getSettings();
+    $repPhone    = $p['salesRepPhone'] ?? $s2['salesRepPhone'] ?? '';
+    $clientName2 = $p['clientName']   ?? 'לקוח';
+    $propNum2    = $p['proposalNum']  ?? '';
+    $total2      = number_format($p['total'] ?? 0, 0, '.', ',');
+    $payLabel    = $paymentMethod === 'credit' ? 'אשראי 💳' : 'העברה בנקאית 🏦';
+    $baseUrl2    = rtrim($s2['baseUrl'] ?? '', '/');
+    $viewUrl2    = $baseUrl2 ? $baseUrl2 . '/price/view-signed.php?id=' . $id : '';
+
+    if ($repPhone) {
+        $waMsg = "✅ {$clientName2} חתמ/ה על הצעת המחיר!\n\n"
+               . "📄 הצעה #{$propNum2}\n"
+               . "💰 סכום: ₪{$total2}\n"
+               . "💳 תשלום: {$payLabel}\n"
+               . "✍️ חתם/ה: {$signerName}"
+               . ($viewUrl2 ? "\n\n🔗 {$viewUrl2}" : '');
+        sendWhatsapp($repPhone, $waMsg);
+    }
+
+    // ─── העלאה לגוגל דרייב ────────────────────────────────────
+    $driveText = implode("\n", [
+        "הסכם חתום — הצעה #{$propNum2}",
+        str_repeat('─', 40),
+        "לקוח:        {$clientName2}",
+        "טלפון:       " . ($p['clientPhone'] ?? ''),
+        "סכום:        ₪{$total2}",
+        "תשלום:       " . ($paymentMethod === 'credit' ? 'אשראי' : 'העברה בנקאית'),
+        "חתם/ה:       {$signerName}",
+        "תאריך חתימה: " . date('d/m/Y H:i', intval($signedAt / 1000)),
+        "",
+        "פרטי עסק:    " . ($p['biz']['name'] ?? ''),
+        "מספר הצעה:   {$propNum2}",
+        "ID:          {$id}",
+    ]);
+    $driveFilename = "הצעה_{$propNum2}_{$clientName2}_" . date('Y-m-d') . '.txt';
+    uploadToDrive($driveFilename, $driveText, 'text/plain');
+
     // מייל לאדמין
     $usersFile  = __DIR__ . '/users.php';
     $users      = file_exists($usersFile) ? (require $usersFile) : [];

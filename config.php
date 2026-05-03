@@ -138,6 +138,53 @@ function savePasswordHash(string $userId, string $hash): void {
     }
 }
 
+// ─── Google Drive upload (service account) ────────────────────
+function uploadToDrive(string $filename, string $content, string $mimeType = 'text/plain'): ?string {
+    $s        = getSettings();
+    $folderId = $s['driveFolderId'] ?? '';
+    $saFile   = DATA_DIR . 'google-service-account.json';
+
+    if (!$folderId || !file_exists($saFile)) return null;
+
+    $sa = json_decode(file_get_contents($saFile), true);
+    if (empty($sa['private_key']) || empty($sa['client_email'])) return null;
+
+    $b64url = fn($d) => rtrim(strtr(base64_encode($d), '+/', '-_'), '=');
+
+    $now    = time();
+    $header = $b64url(json_encode(['alg' => 'RS256', 'typ' => 'JWT']));
+    $claims = $b64url(json_encode([
+        'iss'   => $sa['client_email'],
+        'scope' => 'https://www.googleapis.com/auth/drive.file',
+        'aud'   => 'https://oauth2.googleapis.com/token',
+        'exp'   => $now + 3600,
+        'iat'   => $now,
+    ]));
+    $sig = '';
+    openssl_sign($header . '.' . $claims, $sig, $sa['private_key'], 'SHA256');
+    $jwt = $header . '.' . $claims . '.' . $b64url($sig);
+
+    $ch = curl_init('https://oauth2.googleapis.com/token');
+    curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 10,
+        CURLOPT_POSTFIELDS => http_build_query(['grant_type' => 'urn:ietf:params:oauth:grant-type:jwt-bearer', 'assertion' => $jwt])]);
+    $token = json_decode(curl_exec($ch), true)['access_token'] ?? '';
+    curl_close($ch);
+    if (!$token) return null;
+
+    $boundary = 'drv_' . uniqid();
+    $meta     = json_encode(['name' => $filename, 'parents' => [$folderId]], JSON_UNESCAPED_UNICODE);
+    $body     = "--{$boundary}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n{$meta}\r\n"
+              . "--{$boundary}\r\nContent-Type: {$mimeType}\r\n\r\n{$content}\r\n--{$boundary}--";
+
+    $ch = curl_init('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart');
+    curl_setopt_array($ch, [CURLOPT_POST => true, CURLOPT_RETURNTRANSFER => true, CURLOPT_TIMEOUT => 30,
+        CURLOPT_POSTFIELDS => $body,
+        CURLOPT_HTTPHEADER => ['Authorization: Bearer ' . $token, 'Content-Type: multipart/related; boundary=' . $boundary]]);
+    $fileData = json_decode(curl_exec($ch), true);
+    curl_close($ch);
+    return $fileData['id'] ?? null;
+}
+
 // ─── WhatsApp via Green API ────────────────────────────────────
 function normalizePhone(string $phone): string {
     $digits = preg_replace('/[^0-9]/', '', $phone);

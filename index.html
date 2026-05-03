@@ -339,11 +339,16 @@ body{
 .price-amount-wrapper span{color:var(--text-dim);font-size:13px;font-weight:500}
 
 /* ── SUMMARY ────────────────────────────── */
-.summary-box{position:relative;background:linear-gradient(135deg,rgba(66,142,255,0.15) 0%,rgba(64,75,242,0.1) 100%);border:1px solid rgba(66,142,255,0.4);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;backdrop-filter:blur(20px);box-shadow:0 0 40px rgba(66,142,255,0.1),inset 0 1px 0 rgba(255,255,255,0.15);overflow:hidden}
-.summary-box::before{content:'';position:absolute;top:0;right:-30%;width:60%;height:100%;background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,0.05) 50%,transparent 60%);transform:skewX(-12deg);pointer-events:none}
-.summary-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;font-size:14px;color:var(--text-muted)}
-.summary-final{border-top:1px solid rgba(66,142,255,0.25);margin-top:10px;padding-top:16px;font-size:22px;font-weight:900;color:white;letter-spacing:-0.01em}
-.summary-final-amount{background:linear-gradient(135deg,var(--blue-bright) 0%,var(--blue-primary) 50%,var(--indigo) 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;filter:drop-shadow(0 0 20px rgba(66,142,255,0.4))}
+.project-type-btns{display:flex;gap:8px;flex-wrap:wrap}
+.type-btn{flex:1;min-width:90px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s ease}
+.type-btn:hover{background:rgba(66,142,255,0.1);border-color:rgba(66,142,255,0.3);color:var(--text)}
+.type-btn.active{background:rgba(66,142,255,0.15);border-color:var(--blue-primary);color:var(--blue-bright);box-shadow:0 0 0 1px rgba(66,142,255,0.3)}
+.total-input-box{background:linear-gradient(135deg,rgba(66,142,255,0.12) 0%,rgba(64,75,242,0.08) 100%);border:1px solid rgba(66,142,255,0.35);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:14px}
+.total-input-label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:10px;font-weight:600}
+.total-input{width:100%;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--text);font-size:28px;font-weight:800;font-family:inherit;text-align:center;letter-spacing:1px;-moz-appearance:textfield}
+.total-input::-webkit-outer-spin-button,.total-input::-webkit-inner-spin-button{-webkit-appearance:none}
+.total-input::placeholder{color:rgba(255,255,255,0.2)}
+.total-input:focus{outline:none;border-color:var(--blue-primary);background:rgba(66,142,255,0.06)}
 
 /* ── INFO TAG ───────────────────────────── */
 .info-tag{background:linear-gradient(135deg,rgba(16,185,129,0.1) 0%,rgba(16,185,129,0.05) 100%);border:1px solid rgba(16,185,129,0.25);color:var(--success-bright);padding:14px 16px;border-radius:var(--radius-md);font-size:12px;line-height:1.6;margin-bottom:12px;display:flex;gap:10px;align-items:flex-start;backdrop-filter:blur(10px)}
@@ -622,7 +627,7 @@ body{
         <span class="nav-badge hidden" id="saved-count">0</span>
       </button>
 
-      <div class="sidebar-section" style="margin-top:10px">ניהול</div>
+      <div class="sidebar-section" id="snav-section-mgmt" style="margin-top:10px">ניהול</div>
       <button class="nav-item" id="snav-library" onclick="switchTab('library')">
         <svg class="icon"><use href="#i-book"/></svg>
         <span>ספריית שירותים</span>
@@ -763,7 +768,11 @@ body{
             </div>
             <div class="field">
               <label>סוג הפרויקט</label>
-              <input type="text" id="project-type" placeholder="דף נחיתה, אתר תדמית...">
+              <div class="project-type-btns" id="project-type-btns">
+                <button type="button" class="type-btn" onclick="setProjectType('דף נחיתה')">דף נחיתה</button>
+                <button type="button" class="type-btn" onclick="setProjectType('אתר תדמית')">אתר תדמית</button>
+                <button type="button" class="type-btn" onclick="setProjectType('אתר מכירות')">אתר מכירות</button>
+              </div>
             </div>
             <div class="field">
               <label>מספר הצעה</label>
@@ -793,23 +802,12 @@ body{
             </button>
           </div>
 
-          <!-- Pricing (full width) -->
-          <div class="section-card form-grid-full">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-diamond"/></svg></div>תמחור
-            </div>
-            <div id="items-list"></div>
-            <button class="btn-add" onclick="openServicesPicker()">
-              <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שירות
-            </button>
-          </div>
         </div>
 
-        <!-- Summary -->
-        <div class="summary-box">
-          <div class="summary-row"><span>סכום ביניים</span><span id="sum-subtotal">₪0</span></div>
-          <div class="summary-row"><span>מע"מ 18%</span><span id="sum-vat">₪0</span></div>
-          <div class="summary-row summary-final"><span>סה"כ</span><span class="summary-final-amount" id="sum-total">₪0</span></div>
+        <!-- Total -->
+        <div class="total-input-box">
+          <label class="total-input-label">סכום סופי (כולל מע"מ) ₪</label>
+          <input type="number" id="proposal-total" placeholder="0" inputmode="decimal" min="0" class="total-input">
         </div>
 
         <div class="info-tag">
@@ -921,6 +919,19 @@ body{
           </div>
           <div class="section-card form-grid-full">
             <div class="section-title">
+              <div class="section-title-icon"><svg class="icon"><use href="#i-folder"/></svg></div>Google Drive · שמירת הסכמים חתומים
+            </div>
+            <div class="field">
+              <label>Drive Folder ID</label>
+              <input type="text" id="drive-folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
+              <div class="field-hint">העתק את ה-ID מהURL של התיקיה ב-Drive: drive.google.com/drive/folders/<strong>זה-ה-ID</strong></div>
+            </div>
+            <div class="field-hint" style="margin-top:6px">
+              להפעלה: העלה את קובץ ה-service account של Google Cloud לנתיב <code>data/google-service-account.json</code> ושתף את התיקיה עם כתובת ה-service account.
+            </div>
+          </div>
+          <div class="section-card form-grid-full">
+            <div class="section-title">
               <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>הצהרות והתחייבויות
             </div>
             <div class="field">
@@ -1026,6 +1037,7 @@ body{
 
 <script>
 // ─── auth guard ──────────────────────────────────────────────
+let currentUserRole='agent';
 (async function(){
   const base=window.location.pathname.replace(/\/index\.html$/,'').replace(/\/$/,'');
   try{
@@ -1033,13 +1045,24 @@ body{
     const d=await r.json();
     if(!d.ok){window.location.replace(base+'/login.html');return;}
     if(d.user){
+      currentUserRole=d.user.role||'agent';
       const fn=d.user.name.split(' ')[0];
       document.getElementById('sidebar-name').textContent=fn;
       document.getElementById('sidebar-avatar').textContent=d.user.avatar||fn.charAt(0);
       document.getElementById('header-sub').textContent='שלום, '+fn;
-      if(d.user.role==='admin'){
+      if(currentUserRole==='admin'){
         const adminBtn=document.getElementById('btn-admin');
         if(adminBtn) adminBtn.style.display='';
+      } else {
+        // הסתר היסטוריה והגדרות ממשתמשים שאינם מנהל
+        ['snav-saved','snav-settings'].forEach(id=>{
+          const el=document.getElementById(id);
+          if(el) el.style.display='none';
+        });
+        ['tab-saved','tab-settings'].forEach(id=>{
+          const el=document.getElementById(id);
+          if(el) el.style.display='none';
+        });
       }
     }
   }catch(e){}
@@ -1052,7 +1075,8 @@ function logout(){
 }
 
 // ─── state ───────────────────────────────────────────────────
-let processSteps=[],includes=[],items=[],settings={},library={services:[],includes:[]};
+let processSteps=[],includes=[],settings={},library={services:[],includes:[]};
+let projectType='';
 const VAT_RATE=18;
 
 const DEFAULT_PROCESS=['פגישה ראשונית לאפיון בזום','העברת כל החומרים לתיקיה משותפת','עבודה על עיצוב וסקיצה ראשונית','פגישה שניה לסבב תיקונים','הדרכה לתפעול וניהול','סוף הפרויקט'];
@@ -1114,18 +1138,22 @@ async function loadAllData(){
   }
 }
 
-function init(){
+async function init(){
   loadSettings();loadLibrary();
-  processSteps=[...DEFAULT_PROCESS];includes=[];items=[];
-  document.getElementById('proposal-num').value=genNum();
-  renderProcess();renderIncludes();renderItems();updateSummary();renderSaved();renderLibrary();
+  processSteps=[...DEFAULT_PROCESS];includes=[];projectType='';
+  document.getElementById('proposal-num').value='…';
+  try{
+    const r=await apiCall('POST','next-num',{});
+    if(r.ok) document.getElementById('proposal-num').value=r.num;
+  }catch(e){document.getElementById('proposal-num').value=Date.now()%10000+350;}
+  renderProcess();renderIncludes();renderSaved();renderLibrary();
   renderStatusPanel();
   loadAllData();
 }
-function genNum(){return new Date().getFullYear()+'-'+String(Math.floor(Math.random()*900)+100)}
 
 // ─── tab switching ────────────────────────────────────────────
 function switchTab(tab){
+  if(currentUserRole!=='admin' && (tab==='saved'||tab==='settings')) return;
   // mobile tabs
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   const mobileTab=document.getElementById('tab-'+tab);
@@ -1188,57 +1216,12 @@ function renderIncludes(){
 }
 function removeInclude(i){includes.splice(i,1);renderIncludes()}
 
-// ─── items ───────────────────────────────────────────────────
-function renderItems(){
-  const list=document.getElementById('items-list');
-  if(!items.length){list.innerHTML='<div class="no-items" style="margin-bottom:14px">עוד לא נוספו פריטי תמחור</div>';return}
-  list.innerHTML=items.map((item,i)=>`
-    <div class="price-item">
-      <div class="price-item-header">
-        <div>
-          <div class="price-item-title">${esc(item.title)}</div>
-          ${item.desc?`<div class="price-item-desc">${esc(item.desc)}</div>`:''}
-        </div>
-        <button class="price-item-remove" onclick="removeItem(${i})">הסר</button>
-      </div>
-      <div class="price-item-controls">
-        <input type="number" class="price-qty-input" value="${item.qty}" min="1" inputmode="numeric" oninput="items[${i}].qty=parseFloat(this.value)||1;updateSummary()" placeholder="כמות">
-        <div class="price-amount-wrapper">
-          <input type="number" value="${item.price}" min="0" inputmode="decimal" oninput="items[${i}].price=parseFloat(this.value)||0;updateSummary()">
-          <span>₪</span>
-        </div>
-      </div>
-    </div>`).join('');
-}
-function removeItem(i){items.splice(i,1);renderItems();updateSummary()}
-
-// ─── services picker ─────────────────────────────────────────
-function openServicesPicker(){
-  const list=document.getElementById('services-picker-list');
-  if(!library.services.length){
-    list.innerHTML='<div class="picker-empty">אין שירותים בספריה.<br>הוסף בלשונית ספריה</div>';
-  }else{
-    list.innerHTML=library.services.map(s=>`
-      <div class="picker-item" onclick="selectService('${s.id}')">
-        <div class="picker-item-info">
-          <div class="picker-item-name">${esc(s.name)}</div>
-          ${s.desc?`<div class="picker-item-desc">${esc(s.desc)}</div>`:''}
-        </div>
-        <div class="picker-item-price">₪${Number(s.price).toLocaleString('he-IL')}</div>
-      </div>`).join('');
-  }
-  document.getElementById('services-modal').classList.add('show');
-}
-function selectService(id){
-  const s=library.services.find(x=>x.id===id);if(!s)return;
-  items.push({title:s.name,desc:s.desc||'',qty:1,price:Number(s.price)||0});
-  renderItems();updateSummary();closeModal('services-modal');toast(s.name+' נוסף','success');
-}
-function addCustomItem(){
-  const name=prompt('שם הפריט:');if(!name)return;
-  const price=parseFloat(prompt('מחיר (₪):'))||0;
-  items.push({title:name,desc:'',qty:1,price});
-  renderItems();updateSummary();closeModal('services-modal');toast('נוסף','success');
+// ─── project type ─────────────────────────────────────────────
+function setProjectType(type){
+  projectType=type;
+  document.querySelectorAll('.type-btn').forEach(btn=>{
+    btn.classList.toggle('active',btn.textContent===type);
+  });
 }
 
 // ─── includes picker ─────────────────────────────────────────
@@ -1270,14 +1253,6 @@ function addCustomInclude(){
 
 function closeModal(id){document.getElementById(id).classList.remove('show')}
 
-// ─── summary ─────────────────────────────────────────────────
-function updateSummary(){
-  const sub=items.reduce((s,it)=>s+(it.qty*it.price),0);
-  const vat=Math.round(sub*VAT_RATE/100);
-  document.getElementById('sum-subtotal').textContent='₪'+sub.toLocaleString('he-IL');
-  document.getElementById('sum-vat').textContent='₪'+vat.toLocaleString('he-IL');
-  document.getElementById('sum-total').textContent='₪'+(sub+vat).toLocaleString('he-IL');
-}
 
 // ─── settings ────────────────────────────────────────────────
 function loadSettings(){
@@ -1294,6 +1269,7 @@ function applySettings(s){
   document.getElementById('sales-rep-phone').value=s.salesRepPhone||'';
   document.getElementById('base-url').value=s.baseUrl||'';
   document.getElementById('make-webhook-url').value=s.makeWebhookUrl||'';
+  document.getElementById('drive-folder-id').value=s.driveFolderId||'';
   document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
 }
 async function saveSettings(){
@@ -1307,6 +1283,7 @@ async function saveSettings(){
     salesRepPhone:document.getElementById('sales-rep-phone').value,
     baseUrl:document.getElementById('base-url').value,
     makeWebhookUrl:document.getElementById('make-webhook-url').value,
+    driveFolderId:document.getElementById('drive-folder-id').value,
     defaultTerms:document.getElementById('default-terms').value,
     _savedAt:Date.now()
   };
@@ -1363,21 +1340,20 @@ function saveLibrary(){
 
 // ─── proposal data ────────────────────────────────────────────
 function getProposalData(){
-  const sub=items.reduce((s,it)=>s+(it.qty*it.price),0);
-  const vat=Math.round(sub*VAT_RATE/100);
+  const total=parseFloat(document.getElementById('proposal-total').value)||0;
   return{
     id:'prop_'+Date.now(),
     clientName:document.getElementById('client-name').value.trim(),
     clientPhone:document.getElementById('client-phone').value.trim(),
     clientVatId:document.getElementById('client-vat-id').value.trim(),
-    projectType:document.getElementById('project-type').value.trim(),
+    projectType:projectType,
     proposalNum:document.getElementById('proposal-num').value.trim(),
     date:new Date().toISOString(),
     createdAt:new Date().toISOString(),
     processSteps:processSteps.filter(s=>s.trim()),
     includes:includes.filter(s=>s.trim()),
-    items:items.filter(it=>it.title.trim()),
-    subtotal:sub,vat,vatRate:VAT_RATE,total:sub+vat,
+    items:[],
+    subtotal:Math.round(total/1.18),vat:Math.round(total-total/1.18),vatRate:VAT_RATE,total,
     terms:(settings.defaultTerms||DEFAULT_TERMS).split('\n').filter(t=>t.trim()),
     biz:{name:settings.bizName||'',email:settings.bizEmail||'',phone:settings.bizPhone||'',bank:settings.bizBank||''},
     status:'draft',
@@ -1389,7 +1365,7 @@ function getProposalData(){
 function validateProposal(d){
   if(!d.clientName)return'יש למלא שם לקוח';
   if(!d.clientPhone)return'יש למלא טלפון לקוח';
-  if(!d.items.length)return'יש להוסיף לפחות פריט אחד לתמחור';
+  if(!d.total)return'יש להזין סכום סופי';
   if(!settings.baseUrl)return'יש להגדיר כתובת בסיס בהגדרות';
   return null;
 }
@@ -1412,18 +1388,10 @@ function previewProposal(){
   const d=getProposalData();
   if(!d.clientName){toast('יש למלא שם לקוח','error');return}
   if(!d.clientPhone){toast('יש למלא טלפון לקוח','error');return}
-  if(!d.items.length){toast('יש להוסיף לפחות פריט אחד','error');return}
+  if(!d.total){toast('יש להזין סכום סופי','error');return}
   _pendingProposal=d;
 
   document.getElementById('preview-num').textContent='הצעה מס\' '+esc(d.proposalNum);
-
-  const itemsHtml=d.items.map(it=>`
-    <div class="preview-item-row">
-      <div class="preview-item-name">${esc(it.title)}${it.desc?'<div style="font-size:11px;color:var(--text-dim);font-weight:400;margin-top:2px">'+esc(it.desc)+'</div>':''}</div>
-      <div class="preview-item-qty">×${it.qty}</div>
-      <div class="preview-item-price">₪${Number(it.price).toLocaleString('he-IL')}</div>
-      <div class="preview-item-total">₪${(it.qty*it.price).toLocaleString('he-IL')}</div>
-    </div>`).join('');
 
   const includesHtml=d.includes.length?`
     <div class="preview-section-title">מה כולל</div>
@@ -1448,10 +1416,8 @@ function previewProposal(){
         <div class="preview-field-val">${esc(d.projectType)}</div>
       </div>`:''}
     </div>
-    <div class="preview-section-title">פירוט מחיר</div>
-    <div class="preview-items">${itemsHtml}</div>
     <div class="preview-summary">
-      <div class="preview-sum-row"><span>סכום ביניים</span><span>₪${d.subtotal.toLocaleString('he-IL')}</span></div>
+      <div class="preview-sum-row"><span>לפני מע"מ</span><span>₪${d.subtotal.toLocaleString('he-IL')}</span></div>
       <div class="preview-sum-row"><span>מע"מ ${d.vatRate}%</span><span>₪${d.vat.toLocaleString('he-IL')}</span></div>
       <div class="preview-sum-row total"><span>סה"כ לתשלום</span><span>₪${d.total.toLocaleString('he-IL')}</span></div>
     </div>
@@ -1481,13 +1447,17 @@ async function sendProposal(prefilledData){
     document.getElementById('link-modal').classList.add('show');
     renderStatusPanel();
     toast('נשלח ללקוח!','success');
-    setTimeout(()=>{
+    setTimeout(async()=>{
       document.getElementById('client-name').value='';
       document.getElementById('client-phone').value='';
       document.getElementById('client-vat-id').value='';
-      items=[];includes=[];
-      renderItems();renderIncludes();updateSummary();
-      document.getElementById('proposal-num').value=genNum();
+      document.getElementById('proposal-total').value='';
+      includes=[];projectType='';
+      renderIncludes();setProjectType('');
+      try{
+        const nr=await apiCall('POST','next-num',{});
+        if(nr.ok) document.getElementById('proposal-num').value=nr.num;
+      }catch(e){}
     },500);
   }catch(e){
     toast('שגיאה בשליחה','error');
@@ -1543,10 +1513,11 @@ function loadProposal(id){
   document.getElementById('client-name').value=p.clientName||'';
   document.getElementById('client-phone').value=p.clientPhone||'';
   document.getElementById('client-vat-id').value=p.clientVatId||'';
-  document.getElementById('project-type').value=p.projectType||'';
   document.getElementById('proposal-num').value=p.proposalNum||'';
-  processSteps=p.processSteps||[];includes=p.includes||[];items=p.items||[];
-  renderProcess();renderIncludes();renderItems();updateSummary();
+  document.getElementById('proposal-total').value=p.total||'';
+  processSteps=p.processSteps||[];includes=p.includes||[];
+  setProjectType(p.projectType||'');
+  renderProcess();renderIncludes();
   switchTab('new');toast('ההצעה נטענה','success');
 }
 async function deleteProposal(id){

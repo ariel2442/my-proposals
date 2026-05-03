@@ -169,6 +169,7 @@ if ($action === 'save-settings') {
     $allowed = ['bizName','bizEmail','bizPhone','bizBank','baseUrl','defaultTerms',
                 'greenApiInstance','greenApiToken','salesRepPhone','driveFolderId',
                 'growApiUrl','growApiKey',
+                'growUserId','growPageCode','growSuccessUrl','growSandbox',
                 'autoSendClient','autoRepView','autoRepSign','autoClientPayment','autoDrive',
                 'msgSendClient','msgViewFirst','msgViewReturn','msgSignRep',
                 'msgSignCredit','msgSignNoLink','msgSignBank',
@@ -181,6 +182,54 @@ if ($action === 'save-settings') {
     }
     saveSettingsFile($s);
     jsonOk();
+}
+
+// ─── GROW: test connection ────────────────────────────────────
+if ($action === 'grow-test') {
+    requireAuth();
+    $s        = getSettings();
+    $userId   = $s['growUserId']   ?? '';
+    $pageCode = $s['growPageCode'] ?? '';
+    if (!$userId || !$pageCode) jsonFail('חסרים User ID ו-Page Code — מלא ושמור קודם');
+
+    $sandbox  = !empty($s['growSandbox']);
+    $base     = $sandbox ? 'https://sandbox.meshulam.co.il' : 'https://meshulam.co.il';
+    $ch = curl_init($base . '/api/light/server/1.0/createPaymentProcess');
+    curl_setopt_array($ch, [
+        CURLOPT_POST           => true,
+        CURLOPT_POSTFIELDS     => ['pageCode' => $pageCode, 'userId' => $userId, 'sum' => '1'],
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_TIMEOUT        => 10,
+    ]);
+    $res  = curl_exec($ch);
+    unset($ch);
+    $json = json_decode($res, true);
+    if (!is_array($json)) jsonFail('לא ניתן להגיע לשרת GROW');
+    // Error IDs for missing required fields (not auth) = credentials are valid
+    $errId = is_array($json['err'] ?? null) ? ($json['err']['id'] ?? 0) : 0;
+    if (($json['status'] ?? 0) === 1 || in_array($errId, [7,8,9,10,11,12,13,54,55,56])) {
+        jsonOk(['connected' => true]);
+    }
+    $errMsg = is_array($json['err'] ?? null) ? ($json['err']['message'] ?? '') : '';
+    jsonFail('פרטי GROW לא תקינים' . ($errMsg ? ': ' . $errMsg : ''));
+}
+
+// ─── GROW: create payment link for proposal data ──────────────
+if ($action === 'grow-create-link') {
+    requireAuth();
+    $s = getSettings();
+    if (empty($s['growUserId']) || empty($s['growPageCode'])) {
+        jsonFail('לא מחובר ל-GROW — מלא User ID ו-Page Code באוטומציות ושמור');
+    }
+    $name  = trim($body['clientName']  ?? '');
+    $phone = trim($body['clientPhone'] ?? '');
+    $total = (float)($body['total'] ?? 0);
+    if (!$name || !$phone) jsonFail('חסרים שם וטלפון לקוח');
+    if (!$total)           jsonFail('חסר סכום');
+
+    $url = createGrowPaymentLink($body);
+    if (!$url) jsonFail('שגיאה ביצירת לינק — בדוק User ID, Page Code ו-Success URL');
+    jsonOk(['url' => $url]);
 }
 
 // ─── run reminders (manual trigger) ──────────────────────────

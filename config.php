@@ -215,32 +215,50 @@ function fillTemplate(string $tpl, array $vars): string {
     return $tpl;
 }
 
-// ─── GROW payment link ────────────────────────────────────────
+// ─── GROW / Meshulam payment link ─────────────────────────────
 function createGrowPaymentLink(array $p): ?string {
-    $s      = getSettings();
-    $apiKey = $s['growApiKey'] ?? '';
-    $apiUrl = $s['growApiUrl'] ?? '';
-    if (!$apiKey || !$apiUrl) return null;
+    $s        = getSettings();
+    $userId   = $s['growUserId']   ?? '';
+    $pageCode = $s['growPageCode'] ?? '';
+    if (!$userId || !$pageCode) return null;
 
-    $ch = curl_init($apiUrl);
+    $sandbox    = !empty($s['growSandbox']);
+    $base       = $sandbox
+        ? 'https://sandbox.meshulam.co.il'
+        : 'https://meshulam.co.il';
+    $endpoint   = $base . '/api/light/server/1.0/createPaymentProcess';
+    $successUrl = $s['growSuccessUrl'] ?? '';
+
+    $post = [
+        'pageCode'            => $pageCode,
+        'userId'              => $userId,
+        'sum'                 => (float)($p['total'] ?? 0),
+        'description'         => 'הצעה ' . ($p['proposalNum'] ?? ''),
+        'successUrl'          => $successUrl,
+        'cancelUrl'           => $successUrl,
+        'pageField[fullName]' => $p['clientName']  ?? '',
+        'pageField[phone]'    => $p['clientPhone'] ?? '',
+        'cField1'             => $p['id']          ?? '',
+        'cField2'             => $p['proposalNum'] ?? '',
+    ];
+    if (!empty($p['clientVatId'])) {
+        $post['pageField[invoiceLicenseNumber]'] = $p['clientVatId'];
+    }
+
+    $ch = curl_init($endpoint);
     curl_setopt_array($ch, [
         CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => json_encode([
-            'amount'          => (float)($p['total'] ?? 0),
-            'customer_name'   => $p['clientName']  ?? '',
-            'customer_phone'  => $p['clientPhone'] ?? '',
-            'vat_id'          => $p['clientVatId'] ?? '',
-            'description'     => 'הצעה מס\' ' . ($p['proposalNum'] ?? ''),
-            'project_type'    => $p['projectType'] ?? '',
-        ], JSON_UNESCAPED_UNICODE),
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/json', 'Authorization: Bearer ' . $apiKey],
+        CURLOPT_POSTFIELDS     => $post,   // array → multipart/form-data
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_TIMEOUT        => 15,
     ]);
     $res  = curl_exec($ch);
     unset($ch);
-    $data = json_decode($res, true);
-    return $data['payment_url'] ?? $data['paymentUrl'] ?? $data['link'] ?? $data['url'] ?? null;
+    $json = json_decode($res, true);
+    if (($json['status'] ?? 0) === 1 && !empty($json['data']['url'])) {
+        return $json['data']['url'];
+    }
+    return null;
 }
 
 // ─── Google Drive upload (service account) ────────────────────

@@ -899,14 +899,9 @@ body{
               <div id="total-preview" class="total-preview"></div>
             </div>
             <div class="field" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06)">
-              <label>לינק תשלום (אשראי)</label>
-              <div style="display:flex;gap:6px;align-items:stretch">
-                <input type="url" id="proposal-payment-link" placeholder="https://grow.co.il/pay/..." style="flex:1">
-                <button class="btn btn-secondary" id="grow-link-btn" onclick="createGrowLink()" title="צור לינק ב-GROW אוטומטית" style="padding:0 12px;min-width:56px;flex-shrink:0;font-size:11px;font-weight:700;white-space:nowrap">
-                  <svg class="icon icon-sm" style="margin-left:3px"><use href="#i-diamond"/></svg>GROW
-                </button>
-              </div>
-              <div class="field-hint">הדבק לינק ידנית או לחץ GROW ליצירה אוטומטית</div>
+              <label>לינק תשלום ידני (אופציונלי)</label>
+              <input type="url" id="proposal-payment-link" placeholder="https://grow.co.il/pay/...">
+              <div class="field-hint">אם מולא — ישלח ללקוח במקום הוובהוק</div>
             </div>
           </div>
         </div>
@@ -1114,38 +1109,6 @@ body{
           </details>
         </div>
 
-        <!-- GROW / Meshulam connection -->
-        <div class="section-card">
-          <div class="section-title">
-            <div class="section-title-icon"><svg class="icon"><use href="#i-diamond"/></svg></div>חיבור ל-GROW (Meshulam)
-          </div>
-          <div class="connection-badge disconnected" id="grow-connection-status">○ לא מחובר</div>
-          <div class="field">
-            <label>User ID</label>
-            <input type="text" id="grow-user-id" placeholder="4ec1d595ae764243" dir="ltr">
-            <div class="field-hint">לוח הבקרה של GROW ← הגדרות ← API ← User ID</div>
-          </div>
-          <div class="field">
-            <label>Page Code (עמוד סליקה לאשראי)</label>
-            <input type="text" id="grow-page-code" placeholder="0b7a16e03b25" dir="ltr">
-            <div class="field-hint">לוח הבקרה ← עמודי סליקה ← בחר עמוד ← קוד הדף</div>
-          </div>
-          <div class="field">
-            <label>Success URL (עמוד תודה)</label>
-            <input type="url" id="grow-success-url" placeholder="https://yourdomain.co.il/thank-you">
-            <div class="field-hint">הלקוח יועבר לכאן אחרי תשלום מוצלח (חייב HTTPS)</div>
-          </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:4px">
-            <button class="auto-run-btn" onclick="testGrowConnection(this)">
-              <svg class="icon"><use href="#i-check-circle"/></svg>בדוק חיבור
-            </button>
-            <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-dim);cursor:pointer">
-              <input type="checkbox" id="grow-sandbox" style="accent-color:var(--blue-primary)">
-              Sandbox (בדיקות)
-            </label>
-          </div>
-        </div>
-
         <!-- Auto 3: payment message to client -->
         <div class="auto-card">
           <div class="auto-header">
@@ -1154,6 +1117,13 @@ body{
               <div class="auto-desc">WhatsApp ללקוח עם לינק GROW (אשראי) או פרטי העברה בנקאית</div>
             </div>
             <label class="toggle"><input type="checkbox" id="auto-client-payment" checked><span class="toggle-slider"></span></label>
+          </div>
+          <div class="auto-settings">
+            <div class="field">
+              <label>Webhook URL ליצירת לינק GROW</label>
+              <input type="url" id="grow-webhook-url" placeholder="https://hook.make.com/xxxxx" dir="ltr">
+              <div class="field-hint">כשלקוח בוחר אשראי — השרת שולח POST לוובהוק עם פרטי ההצעה ומצפה לקבל בחזרה <code>{"url":"..."}</code></div>
+            </div>
           </div>
           <details class="auto-msg">
             <summary>✏️ עריכת הודעות</summary>
@@ -1673,48 +1643,6 @@ function insertVar(fieldId,v){
   el.selectionStart=el.selectionEnd=s+v.length;el.focus();
 }
 
-async function testGrowConnection(btn){
-  if(btn){btn.disabled=true;}
-  try{
-    await saveSettings();
-    const r=await apiCall('POST','grow-test',{});
-    const el=document.getElementById('grow-connection-status');
-    if(r.ok){
-      if(el){el.className='connection-badge connected';el.textContent='● מחובר ל-GROW';}
-      toast('GROW מחובר בהצלחה ✅','success');
-    }else{
-      if(el){el.className='connection-badge disconnected';el.textContent='○ לא מחובר';}
-      toast(r.error||'שגיאה בחיבור','error');
-    }
-  }catch(e){toast('שגיאה בחיבור ל-GROW','error');}
-  if(btn){btn.disabled=false;}
-}
-
-async function createGrowLink(){
-  const sub=parseFloat(document.getElementById('proposal-total').value)||0;
-  if(!sub){toast('הכנס סכום קודם','error');return;}
-  const name=document.getElementById('client-name').value.trim();
-  const phone=document.getElementById('client-phone').value.trim();
-  if(!name||!phone){toast('הכנס שם וטלפון לקוח','error');return;}
-  const vat=Math.round(sub*VAT_RATE/100);
-  const btn=document.getElementById('grow-link-btn');
-  const orig=btn.innerHTML;
-  btn.disabled=true;
-  btn.innerHTML='<span class="spin">↻</span>';
-  try{
-    const r=await apiCall('POST','grow-create-link',{
-      proposalNum:document.getElementById('proposal-num').value.trim(),
-      clientName:name,clientPhone:phone,
-      clientVatId:document.getElementById('client-vat-id').value.trim(),
-      total:sub+vat,
-    });
-    if(r.ok){
-      document.getElementById('proposal-payment-link').value=r.url;
-      toast('לינק תשלום נוצר ✅','success');
-    }else{toast(r.error||'שגיאה ביצירת לינק','error');}
-  }catch(e){toast('שגיאה בחיבור ל-GROW','error');}
-  btn.disabled=false;btn.innerHTML=orig;
-}
 
 function updateCronUrl(){
   const base=(settings.baseUrl||'').replace(/\/$/,'');
@@ -1759,16 +1687,7 @@ function applySettings(s){
   document.getElementById('green-api-token').value=s.greenApiToken||'';
   document.getElementById('sales-rep-phone').value=s.salesRepPhone||'';
   document.getElementById('base-url').value=s.baseUrl||'';
-  document.getElementById('grow-user-id').value=s.growUserId||'';
-  document.getElementById('grow-page-code').value=s.growPageCode||'';
-  document.getElementById('grow-success-url').value=s.growSuccessUrl||'';
-  document.getElementById('grow-sandbox').checked=!!s.growSandbox;
-  const gStatus=document.getElementById('grow-connection-status');
-  if(gStatus){
-    const ok=!!(s.growUserId&&s.growPageCode);
-    gStatus.className='connection-badge '+(ok?'connected':'disconnected');
-    gStatus.textContent=ok?'● מחובר ל-GROW':'○ לא מחובר';
-  }
+  document.getElementById('grow-webhook-url').value=s.growWebhookUrl||'';
   document.getElementById('drive-folder-id').value=s.driveFolderId||'';
   document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
   // automation toggles (default on unless explicitly false)
@@ -1807,10 +1726,7 @@ async function saveSettings(){
     greenApiToken:document.getElementById('green-api-token').value,
     salesRepPhone:document.getElementById('sales-rep-phone').value,
     baseUrl:document.getElementById('base-url').value,
-    growUserId:document.getElementById('grow-user-id').value.trim(),
-    growPageCode:document.getElementById('grow-page-code').value.trim(),
-    growSuccessUrl:document.getElementById('grow-success-url').value.trim(),
-    growSandbox:document.getElementById('grow-sandbox').checked,
+    growWebhookUrl:document.getElementById('grow-webhook-url').value.trim(),
     driveFolderId:document.getElementById('drive-folder-id').value,
     defaultTerms:document.getElementById('default-terms').value,
     autoSendClient:document.getElementById('auto-send-client').checked,

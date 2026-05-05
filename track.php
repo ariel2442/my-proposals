@@ -138,10 +138,11 @@ if ($action === 'sign') {
 
     // ─── העלאה לגוגל דרייב ────────────────────────────────────
     if ($s2['autoDrive'] ?? true) {
+        $clientNameDrive = $p['clientName'] ?? '';
         $driveText = implode("\n", [
             "הסכם חתום — הצעה #{$propNum2}",
             str_repeat('─', 40),
-            "לקוח:        {$clientName2}",
+            "לקוח:        {$clientNameDrive}",
             "טלפון:       " . ($p['clientPhone'] ?? ''),
             "סכום:        ₪{$total2}",
             "תשלום:       " . ($paymentMethod === 'credit' ? 'אשראי' : 'העברה בנקאית'),
@@ -152,7 +153,8 @@ if ($action === 'sign') {
             "מספר הצעה:   {$propNum2}",
             "ID:          {$id}",
         ]);
-        $driveFilename = "הצעה_{$propNum2}_{$clientName2}_" . date('Y-m-d') . '.txt';
+        $safeClient    = preg_replace('/[^\p{L}\p{N}_\- ]/u', '', $clientNameDrive);
+        $driveFilename = "הצעה_{$propNum2}_{$safeClient}_" . date('Y-m-d') . '.txt';
         uploadToDrive($driveFilename, $driveText, 'text/plain');
     }
 

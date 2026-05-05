@@ -192,4 +192,39 @@ if ($action === 'run-reminders') {
     jsonOk($result);
 }
 
+// ─── Google Drive: upload service account JSON ────────────────
+if ($action === 'drive-upload-sa') {
+    requireAuth();
+    $content = $body['content'] ?? '';
+    if (!$content) jsonFail('חסר תוכן קובץ');
+    $parsed = json_decode($content, true);
+    if (!is_array($parsed) || empty($parsed['private_key']) || empty($parsed['client_email'])) {
+        jsonFail('קובץ לא תקין — ודא שזה Service Account JSON של Google');
+    }
+    ensureDataDir();
+    file_put_contents(DATA_DIR . 'google-service-account.json', $content);
+    jsonOk(['email' => $parsed['client_email']]);
+}
+
+// ─── Google Drive: check service account status ───────────────
+if ($action === 'drive-check-sa') {
+    requireAuth();
+    $file = DATA_DIR . 'google-service-account.json';
+    if (!file_exists($file)) jsonOk(['configured' => false]);
+    $sa = json_decode(file_get_contents($file), true) ?? [];
+    jsonOk(['configured' => !empty($sa['client_email']), 'email' => $sa['client_email'] ?? '']);
+}
+
+// ─── Google Drive: test upload ────────────────────────────────
+if ($action === 'drive-test') {
+    requireAuth();
+    $s = getSettings();
+    if (empty($s['driveFolderId'])) jsonFail('חסר Drive Folder ID');
+    $file = DATA_DIR . 'google-service-account.json';
+    if (!file_exists($file)) jsonFail('קובץ Service Account לא נמצא');
+    $result = uploadToDrive('drive-test-' . date('Y-m-d-His') . '.txt', 'בדיקת חיבור ל-Google Drive ✓', 'text/plain');
+    if ($result) jsonOk(['fileId' => $result]);
+    jsonFail('העלאה נכשלה — בדוק Folder ID ושיתוף התיקיה עם ה-Service Account');
+}
+
 jsonFail('פעולה לא מוכרת');

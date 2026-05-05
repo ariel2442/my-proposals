@@ -1273,8 +1273,22 @@ body{
               <input type="text" id="drive-folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
               <div class="field-hint">העתק מה-URL: drive.google.com/drive/folders/<strong>ID</strong></div>
             </div>
-            <div class="field-hint" style="margin-top:4px">
-              להפעלה: העלה <code>data/google-service-account.json</code> ושתף התיקיה עם כתובת ה-service account.
+            <div class="field">
+              <label>Google Service Account JSON</label>
+              <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                <label class="btn btn-secondary" style="cursor:pointer;font-size:13px;padding:7px 14px">
+                  📂 בחר קובץ JSON
+                  <input type="file" id="drive-sa-file" accept=".json,application/json" style="display:none" onchange="uploadDriveSA(this)">
+                </label>
+                <span id="drive-sa-status" style="font-size:13px;color:#64748b">טוען...</span>
+              </div>
+              <div class="field-hint" style="margin-top:6px">
+                <a href="https://console.cloud.google.com/iam-admin/serviceaccounts" target="_blank" rel="noopener" style="color:#3b82f6">צור Service Account</a>
+                ← הורד מפתח JSON ← שתף התיקיה ב-Drive עם כתובת ה-Service Account.
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:4px;flex-wrap:wrap">
+              <button class="btn btn-secondary" style="font-size:13px" onclick="testDrive(this)">🔗 בדוק חיבור</button>
             </div>
           </div>
         </div>
@@ -1561,6 +1575,7 @@ function switchTab(tab){
   if(tab==='saved'){renderSaved();}
   if(tab==='library'){renderLibrary();}
   if(tab==='new'){renderStatusPanel();}
+  if(tab==='automations'){checkDriveSA();}
 }
 
 const iconX='<svg class="icon"><use href="#i-x"/></svg>';
@@ -1643,6 +1658,50 @@ function insertVar(fieldId,v){
   el.selectionStart=el.selectionEnd=s+v.length;el.focus();
 }
 
+
+// ─── Google Drive ─────────────────────────────────────────────
+async function checkDriveSA(){
+  const el=document.getElementById('drive-sa-status');
+  if(!el)return;
+  try{
+    const r=await apiCall('GET','drive-check-sa');
+    if(r.configured){
+      el.style.color='#059669';
+      el.textContent='✅ מחובר: '+r.email;
+    }else{
+      el.style.color='#94a3b8';
+      el.textContent='לא מוגדר — העלה קובץ JSON';
+    }
+  }catch(e){el.textContent='—';}
+}
+async function uploadDriveSA(input){
+  const file=input.files[0];
+  if(!file)return;
+  const content=await file.text();
+  const el=document.getElementById('drive-sa-status');
+  if(el){el.style.color='#64748b';el.textContent='מעלה...';}
+  try{
+    const r=await apiCall('POST','drive-upload-sa',{content});
+    if(r.ok){
+      if(el){el.style.color='#059669';el.textContent='✅ מחובר: '+r.email;}
+      toast('Service Account הועלה בהצלחה ✅','success');
+    }else{
+      if(el){el.style.color='#ef4444';el.textContent='שגיאה';}
+      toast(r.error||'שגיאה בהעלאה','error');
+    }
+  }catch(e){toast('שגיאת רשת','error');}
+  input.value='';
+}
+async function testDrive(btn){
+  if(btn){btn.disabled=true;btn.style.opacity='0.5';}
+  try{
+    await saveSettings();
+    const r=await apiCall('POST','drive-test',{});
+    if(r.ok) toast('קובץ בדיקה הועלה בהצלחה לדרייב ✅','success');
+    else toast(r.error||'שגיאה','error');
+  }catch(e){toast('שגיאת רשת','error');}
+  if(btn){btn.disabled=false;btn.style.opacity='';}
+}
 
 function updateCronUrl(){
   const base=(settings.baseUrl||'').replace(/\/$/,'');

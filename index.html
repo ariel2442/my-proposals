@@ -1219,8 +1219,10 @@ body{
             </div>
             <div class="auto-hours">
               <label>שלח אחרי</label>
-              <input type="number" id="reminder-not-open-hours" value="24" min="1" max="720" inputmode="numeric">
-              <span>שעות מהשליחה</span>
+              <input type="number" id="reminder-not-open-hours" value="24" min="0" max="720" inputmode="numeric">
+              <span>שע׳</span>
+              <input type="number" id="reminder-not-open-minutes" value="0" min="0" max="59" inputmode="numeric">
+              <span>דק׳ מהשליחה</span>
             </div>
             <details class="auto-msg">
               <summary>✏️ עריכת הודעה</summary>
@@ -1251,8 +1253,10 @@ body{
             </div>
             <div class="auto-hours">
               <label>שלח אחרי</label>
-              <input type="number" id="reminder-not-signed-hours" value="48" min="1" max="720" inputmode="numeric">
-              <span>שעות מהצפייה</span>
+              <input type="number" id="reminder-not-signed-hours" value="48" min="0" max="720" inputmode="numeric">
+              <span>שע׳</span>
+              <input type="number" id="reminder-not-signed-minutes" value="0" min="0" max="59" inputmode="numeric">
+              <span>דק׳ מהצפייה</span>
             </div>
             <details class="auto-msg">
               <summary>✏️ עריכת הודעה</summary>
@@ -1911,9 +1915,9 @@ function applySettings(s){
   document.getElementById('msg-sign-bank').value    = s.msgSignBank    || MSG_SIGN_BANK;
   // reminder toggles + hours
   document.getElementById('reminder-not-open-enabled').checked   = !!s.reminderNotOpenEnabled;
-  document.getElementById('reminder-not-open-hours').value       = s.reminderNotOpenHours   || 24;
+  {const h=s.reminderNotOpenHours||24;document.getElementById('reminder-not-open-hours').value=Math.floor(h);document.getElementById('reminder-not-open-minutes').value=Math.round((h%1)*60);}
   document.getElementById('reminder-not-signed-enabled').checked = !!s.reminderNotSignedEnabled;
-  document.getElementById('reminder-not-signed-hours').value     = s.reminderNotSignedHours || 48;
+  {const h=s.reminderNotSignedHours||48;document.getElementById('reminder-not-signed-hours').value=Math.floor(h);document.getElementById('reminder-not-signed-minutes').value=Math.round((h%1)*60);}
   // reminder message templates
   document.getElementById('msg-reminder-not-open').value   = s.msgReminderNotOpen   || MSG_REMINDER_NOT_OPEN;
   document.getElementById('msg-reminder-not-signed').value = s.msgReminderNotSigned || MSG_REMINDER_NOT_SIGNED;
@@ -1950,9 +1954,9 @@ async function saveSettings(){
     msgSignNoLink:document.getElementById('msg-sign-no-link').value,
     msgSignBank:document.getElementById('msg-sign-bank').value,
     reminderNotOpenEnabled:document.getElementById('reminder-not-open-enabled').checked,
-    reminderNotOpenHours:parseFloat(document.getElementById('reminder-not-open-hours').value)||24,
+    reminderNotOpenHours:(parseInt(document.getElementById('reminder-not-open-hours').value)||0)+(parseInt(document.getElementById('reminder-not-open-minutes').value)||0)/60||24,
     reminderNotSignedEnabled:document.getElementById('reminder-not-signed-enabled').checked,
-    reminderNotSignedHours:parseFloat(document.getElementById('reminder-not-signed-hours').value)||48,
+    reminderNotSignedHours:(parseInt(document.getElementById('reminder-not-signed-hours').value)||0)+(parseInt(document.getElementById('reminder-not-signed-minutes').value)||0)/60||48,
     msgReminderNotOpen:document.getElementById('msg-reminder-not-open').value,
     msgReminderNotSigned:document.getElementById('msg-reminder-not-signed').value,
     cronToken:settings.cronToken||'',

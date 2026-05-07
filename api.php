@@ -178,7 +178,8 @@ if ($action === 'get-settings') {
 
 if ($action === 'save-settings') {
     requireAuth();
-    $allowed = ['bizName','bizEmail','bizPhone','bizBank','baseUrl','defaultTerms',
+    $allowed = ['bizName','bizEmail','bizPhone','bizBank','baseUrl',
+                'termsLanding','termsBrochure','termsSales','termsCRM',
                 'greenApiInstance','greenApiToken','salesRepPhone','driveFolderId',
                 'growWebhookUrl',
                 'autoSendClient','autoRepView','autoRepSign','autoClientPayment','autoDrive',

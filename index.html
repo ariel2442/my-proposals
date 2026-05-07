@@ -898,17 +898,6 @@ body{
             </button>
           </div>
 
-          <!-- Terms per proposal -->
-          <div class="section-card">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>תנאי הסכם
-            </div>
-            <div class="field">
-              <div class="field-hint" style="margin-bottom:6px">כל סעיף בשורה נפרדת — משתנה אוטומטית לפי סוג הפרויקט</div>
-              <textarea id="proposal-terms" rows="6" placeholder="תנאי ההסכם יופיעו כאן לאחר בחירת סוג פרויקט..."></textarea>
-            </div>
-          </div>
-
         </div>
 
         <!-- Notes + Total -->
@@ -930,11 +919,6 @@ body{
               <label class="total-input-label" style="font-size:12px;margin-bottom:6px">סכום לפני מע"מ ₪</label>
               <input type="number" id="proposal-total" placeholder="0" inputmode="decimal" min="0" class="total-input" oninput="updateTotalPreview()" style="font-size:22px;padding:10px 14px;text-align:right">
               <div id="total-preview" class="total-preview"></div>
-            </div>
-            <div class="field" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,0.06)">
-              <label>לינק תשלום ידני (אופציונלי)</label>
-              <input type="url" id="proposal-payment-link" placeholder="https://grow.co.il/pay/...">
-              <div class="field-hint">אם מולא — ישלח ללקוח במקום הוובהוק</div>
             </div>
           </div>
         </div>
@@ -1010,12 +994,27 @@ body{
           </div>
           <div class="section-card form-grid-full">
             <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>הצהרות והתחייבויות
+              <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>הסכמים לפי סוג מוצר
             </div>
-            <div class="field">
-              <label>כל סעיף בשורה נפרדת</label>
-              <textarea id="default-terms" rows="10"></textarea>
+            <div class="auto-tabs" style="margin-bottom:14px">
+              <button class="auto-tab-btn active" id="sterms-btn-landing"  onclick="switchTermsTab('landing')">
+                <span class="tab-icon">🖥️</span><span class="tab-label">דף נחיתה</span>
+              </button>
+              <button class="auto-tab-btn" id="sterms-btn-brochure" onclick="switchTermsTab('brochure')">
+                <span class="tab-icon">🌐</span><span class="tab-label">אתר תדמית</span>
+              </button>
+              <button class="auto-tab-btn" id="sterms-btn-sales"    onclick="switchTermsTab('sales')">
+                <span class="tab-icon">🛒</span><span class="tab-label">אתר מכירות</span>
+              </button>
+              <button class="auto-tab-btn" id="sterms-btn-crm"      onclick="switchTermsTab('crm')">
+                <span class="tab-icon">📊</span><span class="tab-label">מערכת CRM</span>
+              </button>
             </div>
+            <div class="field-hint" style="margin-bottom:8px">כל סעיף בשורה נפרדת — נטען אוטומטית לפי סוג הפרויקט שנבחר</div>
+            <div class="auto-tab-pane active" id="sterms-landing"><textarea id="terms-landing"  rows="10"></textarea></div>
+            <div class="auto-tab-pane"        id="sterms-brochure"><textarea id="terms-brochure" rows="10"></textarea></div>
+            <div class="auto-tab-pane"        id="sterms-sales"><textarea id="terms-sales"    rows="10"></textarea></div>
+            <div class="auto-tab-pane"        id="sterms-crm"><textarea id="terms-crm"      rows="10"></textarea></div>
           </div>
         </div>
         <button class="btn btn-primary" style="margin-top:6px;" onclick="saveSettings()">
@@ -1635,8 +1634,6 @@ async function loadAllData(){
 async function init(){
   loadSettings();loadLibrary();
   processSteps=[...DEFAULT_PROCESS];includes=[];projectType='';
-  const termsEl=document.getElementById('proposal-terms');
-  if(termsEl) termsEl.value=settings.defaultTerms||DEFAULT_TERMS;
   document.getElementById('proposal-num').value='…';
   try{
     const r=await apiCall('POST','next-num',{});
@@ -1733,8 +1730,6 @@ function setProjectType(type,skipPreset=false){
   if(!preset)return;
   processSteps=[...preset.process];
   renderProcess();
-  const termsEl=document.getElementById('proposal-terms');
-  if(termsEl) termsEl.value=preset.terms;
 }
 
 // ─── includes picker ─────────────────────────────────────────
@@ -1773,6 +1768,14 @@ function insertVar(fieldId,v){
   el.selectionStart=el.selectionEnd=s+v.length;el.focus();
 }
 
+
+// ─── settings terms tabs ──────────────────────────────────────
+function switchTermsTab(tab){
+  ['landing','brochure','sales','crm'].forEach(t=>{
+    document.getElementById('sterms-btn-'+t)?.classList.toggle('active',t===tab);
+    document.getElementById('sterms-'+t)?.classList.toggle('active',t===tab);
+  });
+}
 
 // ─── automations inner tabs ───────────────────────────────────
 function switchAutoTab(tab){
@@ -1888,7 +1891,10 @@ function applySettings(s){
   document.getElementById('base-url').value=s.baseUrl||'';
   document.getElementById('grow-webhook-url').value=s.growWebhookUrl||'';
   document.getElementById('drive-folder-id').value=s.driveFolderId||'';
-  document.getElementById('default-terms').value=s.defaultTerms||DEFAULT_TERMS;
+  document.getElementById('terms-landing').value =s.termsLanding  || PRODUCT_PRESETS['דף נחיתה'].terms;
+  document.getElementById('terms-brochure').value=s.termsBrochure || PRODUCT_PRESETS['אתר תדמית'].terms;
+  document.getElementById('terms-sales').value   =s.termsSales    || PRODUCT_PRESETS['אתר מכירות'].terms;
+  document.getElementById('terms-crm').value     =s.termsCRM      || PRODUCT_PRESETS['מערכת CRM'].terms;
   // automation toggles (default on unless explicitly false)
   document.getElementById('auto-send-client').checked    = s.autoSendClient    !== false;
   document.getElementById('auto-rep-view').checked       = s.autoRepView       !== false;
@@ -1927,7 +1933,10 @@ async function saveSettings(){
     baseUrl:document.getElementById('base-url').value,
     growWebhookUrl:document.getElementById('grow-webhook-url').value.trim(),
     driveFolderId:document.getElementById('drive-folder-id').value,
-    defaultTerms:document.getElementById('default-terms').value,
+    termsLanding :document.getElementById('terms-landing').value,
+    termsBrochure:document.getElementById('terms-brochure').value,
+    termsSales   :document.getElementById('terms-sales').value,
+    termsCRM     :document.getElementById('terms-crm').value,
     autoSendClient:document.getElementById('auto-send-client').checked,
     autoRepView:document.getElementById('auto-rep-view').checked,
     autoRepSign:document.getElementById('auto-rep-sign').checked,
@@ -2012,14 +2021,13 @@ function getProposalData(){
     projectType:projectType,
     proposalNum:document.getElementById('proposal-num').value.trim(),
     notes:document.getElementById('proposal-notes').value.trim(),
-    paymentLink:document.getElementById('proposal-payment-link').value.trim(),
     date:new Date().toISOString(),
     createdAt:new Date().toISOString(),
     processSteps:processSteps.filter(s=>s.trim()),
     includes:includes.filter(s=>s.trim()),
     items:[],
     subtotal:sub,vat,vatRate:VAT_RATE,total:sub+vat,
-    terms:(document.getElementById('proposal-terms').value||settings.defaultTerms||DEFAULT_TERMS).split('\n').filter(t=>t.trim()),
+    terms:(({'דף נחיתה':settings.termsLanding,'אתר תדמית':settings.termsBrochure,'אתר מכירות':settings.termsSales,'מערכת CRM':settings.termsCRM}[projectType]||settings.termsLanding||PRODUCT_PRESETS['דף נחיתה'].terms||DEFAULT_TERMS)).split('\n').filter(t=>t.trim()),
     biz:{name:settings.bizName||'',email:settings.bizEmail||'',phone:settings.bizPhone||'',bank:settings.bizBank||''},
     status:'draft',
     totalViews:0,totalViewSeconds:0,views:[],
@@ -2117,7 +2125,6 @@ async function sendProposal(prefilledData){
       document.getElementById('client-phone').value='';
       document.getElementById('client-vat-id').value='';
       document.getElementById('proposal-total').value='';
-      document.getElementById('proposal-payment-link').value='';
       includes=[];projectType='';
       renderIncludes();setProjectType('');
       try{
@@ -2182,11 +2189,7 @@ function loadProposal(id){
   document.getElementById('proposal-num').value=p.proposalNum||'';
   document.getElementById('proposal-total').value=p.subtotal||'';
   document.getElementById('proposal-notes').value=p.notes||'';
-  document.getElementById('proposal-payment-link').value=p.paymentLink||'';
   processSteps=p.processSteps||[];includes=p.includes||[];
-  // load saved terms first, then set project type without overwriting them
-  const termsEl=document.getElementById('proposal-terms');
-  if(termsEl) termsEl.value=(p.terms||[]).join('\n');
   setProjectType(p.projectType||'',true);
   updateTotalPreview();
   renderProcess();renderIncludes();

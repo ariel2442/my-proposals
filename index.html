@@ -872,7 +872,7 @@ body{
             </div>
             <div class="field">
               <label>מספר הצעה</label>
-              <input type="text" id="proposal-num">
+              <input type="text" id="proposal-num" readonly style="opacity:0.6;cursor:default;">
             </div>
           </div>
 
@@ -1638,7 +1638,7 @@ async function init(){
   try{
     const r=await apiCall('POST','next-num',{});
     if(r.ok) document.getElementById('proposal-num').value=r.num;
-  }catch(e){document.getElementById('proposal-num').value=Date.now()%10000+350;}
+  }catch(e){}
   renderProcess();renderIncludes();renderSaved();renderLibrary();
   renderStatusPanel();
   loadAllData();

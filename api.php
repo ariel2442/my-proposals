@@ -112,7 +112,7 @@ if ($action === 'next-num') {
     requireAuth();
     $file = DATA_DIR . 'proposal_counter.json';
     $data = file_exists($file) ? json_decode(file_get_contents($file), true) : [];
-    $num  = max(350, (int)($data['next'] ?? 350));
+    $num  = max(100, (int)($data['next'] ?? 100));
     file_put_contents($file, json_encode(['next' => $num + 1]), LOCK_EX);
     jsonOk(['num' => $num]);
 }
@@ -126,7 +126,7 @@ if ($action === 'duplicate') {
 
     $counterFile = DATA_DIR . 'proposal_counter.json';
     $counterData = file_exists($counterFile) ? json_decode(file_get_contents($counterFile), true) : [];
-    $nextNum     = max(350, (int)($counterData['next'] ?? 350));
+    $nextNum     = max(100, (int)($counterData['next'] ?? 100));
     file_put_contents($counterFile, json_encode(['next' => $nextNum + 1]), LOCK_EX);
 
     $copy = array_merge($original, [

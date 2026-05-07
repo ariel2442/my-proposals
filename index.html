@@ -554,6 +554,17 @@ body{
 .status-pill.warn{background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.2)}
 .status-pill.off{background:rgba(148,163,184,0.07);color:var(--text-dim);border:1px solid rgba(148,163,184,0.1)}
 .status-dot{width:7px;height:7px;border-radius:50%;background:currentColor;flex-shrink:0}
+/* ── AUTO TABS ─────────────────────────── */
+.auto-tabs{display:flex;gap:4px;background:rgba(0,0,0,0.25);border-radius:14px;padding:5px;margin-bottom:20px;border:1px solid rgba(255,255,255,0.06)}
+.auto-tab-btn{flex:1;padding:10px 8px;border-radius:10px;border:none;background:transparent;color:var(--text-dim);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;display:flex;flex-direction:column;align-items:center;gap:4px;line-height:1.2}
+.auto-tab-btn .tab-icon{font-size:18px}
+.auto-tab-btn .tab-label{font-size:11px}
+.auto-tab-btn:hover{color:var(--text);background:rgba(255,255,255,0.05)}
+.auto-tab-btn.active{background:var(--glass-bg);color:white;border:1px solid var(--glass-border);box-shadow:0 2px 12px rgba(0,0,0,0.3)}
+.auto-tab-btn .tab-dot{width:6px;height:6px;border-radius:50%;background:#6ee7b7;display:none;margin-top:2px}
+.auto-tab-btn.has-status .tab-dot{display:block}
+.auto-tab-pane{display:none}
+.auto-tab-pane.active{display:block}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 .spin{animation:spin 0.7s linear infinite;display:inline-block}
 
@@ -1018,19 +1029,31 @@ body{
       <div class="desktop-page-title">אוטומציות <span>חיבורים ושליחות אוטומטיות</span></div>
       <div class="content">
 
-        <!-- ── סטטוס חיבורים מהיר ── -->
-        <div class="status-bar">
-          <div class="status-pill off" id="wa-status-pill"><div class="status-dot"></div>WhatsApp</div>
-          <div class="status-pill off" id="drive-status-pill"><div class="status-dot"></div>Google Drive</div>
+        <!-- ── טאב בר ── -->
+        <div class="auto-tabs">
+          <button class="auto-tab-btn active" id="atab-btn-wa"    onclick="switchAutoTab('wa')">
+            <span class="tab-icon">📱</span>
+            <span class="tab-label">WhatsApp</span>
+            <span class="tab-dot" id="atab-dot-wa"></span>
+          </button>
+          <button class="auto-tab-btn" id="atab-btn-remind" onclick="switchAutoTab('remind')">
+            <span class="tab-icon">🔔</span>
+            <span class="tab-label">תזכורות</span>
+          </button>
+          <button class="auto-tab-btn" id="atab-btn-drive"  onclick="switchAutoTab('drive')">
+            <span class="tab-icon">📁</span>
+            <span class="tab-label">Drive</span>
+            <span class="tab-dot" id="atab-dot-drive"></span>
+          </button>
         </div>
 
-        <!-- ══ קבוצה 1: חיבורים ══ -->
-        <div class="auto-group">
-          <div class="auto-group-label">⚙️ חיבורים</div>
+        <!-- ══ טאב: WhatsApp ══ -->
+        <div class="auto-tab-pane active" id="atab-wa">
 
-          <div class="section-card">
+          <div class="section-card" style="margin-bottom:12px">
             <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>WhatsApp · Green API
+              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>חיבור Green API
+              <span id="wa-status-pill" class="status-pill off" style="margin-right:auto;margin-left:0"><div class="status-dot"></div>לא מוגדר</span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
               <div class="field">
@@ -1042,7 +1065,7 @@ body{
                 <input type="text" id="green-api-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx">
               </div>
               <div class="field">
-                <label>הטלפון שלך (לקבלת התראות)</label>
+                <label>הטלפון שלך (התראות)</label>
                 <input type="tel" id="sales-rep-phone" placeholder="0521234567" inputmode="numeric">
               </div>
               <div class="field">
@@ -1051,16 +1074,11 @@ body{
               </div>
             </div>
           </div>
-        </div>
-
-        <!-- ══ קבוצה 2: אוטומציות שליחה ══ -->
-        <div class="auto-group">
-          <div class="auto-group-label">📤 אוטומציות שליחה</div>
 
           <div class="auto-card">
             <div class="auto-header">
               <div class="auto-info">
-                <div class="auto-title">שליחת הצעה ללקוח</div>
+                <div class="auto-title">📤 שליחת הצעה ללקוח</div>
                 <div class="auto-desc">WhatsApp ללקוח כשלוחצים "שלח ללקוח"</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-send-client" checked><span class="toggle-slider"></span></label>
@@ -1083,7 +1101,7 @@ body{
           <div class="auto-card">
             <div class="auto-header">
               <div class="auto-info">
-                <div class="auto-title">התראה כשלקוח פתח הצעה</div>
+                <div class="auto-title">📬 התראה כשלקוח פתח הצעה</div>
                 <div class="auto-desc">WhatsApp אליך ברגע שלקוח פותח את ההצעה</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-rep-view" checked><span class="toggle-slider"></span></label>
@@ -1116,7 +1134,7 @@ body{
           <div class="auto-card">
             <div class="auto-header">
               <div class="auto-info">
-                <div class="auto-title">התראה כשלקוח חתם</div>
+                <div class="auto-title">✍️ התראה כשלקוח חתם</div>
                 <div class="auto-desc">WhatsApp אליך עם פרטי החתימה והסכום</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-rep-sign" checked><span class="toggle-slider"></span></label>
@@ -1142,7 +1160,7 @@ body{
           <div class="auto-card">
             <div class="auto-header">
               <div class="auto-info">
-                <div class="auto-title">הודעת תשלום ללקוח אחרי חתימה</div>
+                <div class="auto-title">💳 הודעת תשלום ללקוח אחרי חתימה</div>
                 <div class="auto-desc">לינק תשלום (אשראי) או פרטי העברה בנקאית</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-client-payment" checked><span class="toggle-slider"></span></label>
@@ -1151,7 +1169,7 @@ body{
               <div class="field">
                 <label>Webhook URL — יצירת לינק תשלום</label>
                 <input type="url" id="grow-webhook-url" placeholder="https://hook.make.com/xxxxx" dir="ltr">
-                <div class="field-hint">השרת שולח POST עם פרטי ההצעה ומצפה לקבל בחזרה <code>{"url":"..."}</code></div>
+                <div class="field-hint">השרת שולח POST עם פרטי ההצעה ומצפה לקבל <code>{"url":"..."}</code></div>
               </div>
             </div>
             <details class="auto-msg">
@@ -1186,16 +1204,16 @@ body{
               </div>
             </details>
           </div>
-        </div>
 
-        <!-- ══ קבוצה 3: תזכורות ══ -->
-        <div class="auto-group">
-          <div class="auto-group-label">🔔 תזכורות אוטומטיות</div>
+        </div><!-- /atab-wa -->
+
+        <!-- ══ טאב: תזכורות ══ -->
+        <div class="auto-tab-pane" id="atab-remind">
 
           <div class="auto-card">
             <div class="auto-header">
               <div class="auto-info">
-                <div class="auto-title">לא פתח הצעה</div>
+                <div class="auto-title">📨 לא פתח הצעה</div>
                 <div class="auto-desc">WhatsApp ללקוח שקיבל הצעה אבל לא פתח אותה</div>
               </div>
               <label class="toggle"><input type="checkbox" id="reminder-not-open-enabled"><span class="toggle-slider"></span></label>
@@ -1227,7 +1245,7 @@ body{
           <div class="auto-card">
             <div class="auto-header">
               <div class="auto-info">
-                <div class="auto-title">פתח אבל לא חתם</div>
+                <div class="auto-title">👁️ פתח אבל לא חתם</div>
                 <div class="auto-desc">WhatsApp ללקוח שצפה בהצעה אבל עדיין לא חתם</div>
               </div>
               <label class="toggle"><input type="checkbox" id="reminder-not-signed-enabled"><span class="toggle-slider"></span></label>
@@ -1255,24 +1273,19 @@ body{
               <svg class="icon"><use href="#i-refresh"/></svg>הרץ עכשיו
             </button>
           </div>
-        </div>
 
-        <!-- ══ קבוצה 4: כלים ══ -->
-        <div class="auto-group">
-          <div class="auto-group-label">⏰ הפעלה אוטומטית</div>
-
-          <div class="section-card">
+          <div class="section-card" style="margin-top:12px">
             <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-zap"/></svg></div>Cron Job
+              <div class="section-title-icon"><svg class="icon"><use href="#i-zap"/></svg></div>Cron Job — הפעלה אוטומטית
             </div>
-            <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.7">הגדר Cron Job בשרת (cPanel / SSH) כדי שהתזכורות יישלחו אוטומטית ללא לחיצה ידנית.</p>
+            <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.7">הגדר Cron Job בשרת (cPanel / SSH) כדי שהתזכורות יישלחו אוטומטית.</p>
             <div class="field">
               <label>URL</label>
               <div style="display:flex;gap:6px;align-items:stretch">
                 <div class="cron-box" id="cron-url-display" onclick="copyCronUrl()" style="flex:1;min-height:36px"></div>
                 <button class="btn btn-secondary" style="padding:8px 12px;min-width:40px" onclick="copyCronUrl()" title="העתק"><svg class="icon"><use href="#i-copy"/></svg></button>
               </div>
-              <div class="field-hint">לחץ להעתקה · מומלץ כל 30 דקות</div>
+              <div class="field-hint">לחץ להעתקה · כל 30 דקות</div>
             </div>
             <div class="field">
               <label>פקודת Cron</label>
@@ -1283,17 +1296,17 @@ body{
               <svg class="icon"><use href="#i-refresh"/></svg>הרץ את כל התזכורות עכשיו
             </button>
           </div>
-        </div>
 
-        <!-- ══ קבוצה 5: אחסון ══ -->
-        <div class="auto-group">
-          <div class="auto-group-label">📁 אחסון</div>
+        </div><!-- /atab-remind -->
+
+        <!-- ══ טאב: Drive ══ -->
+        <div class="auto-tab-pane" id="atab-drive">
 
           <div class="auto-card">
             <div class="auto-header">
               <div class="auto-info">
-                <div class="auto-title">שמירת הסכמים ב-Google Drive</div>
-                <div class="auto-desc">כל חוזה חתום מועלה אוטומטית לתיקיה בדרייב</div>
+                <div class="auto-title">📁 שמירת הסכמים ב-Google Drive</div>
+                <div class="auto-desc">כל חוזה חתום מועלה אוטומטית לתיקיה</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-drive"><span class="toggle-slider"></span></label>
             </div>
@@ -1320,9 +1333,10 @@ body{
               <button class="btn btn-secondary" style="font-size:13px;margin-top:8px" onclick="testDrive(this)">🔗 בדוק חיבור</button>
             </div>
           </div>
-        </div>
 
-        <button class="btn btn-primary" style="margin-top:8px;width:100%" onclick="saveSettings()">
+        </div><!-- /atab-drive -->
+
+        <button class="btn btn-primary" style="margin-top:16px;width:100%" onclick="saveSettings()">
           <svg class="icon"><use href="#i-save"/></svg>שמור הגדרות
         </button>
       </div>
@@ -1760,6 +1774,15 @@ function insertVar(fieldId,v){
 }
 
 
+// ─── automations inner tabs ───────────────────────────────────
+function switchAutoTab(tab){
+  ['wa','remind','drive'].forEach(t=>{
+    document.getElementById('atab-btn-'+t)?.classList.toggle('active',t===tab);
+    document.getElementById('atab-'+t)?.classList.toggle('active',t===tab);
+  });
+  if(tab==='drive') checkDriveSA();
+}
+
 // ─── automations status bar ───────────────────────────────────
 function updateStatusBar(){
   const waPill=document.getElementById('wa-status-pill');
@@ -1783,6 +1806,7 @@ async function checkDriveSA(){
       el.style.color='#059669';
       el.textContent='✅ מחובר: '+r.email;
       if(pill){pill.className='status-pill ok';pill.innerHTML='<div class="status-dot"></div>Drive מחובר';}
+      document.getElementById('atab-btn-drive')?.classList.add('has-status');
     }else{
       el.style.color='#94a3b8';
       el.textContent='לא מוגדר — העלה קובץ JSON';

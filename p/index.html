@@ -451,6 +451,35 @@ body{
 }
 .success-details li .icon{width:16px;height:16px;color:var(--success);flex-shrink:0;margin-top:3px;stroke-width:2.5}
 
+/* ========== PAYMENT COUNTDOWN OVERLAY ========== */
+.pay-countdown-overlay{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at top,var(--navy-dark) 0%,var(--navy-deep) 55%,var(--navy-deepest) 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  z-index:500;text-align:center;padding:40px;
+}
+.pay-countdown-overlay.show{display:flex;animation:fadeIn 0.3s}
+.countdown-ring{
+  width:120px;height:120px;position:relative;margin-bottom:28px;
+}
+.countdown-ring svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.countdown-ring-bg{stroke:rgba(66,142,255,0.15);fill:none;stroke-width:4}
+.countdown-ring-fill{
+  stroke:var(--blue-primary);fill:none;stroke-width:4;
+  stroke-linecap:round;
+  stroke-dasharray:339.3;
+  stroke-dashoffset:0;
+  transition:stroke-dashoffset 1s linear;
+}
+.countdown-num{
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:52px;font-weight:900;color:white;letter-spacing:-2px;
+}
+.pay-countdown-overlay h3{
+  font-size:22px;font-weight:800;color:white;margin-bottom:8px;
+}
+.pay-countdown-overlay p{font-size:15px;color:var(--text-muted);}
+
 /* ========== LOADING / ERROR ========== */
 .loading-screen{
   position:fixed;inset:0;
@@ -804,6 +833,19 @@ body{
   </div>
 </div>
 
+<!-- Payment Countdown Overlay -->
+<div class="pay-countdown-overlay" id="pay-countdown">
+  <div class="countdown-ring">
+    <svg viewBox="0 0 120 120" width="120" height="120">
+      <circle class="countdown-ring-bg" cx="60" cy="60" r="54"/>
+      <circle class="countdown-ring-fill" id="countdown-ring-fill" cx="60" cy="60" r="54"/>
+    </svg>
+    <div class="countdown-num" id="countdown-num">3</div>
+  </div>
+  <h3>מכין עמוד תשלום...</h3>
+  <p>תועבר אוטומטית תוך שנייה</p>
+</div>
+
 <!-- Success Screen -->
 <div class="success-screen" id="success-screen">
   <div class="success-icon-big"><svg class="icon"><use href="#i-check"/></svg></div>
@@ -811,9 +853,18 @@ body{
   <p style="font-size:15px;color:var(--text-muted);margin-bottom:4px">תודה, <strong id="success-signer-name" style="color:white"></strong></p>
   <p style="font-size:13px;color:var(--text-dim);margin-bottom:16px">סה"כ לתשלום: <strong id="success-total" style="color:var(--blue-bright)"></strong></p>
 
-  <div id="success-whatsapp-msg" style="display:none;background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);border-radius:14px;padding:16px 20px;text-align:center;font-size:14px;color:var(--success-bright);max-width:320px;margin-bottom:16px">
-    <div style="font-size:22px;margin-bottom:6px">📲</div>
-    <strong>לינק לתשלום נשלח אליך ב-WhatsApp!</strong>
+  <div id="success-whatsapp-msg" style="display:none;text-align:center;margin-bottom:16px">
+    <button onclick="goToPayment()" style="
+      background:linear-gradient(135deg,#428EFF 0%,#6366f1 100%);
+      color:white;border:none;padding:18px 40px;border-radius:16px;
+      font-size:18px;font-weight:800;cursor:pointer;font-family:inherit;
+      box-shadow:0 8px 28px rgba(66,142,255,0.5);
+      display:inline-flex;align-items:center;gap:10px;
+      transition:transform 0.2s,box-shadow 0.2s;
+    " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform=''">
+      💳 לתשלום עכשיו
+    </button>
+    <div style="margin-top:10px;font-size:12px;color:var(--text-dim)">תועבר לעמוד תשלום מאובטח</div>
   </div>
   <div id="success-bank-msg" style="display:none;background:rgba(66,142,255,0.1);border:1px solid rgba(66,142,255,0.3);border-radius:14px;padding:16px 20px;text-align:center;font-size:14px;color:var(--blue-soft);max-width:320px;margin-bottom:16px">
     <div style="font-size:22px;margin-bottom:6px">🏦</div>
@@ -1129,6 +1180,49 @@ async function doSign(method){
 function printCopy(){
   document.getElementById('success-screen').classList.remove('show');
   setTimeout(()=>window.print(),80);
+}
+
+async function goToPayment(){
+  const overlay=document.getElementById('pay-countdown');
+  const numEl=document.getElementById('countdown-num');
+  const ringEl=document.getElementById('countdown-ring-fill');
+  const circumference=339.3;
+
+  overlay.classList.add('show');
+
+  // fetch pay link and countdown simultaneously
+  const fetchPromise=fetch(apiBase()+'/api.php?action=get-pay-link&id='+encodeURIComponent(proposalData.id))
+    .then(r=>r.json()).catch(()=>({ok:false}));
+
+  // countdown 3 → 2 → 1 → 0
+  let count=3;
+  numEl.textContent=count;
+  ringEl.style.strokeDashoffset='0';
+
+  await new Promise(resolve=>{
+    const tick=()=>{
+      count--;
+      numEl.textContent=count;
+      // shrink ring proportionally
+      ringEl.style.strokeDashoffset=String(circumference*(1-count/3));
+      if(count<=0){resolve();return;}
+      setTimeout(tick,1000);
+    };
+    setTimeout(tick,1000);
+  });
+
+  const result=await fetchPromise;
+
+  if(result.ok&&result.url){
+    window.location.href=result.url;
+  }else{
+    overlay.classList.remove('show');
+    // show error under button
+    const errEl=document.createElement('div');
+    errEl.style.cssText='margin-top:10px;color:#f87171;font-size:13px;text-align:center';
+    errEl.textContent='שגיאה ביצירת לינק תשלום — נסה שוב';
+    document.getElementById('success-whatsapp-msg').appendChild(errEl);
+  }
 }
 
 function esc(s){return String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}

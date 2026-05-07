@@ -148,6 +148,18 @@ if ($action === 'duplicate') {
     jsonOk(['proposal' => $copy]);
 }
 
+// ─── get payment link (public — called by client page) ────────
+if ($action === 'get-pay-link') {
+    $id = $_GET['id'] ?? $body['id'] ?? '';
+    if (!$id) jsonFail('חסר ID');
+    $p = readProposal($id);
+    if (!$p) jsonFail('הצעה לא נמצאה', 404);
+    // use saved payment link first; fall back to webhook
+    $url = !empty($p['paymentLink']) ? $p['paymentLink'] : createGrowPaymentLink($p);
+    if (!$url) jsonFail('לא הוגדר Webhook URL ליצירת לינק תשלום');
+    jsonOk(['url' => $url]);
+}
+
 // ─── get signed agreement ──────────────────────────────────────
 if ($action === 'get-signed') {
     $id = $_GET['id'] ?? $body['id'] ?? '';

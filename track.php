@@ -87,34 +87,9 @@ if ($action === 'sign') {
     ];
     file_put_contents(DATA_DIR . safeId($id) . '_signed.json', json_encode($signed, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 
-    // ─── WhatsApp ללקוח + לינק GROW (ישיר, ללא Make) ─────────────
-    $s3           = getSettings();
-    $clientPhone3 = $p['clientPhone'] ?? '';
-    $clientName3  = $p['clientName']  ?? 'לקוח';
-    $total3       = number_format($p['total'] ?? 0, 0, '.', ',');
+    $s3 = getSettings();
 
-    if ($clientPhone3 && ($s3['autoClientPayment'] ?? true)) {
-        $clientVars = ['name' => $clientName3, 'num' => $p['proposalNum'] ?? '', 'total' => $total3];
-        if ($paymentMethod === 'credit') {
-            // proposal-level link takes priority; fall back to GROW API
-            $payLink = !empty($p['paymentLink'])
-                ? $p['paymentLink']
-                : createGrowPaymentLink($p);
-            if ($payLink) {
-                $tpl = $s3['msgSignCredit'] ?? "שלום {name} 👋\n\nתודה על חתימתך!\n\nלתשלום לחץ על הקישור:\n🔗 {payLink}\n\nסכום לתשלום: ₪{total}";
-                sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars + ['payLink' => $payLink]));
-            } else {
-                $tpl = $s3['msgSignNoLink'] ?? "שלום {name} 👋\n\nתודה על חתימתך! ✍️\n\nלינק התשלום יישלח אליך בקרוב.";
-                sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars));
-            }
-        } else {
-            $bank = $p['biz']['bank'] ?? ($s3['bizBank'] ?? '');
-            $tpl  = $s3['msgSignBank'] ?? "שלום {name} 👋\n\nתודה על חתימתך! ✍️\n\nלהעברה בנקאית:\n{bank}\n\nסכום: ₪{total}\nנא לציין בהעברה: הצעה #{num}";
-            sendWhatsapp($clientPhone3, fillTemplate($tpl, $clientVars + ['bank' => $bank]));
-        }
-    }
-
-    // ─── WhatsApp לנציג מכירות על חתימה ──────────────────────────
+    // ─── WhatsApp לנציג מכירות על חתימה (מיידי) ──────────────────
     $s2       = $s3;
     $repPhone = $p['salesRepPhone'] ?? $s2['salesRepPhone'] ?? '';
     $propNum2 = $p['proposalNum']  ?? '';

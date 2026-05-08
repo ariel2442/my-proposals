@@ -233,16 +233,31 @@ function createGrowPaymentLink(array $p): ?string {
 
     $ch = curl_init($webhookUrl);
     curl_setopt_array($ch, [
-        CURLOPT_POST           => true,
-        CURLOPT_POSTFIELDS     => $payload,
-        CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_TIMEOUT        => 15,
+        CURLOPT_POST            => true,
+        CURLOPT_POSTFIELDS      => $payload,
+        CURLOPT_HTTPHEADER      => ['Content-Type: application/json'],
+        CURLOPT_RETURNTRANSFER  => true,
+        CURLOPT_TIMEOUT         => 25,
+        CURLOPT_CONNECTTIMEOUT  => 10,
+        CURLOPT_SSL_VERIFYPEER  => false,
+        CURLOPT_SSL_VERIFYHOST  => false,
     ]);
-    $res  = curl_exec($ch);
+    $res    = curl_exec($ch);
+    $errno  = curl_errno($ch);
+    $errmsg = curl_error($ch);
     unset($ch);
+    if ($errno) {
+        error_log("createGrowPaymentLink curl error {$errno}: {$errmsg}");
+        return null;
+    }
+    error_log("createGrowPaymentLink response: " . $res);
     $data = json_decode($res, true);
-    return $data['url'] ?? $data['payment_url'] ?? $data['paymentUrl'] ?? $data['link'] ?? null;
+    $url = $data['url'] ?? $data['payment_url'] ?? $data['paymentUrl'] ?? $data['link'] ?? null;
+    // Make sometimes returns the raw URL directly instead of JSON
+    if (!$url && $res && filter_var(trim($res), FILTER_VALIDATE_URL)) {
+        $url = trim($res);
+    }
+    return $url ?: null;
 }
 
 // ─── Google Drive upload (service account) ────────────────────

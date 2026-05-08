@@ -98,6 +98,7 @@ if ($action === 'sign') {
     $baseUrl2 = rtrim($s2['baseUrl'] ?? '', '/');
     $viewUrl2 = $baseUrl2 ? $baseUrl2 . '/price/view-signed.php?id=' . $id : '';
 
+    error_log("sign: repPhone={$repPhone} autoRepSign=" . json_encode($s2['autoRepSign'] ?? 'default'));
     if ($repPhone && ($s2['autoRepSign'] ?? true)) {
         $tpl   = $s2['msgSignRep'] ?? "✅ {name} חתמ/ה על הצעת המחיר!\n\n📄 הצעה #{num}\n💰 סכום: ₪{total}\n💳 תשלום: {payMethod}\n✍️ חתם/ה: {signerName}\n\n🔗 {link}";
         $waMsg = fillTemplate($tpl, [
@@ -108,7 +109,8 @@ if ($action === 'sign') {
             'signerName' => $signerName,
             'link'       => $viewUrl2,
         ]);
-        sendWhatsapp($repPhone, $waMsg);
+        $sent = sendWhatsapp($repPhone, $waMsg);
+        error_log("sign: sendWhatsapp result=" . ($sent ? 'ok' : 'FAILED'));
     }
 
     // ─── העלאה לגוגל דרייב ────────────────────────────────────

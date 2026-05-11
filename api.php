@@ -257,4 +257,38 @@ if ($action === 'drive-test') {
     jsonFail('העלאה נכשלה — בדוק Folder ID ושיתוף התיקיה עם ה-Service Account');
 }
 
+// ─── products ──────────────────────────────────────────────────
+if ($action === 'list-products') {
+    requireAuth();
+    jsonOk(['products' => getProducts()]);
+}
+
+if ($action === 'save-product') {
+    requireAuth();
+    if (empty($body['name'])) jsonFail('חסר שם מוצר');
+    $products = getProducts();
+    $product = $body;
+    if (empty($product['id'])) {
+        $product['id']        = 'prod_' . time() . '_' . rand(100, 999);
+        $product['createdAt'] = date('c');
+    }
+    $found = false;
+    foreach ($products as &$p) {
+        if ($p['id'] === $product['id']) { $p = $product; $found = true; break; }
+    }
+    unset($p);
+    if (!$found) array_unshift($products, $product);
+    saveProducts($products);
+    jsonOk(['product' => $product]);
+}
+
+if ($action === 'delete-product') {
+    requireAuth();
+    $id = $body['id'] ?? '';
+    if (!$id) jsonFail('חסר ID');
+    $products = array_values(array_filter(getProducts(), fn($p) => $p['id'] !== $id));
+    saveProducts($products);
+    jsonOk();
+}
+
 jsonFail('פעולה לא מוכרת');

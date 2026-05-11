@@ -677,6 +677,23 @@ body{
 .auto-card-v2-settings{margin-bottom:12px}
 .webhook-section{background:rgba(64,75,242,0.06);border:1px solid rgba(64,75,242,0.15);border-radius:var(--radius-md);padding:16px;margin-bottom:10px}
 .webhook-section-title{font-size:11px;font-weight:700;color:rgba(148,163,184,0.75);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;display:flex;align-items:center;gap:7px}
+
+/* ── PRODUCTS SCREEN ──────────────────────────────────────────── */
+.products-layout{display:flex;gap:20px;align-items:flex-start}
+.products-list-panel{width:260px;flex-shrink:0;display:flex;flex-direction:column}
+.products-editor-panel{flex:1}
+.product-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:var(--radius-md);background:var(--card-bg);border:1px solid var(--border);cursor:pointer;margin-bottom:8px;transition:all 0.2s}
+.product-item:hover{border-color:rgba(66,142,255,0.4);background:rgba(66,142,255,0.05)}
+.product-item.active{border-color:var(--blue-primary);background:rgba(66,142,255,0.1)}
+.product-item-icon{width:34px;height:34px;border-radius:10px;background:rgba(66,142,255,0.12);display:flex;align-items:center;justify-content:center;color:var(--blue-bright);flex-shrink:0}
+.product-item-icon .icon{width:16px;height:16px}
+.product-item-info{flex:1;min-width:0}
+.product-item-name{font-weight:600;font-size:14px;color:var(--text-primary)}
+.product-item-meta{font-size:11px;color:var(--text-muted);margin-top:2px}
+.products-empty{text-align:center;color:var(--text-muted);padding:40px 20px;font-size:13px;background:var(--card-bg);border-radius:var(--radius-md);border:1px dashed var(--border);line-height:1.6}
+.btn-danger{background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);border-radius:var(--radius-md);padding:14px 16px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:7px;transition:all 0.2s}
+.btn-danger:hover{background:rgba(239,68,68,0.2)}
+@media(max-width:700px){.products-layout{flex-direction:column}.products-list-panel{width:100%}}
 </style>
 </head>
 <body>
@@ -713,6 +730,7 @@ body{
     <symbol id="i-log-out" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></symbol>
     <symbol id="i-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></symbol>
     <symbol id="i-bar-chart" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></symbol>
+    <symbol id="i-package" viewBox="0 0 24 24"><line x1="16.5" y1="9.4" x2="7.55" y2="4.24"/><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 002 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
   </defs>
 </svg>
 
@@ -749,6 +767,10 @@ body{
       </button>
 
       <div class="sidebar-section" id="snav-section-mgmt" style="margin-top:10px">ניהול</div>
+      <button class="nav-item" id="snav-products" onclick="switchTab('products')">
+        <svg class="icon"><use href="#i-package"/></svg>
+        <span>מוצרים</span>
+      </button>
       <button class="nav-item" id="snav-library" onclick="switchTab('library')">
         <svg class="icon"><use href="#i-book"/></svg>
         <span>ספריית שירותים</span>
@@ -893,12 +915,7 @@ body{
             </div>
             <div class="field">
               <label>סוג הפרויקט</label>
-              <div class="project-type-btns" id="project-type-btns">
-                <button type="button" class="type-btn" onclick="setProjectType('דף נחיתה')">דף נחיתה</button>
-                <button type="button" class="type-btn" onclick="setProjectType('אתר תדמית')">אתר תדמית</button>
-                <button type="button" class="type-btn" onclick="setProjectType('אתר מכירות')">אתר מכירות</button>
-                <button type="button" class="type-btn" onclick="setProjectType('מערכת CRM')">מערכת CRM</button>
-              </div>
+              <div class="project-type-btns" id="project-type-btns"></div>
             </div>
             <div class="field">
               <label>מספר הצעה</label>
@@ -1002,6 +1019,64 @@ body{
         <button class="btn btn-primary" style="margin-top:6px;" onclick="saveLibrary()">
           <svg class="icon"><use href="#i-save"/></svg>שמור ספריה
         </button>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div id="screen-products" class="hidden fade-in">
+      <div class="desktop-page-title">מוצרים <span>הגדרת מוצרים ותבניות הצעה</span></div>
+      <div class="content">
+        <div class="products-layout">
+
+          <!-- List panel -->
+          <div class="products-list-panel">
+            <div id="products-list-items"></div>
+            <button class="btn-add" style="margin-top:10px" onclick="newProduct()">
+              <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>מוצר חדש
+            </button>
+          </div>
+
+          <!-- Editor panel -->
+          <div class="products-editor-panel hidden" id="products-editor">
+            <div class="section-card">
+              <div class="section-title">
+                <div class="section-title-icon"><svg class="icon"><use href="#i-package"/></svg></div>
+                <span id="prod-editor-title">מוצר חדש</span>
+              </div>
+              <div class="field">
+                <label>שם המוצר / סוג הפרויקט</label>
+                <input type="text" id="prod-name" placeholder="לדוגמה: דף נחיתה">
+              </div>
+              <div class="field">
+                <label>שלבי התהליך</label>
+                <div id="prod-process-list"></div>
+                <button class="btn-add" style="margin-top:6px" onclick="addProdProcess()">
+                  <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שלב
+                </button>
+              </div>
+              <div class="field">
+                <label>מה כולל (אופציונלי)</label>
+                <div id="prod-includes-list"></div>
+                <button class="btn-add" style="margin-top:6px" onclick="addProdInclude()">
+                  <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף פריט
+                </button>
+              </div>
+              <div class="field">
+                <label>הסכם / תנאים — כל שורה = סעיף</label>
+                <textarea id="prod-terms" rows="10" style="min-height:180px" placeholder="הכנס את תנאי ההסכם, שורה לכל סעיף"></textarea>
+              </div>
+              <div style="display:flex;gap:10px;margin-top:6px">
+                <button class="btn btn-primary" onclick="saveProduct()" style="flex:1">
+                  <svg class="icon"><use href="#i-save"/></svg>שמור מוצר
+                </button>
+                <button class="btn-danger" id="prod-delete-btn" onclick="deleteProduct()" style="display:none">
+                  <svg class="icon"><use href="#i-trash"/></svg>מחק
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
       </div>
     </div>
 
@@ -1564,6 +1639,7 @@ function logout(){
 // ─── state ───────────────────────────────────────────────────
 let processSteps=[],includes=[],settings={},library={services:[],includes:[]};
 let projectType='';
+let products=[],editingProductId=null,editingProdProcess=[],editingProdIncludes=[];
 const VAT_RATE=18;
 
 const MSG_SEND_CLIENT         = "שלום {name} 👋\n\nהצעת המחיר שלך מוכנה לצפייה:\n🔗 {link}\n\nלכל שאלה — אשמח לעזור!";
@@ -1709,6 +1785,7 @@ async function init(){
   renderProcess();renderIncludes();renderSaved();renderLibrary();
   renderStatusPanel();
   loadAllData();
+  loadProducts();
 }
 
 // ─── tab switching ────────────────────────────────────────────
@@ -1725,7 +1802,7 @@ function switchTab(tab){
   if(snavEl)snavEl.classList.add('active');
 
   // screens
-  ['new','saved','library','settings','automations'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
+  ['new','saved','library','products','settings','automations'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
   const screen=document.getElementById('screen-'+tab);
   screen.classList.remove('hidden');screen.classList.remove('fade-in');
   void screen.offsetWidth;screen.classList.add('fade-in');
@@ -1746,6 +1823,7 @@ function switchTab(tab){
 
   if(tab==='saved'){renderSaved();}
   if(tab==='library'){renderLibrary();}
+  if(tab==='products'){renderProductsList();}
   if(tab==='new'){renderStatusPanel();}
   if(tab==='automations'){checkDriveSA();}
 }
@@ -1790,13 +1868,150 @@ function updateTotalPreview(){
 function setProjectType(type,skipPreset=false){
   projectType=type;
   document.querySelectorAll('.type-btn').forEach(btn=>{
-    btn.classList.toggle('active',btn.textContent===type);
+    btn.classList.toggle('active',btn.dataset.type===type);
   });
   if(skipPreset||!type)return;
+  // dynamic products first
+  const dynProd=products.find(p=>p.name===type);
+  if(dynProd){
+    processSteps=[...(dynProd.process||[])];
+    includes=[...(dynProd.includes||[])];
+    renderProcess();renderIncludes();
+    return;
+  }
+  // fallback to hardcoded presets
   const preset=PRODUCT_PRESETS[type];
   if(!preset)return;
   processSteps=[...preset.process];
   renderProcess();
+}
+
+// ─── products management ──────────────────────────────────────
+async function loadProducts(){
+  try{
+    const r=await apiCall('GET','list-products');
+    if(r.ok) products=r.products||[];
+  }catch(e){products=[];}
+  renderProductTypeBtns();
+}
+
+function renderProductTypeBtns(){
+  const container=document.getElementById('project-type-btns');
+  if(!container)return;
+  const names=products.length?products.map(p=>p.name):Object.keys(PRODUCT_PRESETS);
+  container.innerHTML=names.map(name=>
+    `<button type="button" class="type-btn" data-type="${esc(name)}" onclick="setProjectType('${esc(name)}')">${esc(name)}</button>`
+  ).join('');
+}
+
+function renderProductsList(){
+  const el=document.getElementById('products-list-items');
+  if(!el)return;
+  if(!products.length){
+    el.innerHTML='<div class="products-empty">עדיין אין מוצרים מוגדרים.<br>לחץ "מוצר חדש" להתחיל</div>';
+    return;
+  }
+  el.innerHTML=products.map(p=>`
+    <div class="product-item ${p.id===editingProductId?'active':''}" onclick="openProductEditor('${p.id}')">
+      <div class="product-item-icon"><svg class="icon"><use href="#i-package"/></svg></div>
+      <div class="product-item-info">
+        <div class="product-item-name">${esc(p.name)}</div>
+        <div class="product-item-meta">${(p.process||[]).length} שלבים · ${(p.includes||[]).length} כלולים</div>
+      </div>
+    </div>`).join('');
+}
+
+function openProductEditor(id){
+  const p=products.find(x=>x.id===id);
+  if(!p)return;
+  editingProductId=id;
+  editingProdProcess=[...(p.process||[])];
+  editingProdIncludes=[...(p.includes||[])];
+  document.getElementById('prod-editor-title').textContent=p.name||'עריכת מוצר';
+  document.getElementById('prod-name').value=p.name||'';
+  document.getElementById('prod-terms').value=p.terms||'';
+  document.getElementById('prod-delete-btn').style.display='';
+  renderProdProcess();renderProdIncludes();
+  document.getElementById('products-editor').classList.remove('hidden');
+  renderProductsList();
+}
+
+function newProduct(){
+  editingProductId=null;
+  editingProdProcess=[...DEFAULT_PROCESS];
+  editingProdIncludes=[];
+  document.getElementById('prod-editor-title').textContent='מוצר חדש';
+  document.getElementById('prod-name').value='';
+  document.getElementById('prod-terms').value='';
+  document.getElementById('prod-delete-btn').style.display='none';
+  renderProdProcess();renderProdIncludes();
+  document.getElementById('products-editor').classList.remove('hidden');
+  renderProductsList();
+}
+
+function renderProdProcess(){
+  document.getElementById('prod-process-list').innerHTML=editingProdProcess.map((s,i)=>`
+    <div class="list-item-row">
+      <input type="text" value="${esc(s)}" oninput="editingProdProcess[${i}]=this.value">
+      <button class="icon-btn-danger" onclick="removeProdProcess(${i})">${iconX}</button>
+    </div>`).join('');
+}
+function addProdProcess(){editingProdProcess.push('');renderProdProcess();}
+function removeProdProcess(i){editingProdProcess.splice(i,1);renderProdProcess();}
+
+function renderProdIncludes(){
+  const el=document.getElementById('prod-includes-list');
+  if(!editingProdIncludes.length){el.innerHTML='<div class="no-items">אין פריטים</div>';return;}
+  el.innerHTML=editingProdIncludes.map((s,i)=>`
+    <div class="list-item-row">
+      <input type="text" value="${esc(s)}" oninput="editingProdIncludes[${i}]=this.value">
+      <button class="icon-btn-danger" onclick="removeProdInclude(${i})">${iconX}</button>
+    </div>`).join('');
+}
+function addProdInclude(){editingProdIncludes.push('');renderProdIncludes();}
+function removeProdInclude(i){editingProdIncludes.splice(i,1);renderProdIncludes();}
+
+async function saveProduct(){
+  const name=document.getElementById('prod-name').value.trim();
+  if(!name){toast('הכנס שם למוצר','error');return;}
+  let product={
+    id:editingProductId||('prod_'+Date.now()+'_'+Math.floor(Math.random()*900+100)),
+    name,
+    process:editingProdProcess.filter(s=>s.trim()),
+    includes:editingProdIncludes.filter(s=>s.trim()),
+    terms:document.getElementById('prod-terms').value,
+    createdAt:editingProductId?(products.find(p=>p.id===editingProductId)?.createdAt||new Date().toISOString()):new Date().toISOString()
+  };
+  try{
+    const r=await apiCall('POST','save-product',product);
+    if(!r.ok){toast('שגיאה בשמירה','error');return;}
+    if(r.product)product=r.product;
+    if(editingProductId){
+      const idx=products.findIndex(p=>p.id===editingProductId);
+      if(idx>=0)products[idx]=product;
+    }else{
+      editingProductId=product.id;
+      products.unshift(product);
+    }
+    toast('מוצר נשמר ✓','success');
+    document.getElementById('prod-editor-title').textContent=name;
+    document.getElementById('prod-delete-btn').style.display='';
+    renderProductsList();renderProductTypeBtns();
+  }catch(e){toast('שגיאה בשמירה','error');}
+}
+
+async function deleteProduct(){
+  if(!editingProductId)return;
+  if(!confirm('למחוק את המוצר הזה?'))return;
+  try{
+    const r=await apiCall('POST','delete-product',{id:editingProductId});
+    if(!r.ok){toast('שגיאה במחיקה','error');return;}
+    products=products.filter(p=>p.id!==editingProductId);
+    editingProductId=null;
+    document.getElementById('products-editor').classList.add('hidden');
+    toast('מוצר נמחק','success');
+    renderProductsList();renderProductTypeBtns();
+  }catch(e){toast('שגיאה במחיקה','error');}
 }
 
 // ─── includes picker ─────────────────────────────────────────
@@ -2096,7 +2311,7 @@ function getProposalData(){
     includes:includes.filter(s=>s.trim()),
     items:[],
     subtotal:sub,vat,vatRate:VAT_RATE,total:sub+vat,
-    terms:(({'דף נחיתה':settings.termsLanding,'אתר תדמית':settings.termsBrochure,'אתר מכירות':settings.termsSales,'מערכת CRM':settings.termsCRM}[projectType]||settings.termsLanding||PRODUCT_PRESETS['דף נחיתה'].terms||DEFAULT_TERMS)).split('\n').filter(t=>t.trim()),
+    terms:((products.find(p=>p.name===projectType)?.terms)||({'דף נחיתה':settings.termsLanding,'אתר תדמית':settings.termsBrochure,'אתר מכירות':settings.termsSales,'מערכת CRM':settings.termsCRM}[projectType])||settings.termsLanding||PRODUCT_PRESETS['דף נחיתה']?.terms||DEFAULT_TERMS).split('\n').filter(t=>t.trim()),
     biz:{name:settings.bizName||'',email:settings.bizEmail||'',phone:settings.bizPhone||'',bank:settings.bizBank||''},
     status:'draft',
     totalViews:0,totalViewSeconds:0,views:[],

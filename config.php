@@ -16,6 +16,7 @@ define('DB_CHARSET', 'utf8mb4');
 define('DATA_DIR',      __DIR__ . '/data/');
 define('SETTINGS_FILE', DATA_DIR . 'settings.json');
 define('INDEX_FILE',    DATA_DIR . '__index__.json');
+define('PRODUCTS_FILE', DATA_DIR . 'products.json');
 
 // ─── auth ──────────────────────────────────────────────────────
 function requireAuth(): array {
@@ -36,6 +37,16 @@ function jsonFail(string $msg, int $code = 400): void {
     http_response_code($code);
     echo json_encode(['ok' => false, 'error' => $msg], JSON_UNESCAPED_UNICODE);
     exit;
+}
+
+// ─── products ─────────────────────────────────────────────────
+function getProducts(): array {
+    if (!file_exists(PRODUCTS_FILE)) return [];
+    return json_decode(file_get_contents(PRODUCTS_FILE), true) ?? [];
+}
+function saveProducts(array $products): void {
+    ensureDataDir();
+    file_put_contents(PRODUCTS_FILE, json_encode(array_values($products), JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
 }
 
 // ─── settings ─────────────────────────────────────────────────

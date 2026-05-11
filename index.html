@@ -340,10 +340,30 @@ body{
 .price-amount-wrapper span{color:var(--text-dim);font-size:13px;font-weight:500}
 
 /* ── SUMMARY ────────────────────────────── */
-.project-type-btns{display:flex;gap:8px;flex-wrap:wrap}
-.type-btn{flex:1;min-width:90px;padding:9px 14px;border-radius:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s ease}
+.project-type-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.type-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:16px 10px;min-height:84px;border-radius:14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);color:var(--text-muted);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s ease;text-align:center}
+.type-btn .icon{width:22px;height:22px;transition:color 0.2s}
 .type-btn:hover{background:rgba(66,142,255,0.1);border-color:rgba(66,142,255,0.3);color:var(--text)}
 .type-btn.active{background:rgba(66,142,255,0.15);border-color:var(--blue-primary);color:var(--blue-bright);box-shadow:0 0 0 1px rgba(66,142,255,0.3)}
+.type-btn.active .icon{filter:drop-shadow(0 0 5px rgba(96,165,250,0.7))}
+/* prod in library */
+.prod-lib-item{border:1px solid var(--border);border-radius:var(--radius-md);background:var(--card-bg);margin-bottom:8px;overflow:hidden}
+.prod-lib-header{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;user-select:none}
+.prod-lib-header:hover{background:rgba(66,142,255,0.04)}
+.prod-lib-icon{width:32px;height:32px;border-radius:9px;background:rgba(66,142,255,0.12);display:flex;align-items:center;justify-content:center;color:var(--blue-bright);flex-shrink:0}
+.prod-lib-icon .icon{width:15px;height:15px}
+.prod-lib-info{flex:1;min-width:0}
+.prod-lib-name{font-weight:600;font-size:14px;color:var(--text-primary)}
+.prod-lib-meta{font-size:11px;color:var(--text-muted);margin-top:1px}
+.prod-lib-chevron{width:16px;height:16px;color:var(--text-muted);flex-shrink:0;transition:transform 0.2s}
+.prod-lib-item.open .prod-lib-chevron{transform:rotate(180deg)}
+.prod-lib-body{display:none;padding:0 14px 14px;border-top:1px solid var(--border)}
+.prod-lib-item.open .prod-lib-body{display:block}
+.prod-lib-icon-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.prod-lib-icon-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted);transition:all 0.15s}
+.prod-lib-icon-btn .icon{width:15px;height:15px}
+.prod-lib-icon-btn:hover{background:rgba(66,142,255,0.1);border-color:rgba(66,142,255,0.4);color:var(--blue-bright)}
+.prod-lib-icon-btn.active{background:rgba(66,142,255,0.18);border-color:var(--blue-primary);color:var(--blue-bright)}
 .total-input-box{background:linear-gradient(135deg,rgba(66,142,255,0.12) 0%,rgba(64,75,242,0.08) 100%);border:1px solid rgba(66,142,255,0.35);border-radius:var(--radius-lg);padding:20px 22px;margin-bottom:14px}
 .total-input-label{display:block;font-size:13px;color:var(--text-muted);margin-bottom:10px;font-weight:600}
 .total-input{width:100%;padding:14px 16px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);border-radius:12px;color:var(--text);font-size:28px;font-weight:800;font-family:inherit;text-align:center;letter-spacing:1px;-moz-appearance:textfield}
@@ -767,10 +787,6 @@ body{
       </button>
 
       <div class="sidebar-section" id="snav-section-mgmt" style="margin-top:10px">ניהול</div>
-      <button class="nav-item" id="snav-products" onclick="switchTab('products')">
-        <svg class="icon"><use href="#i-package"/></svg>
-        <span>מוצרים</span>
-      </button>
       <button class="nav-item" id="snav-library" onclick="switchTab('library')">
         <svg class="icon"><use href="#i-book"/></svg>
         <span>ספריית שירותים</span>
@@ -992,9 +1008,73 @@ body{
 
     <!-- LIBRARY -->
     <div id="screen-library" class="hidden fade-in">
-      <div class="desktop-page-title">ספריה <span>ניהול שירותים ופריטים</span></div>
+      <div class="desktop-page-title">ספריה <span>מוצרים, שירותים ופריטים</span></div>
       <div class="content">
         <div class="form-grid">
+
+          <!-- ── Products (full width) ── -->
+          <div class="section-card" style="grid-column:1/-1">
+            <div class="section-title">
+              <div class="section-title-icon"><svg class="icon"><use href="#i-package"/></svg></div>סוגי פרויקטים
+            </div>
+            <div class="field-hint" style="margin-bottom:14px;margin-top:-8px">כל סוג מוצר עם אייקון, תהליך, כלולים והסכם. יופיע כאפשרות בחירה בהצעה חדשה.</div>
+
+            <div class="products-layout">
+              <!-- list -->
+              <div class="products-list-panel">
+                <div id="products-list-items"></div>
+                <button class="btn-add" style="margin-top:8px" onclick="newProduct()">
+                  <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>סוג פרויקט חדש
+                </button>
+              </div>
+              <!-- editor -->
+              <div class="products-editor-panel hidden" id="products-editor">
+                <div style="border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;background:rgba(255,255,255,0.02)">
+                  <div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:14px;display:flex;align-items:center;gap:8px">
+                    <svg class="icon" style="width:16px;height:16px;color:var(--blue-bright)"><use href="#i-package"/></svg>
+                    <span id="prod-editor-title">סוג פרויקט חדש</span>
+                  </div>
+                  <div class="field">
+                    <label>שם המוצר / סוג הפרויקט</label>
+                    <input type="text" id="prod-name" placeholder="לדוגמה: דף נחיתה">
+                  </div>
+                  <div class="field">
+                    <label>אייקון</label>
+                    <div class="prod-lib-icon-grid" id="prod-icon-grid"></div>
+                    <input type="hidden" id="prod-icon" value="file-text">
+                  </div>
+                  <div class="field">
+                    <label>שלבי התהליך</label>
+                    <div id="prod-process-list"></div>
+                    <button class="btn-add" style="margin-top:6px" onclick="addProdProcess()">
+                      <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שלב
+                    </button>
+                  </div>
+                  <div class="field">
+                    <label>מה כולל (אופציונלי)</label>
+                    <div id="prod-includes-list"></div>
+                    <button class="btn-add" style="margin-top:6px" onclick="addProdInclude()">
+                      <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף פריט
+                    </button>
+                  </div>
+                  <div class="field">
+                    <label>הסכם / תנאים — כל שורה = סעיף</label>
+                    <textarea id="prod-terms" rows="8" style="min-height:160px" placeholder="הכנס את תנאי ההסכם, שורה לכל סעיף"></textarea>
+                  </div>
+                  <div style="display:flex;gap:10px;margin-top:6px">
+                    <button class="btn btn-primary" onclick="saveProduct()" style="flex:1">
+                      <svg class="icon"><use href="#i-save"/></svg>שמור
+                    </button>
+                    <button class="btn-danger" id="prod-delete-btn" onclick="deleteProduct()" style="display:none">
+                      <svg class="icon"><use href="#i-trash"/></svg>מחק
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── Services ── -->
           <div class="section-card">
             <div class="section-title">
               <div class="section-title-icon"><svg class="icon"><use href="#i-tool"/></svg></div>ספריית שירותים
@@ -1005,6 +1085,8 @@ body{
               <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שירות
             </button>
           </div>
+
+          <!-- ── Includes ── -->
           <div class="section-card">
             <div class="section-title">
               <div class="section-title-icon"><svg class="icon"><use href="#i-list"/></svg></div>ספריית "מה כולל"
@@ -1015,68 +1097,11 @@ body{
               <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף פריט
             </button>
           </div>
+
         </div>
         <button class="btn btn-primary" style="margin-top:6px;" onclick="saveLibrary()">
           <svg class="icon"><use href="#i-save"/></svg>שמור ספריה
         </button>
-      </div>
-    </div>
-
-    <!-- PRODUCTS -->
-    <div id="screen-products" class="hidden fade-in">
-      <div class="desktop-page-title">מוצרים <span>הגדרת מוצרים ותבניות הצעה</span></div>
-      <div class="content">
-        <div class="products-layout">
-
-          <!-- List panel -->
-          <div class="products-list-panel">
-            <div id="products-list-items"></div>
-            <button class="btn-add" style="margin-top:10px" onclick="newProduct()">
-              <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>מוצר חדש
-            </button>
-          </div>
-
-          <!-- Editor panel -->
-          <div class="products-editor-panel hidden" id="products-editor">
-            <div class="section-card">
-              <div class="section-title">
-                <div class="section-title-icon"><svg class="icon"><use href="#i-package"/></svg></div>
-                <span id="prod-editor-title">מוצר חדש</span>
-              </div>
-              <div class="field">
-                <label>שם המוצר / סוג הפרויקט</label>
-                <input type="text" id="prod-name" placeholder="לדוגמה: דף נחיתה">
-              </div>
-              <div class="field">
-                <label>שלבי התהליך</label>
-                <div id="prod-process-list"></div>
-                <button class="btn-add" style="margin-top:6px" onclick="addProdProcess()">
-                  <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף שלב
-                </button>
-              </div>
-              <div class="field">
-                <label>מה כולל (אופציונלי)</label>
-                <div id="prod-includes-list"></div>
-                <button class="btn-add" style="margin-top:6px" onclick="addProdInclude()">
-                  <span class="btn-add-icon"><svg class="icon"><use href="#i-plus"/></svg></span>הוסף פריט
-                </button>
-              </div>
-              <div class="field">
-                <label>הסכם / תנאים — כל שורה = סעיף</label>
-                <textarea id="prod-terms" rows="10" style="min-height:180px" placeholder="הכנס את תנאי ההסכם, שורה לכל סעיף"></textarea>
-              </div>
-              <div style="display:flex;gap:10px;margin-top:6px">
-                <button class="btn btn-primary" onclick="saveProduct()" style="flex:1">
-                  <svg class="icon"><use href="#i-save"/></svg>שמור מוצר
-                </button>
-                <button class="btn-danger" id="prod-delete-btn" onclick="deleteProduct()" style="display:none">
-                  <svg class="icon"><use href="#i-trash"/></svg>מחק
-                </button>
-              </div>
-            </div>
-          </div>
-
-        </div>
       </div>
     </div>
 
@@ -1802,7 +1827,7 @@ function switchTab(tab){
   if(snavEl)snavEl.classList.add('active');
 
   // screens
-  ['new','saved','library','products','settings','automations'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
+  ['new','saved','library','settings','automations'].forEach(s=>document.getElementById('screen-'+s).classList.add('hidden'));
   const screen=document.getElementById('screen-'+tab);
   screen.classList.remove('hidden');screen.classList.remove('fade-in');
   void screen.offsetWidth;screen.classList.add('fade-in');
@@ -1823,7 +1848,6 @@ function switchTab(tab){
 
   if(tab==='saved'){renderSaved();}
   if(tab==='library'){renderLibrary();}
-  if(tab==='products'){renderProductsList();}
   if(tab==='new'){renderStatusPanel();}
   if(tab==='automations'){checkDriveSA();}
 }
@@ -1887,6 +1911,21 @@ function setProjectType(type,skipPreset=false){
 }
 
 // ─── products management ──────────────────────────────────────
+const PRODUCT_ICONS=[
+  {id:'file-text',   label:'דף'},
+  {id:'building',    label:'אתר'},
+  {id:'diamond',     label:'חנות'},
+  {id:'tool',        label:'מערכת'},
+  {id:'zap',         label:'אוטומציה'},
+  {id:'bar-chart',   label:'ניתוח'},
+  {id:'sparkles',    label:'קריאייטיב'},
+  {id:'folder',      label:'פרויקט'},
+  {id:'package',     label:'מוצר'},
+  {id:'check-circle',label:'שירות'},
+  {id:'route',       label:'תהליך'},
+  {id:'user',        label:'לקוח'},
+];
+
 async function loadProducts(){
   try{
     const r=await apiCall('GET','list-products');
@@ -1898,9 +1937,12 @@ async function loadProducts(){
 function renderProductTypeBtns(){
   const container=document.getElementById('project-type-btns');
   if(!container)return;
-  const names=products.length?products.map(p=>p.name):Object.keys(PRODUCT_PRESETS);
-  container.innerHTML=names.map(name=>
-    `<button type="button" class="type-btn" data-type="${esc(name)}" onclick="setProjectType('${esc(name)}')">${esc(name)}</button>`
+  const list=products.length?products:Object.keys(PRODUCT_PRESETS).map((name,i)=>({name,icon:['file-text','building','diamond','tool'][i]||'file-text'}));
+  container.innerHTML=list.map(p=>
+    `<button type="button" class="type-btn" data-type="${esc(p.name)}" onclick="setProjectType('${esc(p.name)}')">
+      <svg class="icon"><use href="#i-${p.icon||'file-text'}"/></svg>
+      ${esc(p.name)}
+    </button>`
   ).join('');
 }
 
@@ -1908,17 +1950,32 @@ function renderProductsList(){
   const el=document.getElementById('products-list-items');
   if(!el)return;
   if(!products.length){
-    el.innerHTML='<div class="products-empty">עדיין אין מוצרים מוגדרים.<br>לחץ "מוצר חדש" להתחיל</div>';
+    el.innerHTML='<div class="products-empty">עדיין אין סוגי פרויקטים.<br>לחץ "סוג פרויקט חדש" להתחיל</div>';
     return;
   }
   el.innerHTML=products.map(p=>`
     <div class="product-item ${p.id===editingProductId?'active':''}" onclick="openProductEditor('${p.id}')">
-      <div class="product-item-icon"><svg class="icon"><use href="#i-package"/></svg></div>
+      <div class="product-item-icon"><svg class="icon"><use href="#i-${p.icon||'file-text'}"/></svg></div>
       <div class="product-item-info">
         <div class="product-item-name">${esc(p.name)}</div>
         <div class="product-item-meta">${(p.process||[]).length} שלבים · ${(p.includes||[]).length} כלולים</div>
       </div>
     </div>`).join('');
+}
+
+function renderIconPicker(selectedIcon){
+  const grid=document.getElementById('prod-icon-grid');
+  if(!grid)return;
+  grid.innerHTML=PRODUCT_ICONS.map(ic=>`
+    <button type="button" class="prod-lib-icon-btn ${(selectedIcon||'file-text')===ic.id?'active':''}"
+      title="${ic.label}" onclick="selectProdIcon('${ic.id}')">
+      <svg class="icon"><use href="#i-${ic.id}"/></svg>
+    </button>`).join('');
+}
+
+function selectProdIcon(iconId){
+  document.getElementById('prod-icon').value=iconId;
+  renderIconPicker(iconId);
 }
 
 function openProductEditor(id){
@@ -1929,8 +1986,10 @@ function openProductEditor(id){
   editingProdIncludes=[...(p.includes||[])];
   document.getElementById('prod-editor-title').textContent=p.name||'עריכת מוצר';
   document.getElementById('prod-name').value=p.name||'';
+  document.getElementById('prod-icon').value=p.icon||'file-text';
   document.getElementById('prod-terms').value=p.terms||'';
   document.getElementById('prod-delete-btn').style.display='';
+  renderIconPicker(p.icon||'file-text');
   renderProdProcess();renderProdIncludes();
   document.getElementById('products-editor').classList.remove('hidden');
   renderProductsList();
@@ -1940,10 +1999,12 @@ function newProduct(){
   editingProductId=null;
   editingProdProcess=[...DEFAULT_PROCESS];
   editingProdIncludes=[];
-  document.getElementById('prod-editor-title').textContent='מוצר חדש';
+  document.getElementById('prod-editor-title').textContent='סוג פרויקט חדש';
   document.getElementById('prod-name').value='';
+  document.getElementById('prod-icon').value='file-text';
   document.getElementById('prod-terms').value='';
   document.getElementById('prod-delete-btn').style.display='none';
+  renderIconPicker('file-text');
   renderProdProcess();renderProdIncludes();
   document.getElementById('products-editor').classList.remove('hidden');
   renderProductsList();
@@ -1974,9 +2035,10 @@ function removeProdInclude(i){editingProdIncludes.splice(i,1);renderProdIncludes
 async function saveProduct(){
   const name=document.getElementById('prod-name').value.trim();
   if(!name){toast('הכנס שם למוצר','error');return;}
+  const icon=document.getElementById('prod-icon').value||'file-text';
   let product={
     id:editingProductId||('prod_'+Date.now()+'_'+Math.floor(Math.random()*900+100)),
-    name,
+    name,icon,
     process:editingProdProcess.filter(s=>s.trim()),
     includes:editingProdIncludes.filter(s=>s.trim()),
     terms:document.getElementById('prod-terms').value,
@@ -2002,14 +2064,14 @@ async function saveProduct(){
 
 async function deleteProduct(){
   if(!editingProductId)return;
-  if(!confirm('למחוק את המוצר הזה?'))return;
+  if(!confirm('למחוק את סוג הפרויקט הזה?'))return;
   try{
     const r=await apiCall('POST','delete-product',{id:editingProductId});
     if(!r.ok){toast('שגיאה במחיקה','error');return;}
     products=products.filter(p=>p.id!==editingProductId);
     editingProductId=null;
     document.getElementById('products-editor').classList.add('hidden');
-    toast('מוצר נמחק','success');
+    toast('נמחק','success');
     renderProductsList();renderProductTypeBtns();
   }catch(e){toast('שגיאה במחיקה','error');}
 }
@@ -2258,6 +2320,7 @@ function loadLibrary(){
   }catch(e){library={services:[...DEFAULT_SERVICES],includes:[...DEFAULT_INCLUDES_LIB]}}
 }
 function renderLibrary(){
+  renderProductsList();
   const sEl=document.getElementById('services-library');
   sEl.innerHTML=library.services.length?library.services.map((s,i)=>`
     <div class="library-item">

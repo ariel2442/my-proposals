@@ -170,6 +170,23 @@ if ($action === 'get-signed') {
     jsonOk(['signed' => $signed]);
 }
 
+// ─── serve signature image (PNG) — used by Green API sendFileByUrl ─
+if ($action === 'get-sig-img') {
+    $id   = safeId($_GET['id'] ?? '');
+    if (!$id) { http_response_code(400); exit; }
+    $file = DATA_DIR . $id . '_signed.json';
+    if (!file_exists($file)) { http_response_code(404); exit; }
+    $signed = json_decode(file_get_contents($file), true) ?? [];
+    $sig    = $signed['signature'] ?? '';
+    if (!$sig || !str_starts_with($sig, 'data:image/')) { http_response_code(404); exit; }
+    $raw = base64_decode(substr($sig, strpos($sig, ',') + 1));
+    header('Content-Type: image/png');
+    header('Content-Length: ' . strlen($raw));
+    header('Cache-Control: public, max-age=86400');
+    echo $raw;
+    exit;
+}
+
 // ─── settings ──────────────────────────────────────────────────
 if ($action === 'get-settings') {
     requireAuth();

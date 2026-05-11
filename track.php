@@ -111,6 +111,30 @@ if ($action === 'sign') {
         ]);
         $sent = sendWhatsapp($repPhone, $waMsg);
         error_log("sign: sendWhatsapp result=" . ($sent ? 'ok' : 'FAILED'));
+
+        // ─── שלח תמונת חתימה ב-WhatsApp (עותק) ───────────────────
+        if ($sent && $baseUrl2 && !empty($s2['greenApiInstance']) && !empty($s2['greenApiToken'])) {
+            $sigImgUrl  = $baseUrl2 . '/api.php?action=get-sig-img&id=' . $id;
+            $normalized = normalizePhone($repPhone);
+            if ($normalized) {
+                $gaUrl = "https://api.green-api.com/waInstance{$s2['greenApiInstance']}/sendFileByUrl/{$s2['greenApiToken']}";
+                $ch    = curl_init($gaUrl);
+                curl_setopt_array($ch, [
+                    CURLOPT_POST           => true,
+                    CURLOPT_POSTFIELDS     => json_encode([
+                        'chatId'   => $normalized . '@c.us',
+                        'urlFile'  => $sigImgUrl,
+                        'fileName' => 'signature_' . $id . '.png',
+                        'caption'  => '✍️ חתימה של ' . ($p['clientName'] ?? ''),
+                    ], JSON_UNESCAPED_UNICODE),
+                    CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_TIMEOUT        => 15,
+                ]);
+                curl_exec($ch);
+                unset($ch);
+            }
+        }
     }
 
     // ─── העלאה לגוגל דרייב ────────────────────────────────────

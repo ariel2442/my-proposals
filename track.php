@@ -152,6 +152,32 @@ if ($action === 'sign') {
         @mail($adminEmail, $subject, $message, $headers);
     }
 
+    // ─── Webhook notification on sign ─────────────────────────────
+    $signWebhookUrl = $s3['signWebhookUrl'] ?? '';
+    if ($signWebhookUrl) {
+        $webhookPayload = json_encode([
+            'id'            => $id,
+            'proposalNum'   => $p['proposalNum'] ?? '',
+            'clientName'    => $p['clientName']  ?? '',
+            'clientPhone'   => $p['clientPhone'] ?? '',
+            'total'         => $p['total']       ?? 0,
+            'signerName'    => $signerName,
+            'signedAt'      => $signedAt,
+            'paymentMethod' => $paymentMethod,
+        ], JSON_UNESCAPED_UNICODE);
+        $ch = curl_init($signWebhookUrl);
+        curl_setopt_array($ch, [
+            CURLOPT_POST           => true,
+            CURLOPT_POSTFIELDS     => $webhookPayload,
+            CURLOPT_HTTPHEADER     => ['Content-Type: application/json'],
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT        => 10,
+            CURLOPT_CONNECTTIMEOUT => 5,
+        ]);
+        curl_exec($ch);
+        unset($ch);
+    }
+
     echo json_encode(['ok' => true]);
     exit;
 }

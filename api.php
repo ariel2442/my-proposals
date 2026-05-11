@@ -181,7 +181,7 @@ if ($action === 'save-settings') {
     $allowed = ['bizName','bizEmail','bizPhone','bizBank','baseUrl',
                 'termsLanding','termsBrochure','termsSales','termsCRM',
                 'greenApiInstance','greenApiToken','salesRepPhone','driveFolderId',
-                'growWebhookUrl',
+                'growWebhookUrl','signWebhookUrl',
                 'autoSendClient','autoRepView','autoRepSign','autoClientPayment','autoDrive',
                 'msgSendClient','msgViewFirst','msgViewReturn','msgSignRep',
                 'msgSignCredit','msgSignNoLink','msgSignBank',

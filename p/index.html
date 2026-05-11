@@ -843,7 +843,7 @@ body{
     <div class="countdown-num" id="countdown-num">3</div>
   </div>
   <h3>מכין עמוד תשלום...</h3>
-  <p>תועבר אוטומטית תוך שנייה</p>
+  <p>מייד תועבר לתשלום מאובטח</p>
 </div>
 
 <!-- Success Screen -->
@@ -1075,6 +1075,14 @@ async function showAlreadySigned(){
   document.getElementById('sign-form-area').style.display='none';
   document.getElementById('signed-box').style.display='block';
 
+  // כפתור תשלום מהיר אם חתם באשראי ועדיין לא שילם
+  if(d.paymentMethod==='credit'&&!d.paidAt){
+    const payWrap=document.createElement('div');
+    payWrap.style.cssText='text-align:center;margin-top:20px';
+    payWrap.innerHTML=`<button class="btn-quick-pay" id="return-pay-btn" onclick="returnQuickPay()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;flex-shrink:0"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>לתשלום מהיר</button><div style="margin-top:8px;font-size:12px;color:var(--text-dim)">ההצעה כבר נחתמה — לחץ להמשיך לתשלום</div>`;
+    document.getElementById('signed-box').after(payWrap);
+  }
+
   // טען תמונת חתימה מהשרת
   if(d.id&&d.id!=='demo'){
     try{
@@ -1163,6 +1171,12 @@ async function doSign(method){
   document.getElementById('sign-form-area').style.display='none';
   document.getElementById('signed-box').style.display='block';
 
+  // Pre-fetch payment link ברקע מיד — כשהמשתמש ילחץ "תשלום" הוא יהיה מוכן
+  if(method==='credit'){
+    window._payLinkPromise=fetch(apiBase()+'/api.php?action=get-pay-link&id='+encodeURIComponent(proposalData.id))
+      .then(r=>r.json()).catch(()=>({ok:false}));
+  }
+
   // שמור לשרת — השרת יוצר לינק GROW ושולח WhatsApp אוטומטית
   await trackEvent('sign',proposalData.id,{
     signerName:window._signerName,
@@ -1184,44 +1198,43 @@ function printCopy(){
 
 async function goToPayment(){
   const overlay=document.getElementById('pay-countdown');
-  const numEl=document.getElementById('countdown-num');
-  const ringEl=document.getElementById('countdown-ring-fill');
-  const circumference=339.3;
-
+  document.getElementById('countdown-num').textContent='...';
   overlay.classList.add('show');
 
-  // fetch pay link and countdown simultaneously
-  const fetchPromise=fetch(apiBase()+'/api.php?action=get-pay-link&id='+encodeURIComponent(proposalData.id))
-    .then(r=>r.json()).catch(()=>({ok:false}));
-
-  // countdown 3 → 2 → 1 → 0
-  let count=3;
-  numEl.textContent=count;
-  ringEl.style.strokeDashoffset='0';
-
-  await new Promise(resolve=>{
-    const tick=()=>{
-      count--;
-      numEl.textContent=count;
-      // shrink ring proportionally
-      ringEl.style.strokeDashoffset=String(circumference*(1-count/3));
-      if(count<=0){resolve();return;}
-      setTimeout(tick,1000);
-    };
-    setTimeout(tick,1000);
-  });
-
-  const result=await fetchPromise;
+  // אם הלינק כבר הוכן ברקע — redirect מיידי; אחרת fetch עכשיו
+  const result=await(window._payLinkPromise||
+    fetch(apiBase()+'/api.php?action=get-pay-link&id='+encodeURIComponent(proposalData.id))
+      .then(r=>r.json()).catch(()=>({ok:false})));
 
   if(result.ok&&result.url){
     window.location.href=result.url;
   }else{
     overlay.classList.remove('show');
-    // show error under button
     const errEl=document.createElement('div');
     errEl.style.cssText='margin-top:10px;color:#f87171;font-size:13px;text-align:center';
     errEl.textContent='שגיאה ביצירת לינק תשלום — נסה שוב';
     document.getElementById('success-whatsapp-msg').appendChild(errEl);
+  }
+}
+
+async function returnQuickPay(){
+  const btn=document.getElementById('return-pay-btn');
+  if(btn){btn.disabled=true;btn.innerHTML='<span>טוען...</span>';}
+  const overlay=document.getElementById('pay-countdown');
+  document.getElementById('countdown-num').textContent='...';
+  overlay.classList.add('show');
+  try{
+    const r=await fetch(apiBase()+'/api.php?action=get-pay-link&id='+encodeURIComponent(proposalData.id));
+    const result=await r.json();
+    if(result.ok&&result.url){
+      window.location.href=result.url;
+    }else{
+      overlay.classList.remove('show');
+      if(btn){btn.disabled=false;btn.innerHTML='💳 לתשלום מהיר';}
+    }
+  }catch(e){
+    overlay.classList.remove('show');
+    if(btn){btn.disabled=false;btn.innerHTML='💳 לתשלום מהיר';}
   }
 }
 

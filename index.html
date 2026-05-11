@@ -647,6 +647,36 @@ body{
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:0.01ms !important;transition-duration:0.01ms !important}
 }
+
+/* ══ SETTINGS PAGE ══════════════════════════════════════════ */
+.settings-section{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-lg);margin-bottom:16px;backdrop-filter:blur(20px);overflow:hidden;transition:border-color 0.2s}
+.settings-section:focus-within{border-color:var(--glass-border-hover)}
+.settings-section-header{display:flex;align-items:center;gap:14px;padding:18px 20px;border-bottom:1px solid rgba(255,255,255,0.05)}
+.settings-section-icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px rgba(66,142,255,0.3)}
+.settings-section-icon .icon{width:18px;height:18px;color:white;stroke-width:2}
+.settings-section-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.settings-section-desc{font-size:12px;color:var(--text-dim);line-height:1.4}
+.settings-body{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.settings-2col{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ══ AUTOMATIONS REDESIGN ════════════════════════════════════ */
+.conn-card{background:linear-gradient(135deg,rgba(66,142,255,0.06) 0%,rgba(10,36,86,0.3) 100%);border:1px solid rgba(66,142,255,0.18);border-radius:var(--radius-lg);padding:20px;margin-bottom:14px;backdrop-filter:blur(20px)}
+.conn-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;gap:12px}
+.conn-card-title{font-size:14px;font-weight:700;color:var(--text)}
+.auto-card-v2{background:var(--glass-bg);border:1px solid var(--glass-border);border-radius:var(--radius-lg);margin-bottom:10px;backdrop-filter:blur(20px);overflow:hidden;transition:border-color 0.2s}
+.auto-card-v2:focus-within{border-color:var(--glass-border-hover)}
+.auto-card-v2-header{display:flex;align-items:center;gap:14px;padding:15px 18px}
+.auto-card-v2-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:19px;line-height:1}
+.auto-card-v2-info{flex:1;min-width:0}
+.auto-card-v2-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:2px}
+.auto-card-v2-desc{font-size:12px;color:var(--text-dim);line-height:1.4}
+.auto-card-v2-body{border-top:1px solid rgba(255,255,255,0.05);padding:14px 18px 16px}
+.auto-card-v2-body .auto-msg{border-top:none;margin-top:0;padding-top:0}
+.auto-card-v2-body .auto-msg>summary{padding:0}
+.auto-card-v2-body .auto-hours{margin-top:0;padding-top:0;border-top:none}
+.auto-card-v2-settings{margin-bottom:12px}
+.webhook-section{background:rgba(64,75,242,0.06);border:1px solid rgba(64,75,242,0.15);border-radius:var(--radius-md);padding:16px;margin-bottom:10px}
+.webhook-section-title{font-size:11px;font-weight:700;color:rgba(148,163,184,0.75);text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;display:flex;align-items:center;gap:7px}
 </style>
 </head>
 <body>
@@ -979,45 +1009,61 @@ body{
     <div id="screen-settings" class="hidden fade-in">
       <div class="desktop-page-title">הגדרות <span>פרטי עסק וחיבורים</span></div>
       <div class="content">
-        <div class="form-grid">
-          <div class="section-card">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-building"/></svg></div>העסק שלך
+
+        <!-- פרטי העסק -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <div class="settings-section-icon" style="background:linear-gradient(135deg,var(--blue-primary),var(--indigo))">
+              <svg class="icon"><use href="#i-building"/></svg>
             </div>
-            <div class="field"><label>שם העסק / שם מלא</label><input type="text" id="biz-name"></div>
-            <div class="field"><label>מייל</label><input type="email" id="biz-email"></div>
-            <div class="field"><label>טלפון (עם 972)</label><input type="tel" id="biz-phone" inputmode="numeric"></div>
+            <div>
+              <div class="settings-section-title">פרטי העסק</div>
+              <div class="settings-section-desc">מופיע בתחתית הצעות המחיר ובהודעות ללקוחות</div>
+            </div>
+          </div>
+          <div class="settings-body">
+            <div class="settings-2col">
+              <div class="field"><label>שם העסק / שם מלא</label><input type="text" id="biz-name" placeholder="אריאל אזולאי"></div>
+              <div class="field"><label>מייל</label><input type="email" id="biz-email" placeholder="hello@example.com" dir="ltr"></div>
+            </div>
+            <div class="field">
+              <label>טלפון (כולל קידומת מדינה)</label>
+              <input type="tel" id="biz-phone" inputmode="numeric" placeholder="972521234567" style="max-width:220px" dir="ltr">
+            </div>
             <div class="field">
               <label>פרטי חשבון בנק</label>
               <textarea id="biz-bank" rows="4" placeholder="בנק: XX&#10;סניף: XXX&#10;חשבון: XXXXXX&#10;שם בעל החשבון: XXX"></textarea>
+              <div class="field-hint">נשלח ללקוח שבוחר בהעברה בנקאית</div>
             </div>
           </div>
-          <div class="section-card form-grid-full">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-file-text"/></svg></div>הסכמים לפי סוג מוצר
+        </div>
+
+        <!-- הסכמים -->
+        <div class="settings-section">
+          <div class="settings-section-header">
+            <div class="settings-section-icon" style="background:linear-gradient(135deg,#10b981,#059669)">
+              <svg class="icon"><use href="#i-file-text"/></svg>
             </div>
-            <div class="auto-tabs" style="margin-bottom:14px">
-              <button class="auto-tab-btn active" id="sterms-btn-landing"  onclick="switchTermsTab('landing')">
-                <span class="tab-icon">🖥️</span><span class="tab-label">דף נחיתה</span>
-              </button>
-              <button class="auto-tab-btn" id="sterms-btn-brochure" onclick="switchTermsTab('brochure')">
-                <span class="tab-icon">🌐</span><span class="tab-label">אתר תדמית</span>
-              </button>
-              <button class="auto-tab-btn" id="sterms-btn-sales"    onclick="switchTermsTab('sales')">
-                <span class="tab-icon">🛒</span><span class="tab-label">אתר מכירות</span>
-              </button>
-              <button class="auto-tab-btn" id="sterms-btn-crm"      onclick="switchTermsTab('crm')">
-                <span class="tab-icon">📊</span><span class="tab-label">מערכת CRM</span>
-              </button>
+            <div>
+              <div class="settings-section-title">הסכמים לפי סוג מוצר</div>
+              <div class="settings-section-desc">כל סעיף בשורה נפרדת — נטען אוטומטית לפי סוג הפרויקט שנבחר</div>
             </div>
-            <div class="field-hint" style="margin-bottom:8px">כל סעיף בשורה נפרדת — נטען אוטומטית לפי סוג הפרויקט שנבחר</div>
+          </div>
+          <div class="settings-body">
+            <div class="auto-tabs" style="margin-bottom:4px">
+              <button class="auto-tab-btn active" id="sterms-btn-landing"  onclick="switchTermsTab('landing')"><span class="tab-icon">🖥️</span><span class="tab-label">דף נחיתה</span></button>
+              <button class="auto-tab-btn" id="sterms-btn-brochure" onclick="switchTermsTab('brochure')"><span class="tab-icon">🌐</span><span class="tab-label">אתר תדמית</span></button>
+              <button class="auto-tab-btn" id="sterms-btn-sales"    onclick="switchTermsTab('sales')"><span class="tab-icon">🛒</span><span class="tab-label">אתר מכירות</span></button>
+              <button class="auto-tab-btn" id="sterms-btn-crm"      onclick="switchTermsTab('crm')"><span class="tab-icon">📊</span><span class="tab-label">CRM</span></button>
+            </div>
             <div class="auto-tab-pane active" id="sterms-landing"><textarea id="terms-landing"  rows="10"></textarea></div>
             <div class="auto-tab-pane"        id="sterms-brochure"><textarea id="terms-brochure" rows="10"></textarea></div>
             <div class="auto-tab-pane"        id="sterms-sales"><textarea id="terms-sales"    rows="10"></textarea></div>
             <div class="auto-tab-pane"        id="sterms-crm"><textarea id="terms-crm"      rows="10"></textarea></div>
           </div>
         </div>
-        <button class="btn btn-primary" style="margin-top:6px;" onclick="saveSettings()">
+
+        <button class="btn btn-primary" onclick="saveSettings()">
           <svg class="icon"><use href="#i-save"/></svg>שמור הגדרות
         </button>
       </div>
@@ -1028,120 +1074,115 @@ body{
       <div class="desktop-page-title">אוטומציות <span>חיבורים ושליחות אוטומטיות</span></div>
       <div class="content">
 
-        <!-- ── טאב בר ── -->
+        <!-- טאב בר -->
         <div class="auto-tabs">
-          <button class="auto-tab-btn active" id="atab-btn-wa"    onclick="switchAutoTab('wa')">
-            <span class="tab-icon">📱</span>
-            <span class="tab-label">WhatsApp</span>
+          <button class="auto-tab-btn active" id="atab-btn-wa" onclick="switchAutoTab('wa')">
+            <span class="tab-icon">📱</span><span class="tab-label">WhatsApp</span>
             <span class="tab-dot" id="atab-dot-wa"></span>
           </button>
           <button class="auto-tab-btn" id="atab-btn-remind" onclick="switchAutoTab('remind')">
-            <span class="tab-icon">🔔</span>
-            <span class="tab-label">תזכורות</span>
+            <span class="tab-icon">🔔</span><span class="tab-label">תזכורות</span>
           </button>
-          <button class="auto-tab-btn" id="atab-btn-drive"  onclick="switchAutoTab('drive')">
-            <span class="tab-icon">📁</span>
-            <span class="tab-label">Drive</span>
+          <button class="auto-tab-btn" id="atab-btn-drive" onclick="switchAutoTab('drive')">
+            <span class="tab-icon">📁</span><span class="tab-label">Drive</span>
             <span class="tab-dot" id="atab-dot-drive"></span>
           </button>
         </div>
 
-        <!-- ══ טאב: WhatsApp ══ -->
+        <!-- ══ WhatsApp ══ -->
         <div class="auto-tab-pane active" id="atab-wa">
 
-          <div class="section-card" style="margin-bottom:12px">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-link"/></svg></div>חיבור Green API
-              <span id="wa-status-pill" class="status-pill off" style="margin-right:auto;margin-left:0"><div class="status-dot"></div>לא מוגדר</span>
+          <!-- חיבור Green API -->
+          <div class="conn-card">
+            <div class="conn-card-header">
+              <div style="display:flex;align-items:center;gap:12px">
+                <div style="font-size:24px;line-height:1">📱</div>
+                <div>
+                  <div class="conn-card-title">חיבור Green API</div>
+                  <div style="font-size:12px;color:var(--text-dim);margin-top:2px">הגדר כדי לשלוח הודעות WhatsApp אוטומטיות</div>
+                </div>
+              </div>
+              <span id="wa-status-pill" class="status-pill off"><div class="status-dot"></div>לא מוגדר</span>
             </div>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
-              <div class="field">
-                <label>Instance ID</label>
-                <input type="text" id="green-api-instance" placeholder="1234567890">
-              </div>
-              <div class="field">
-                <label>API Token</label>
-                <input type="text" id="green-api-token" placeholder="xxxxxxxxxxxxxxxxxxxxxxxx">
-              </div>
-              <div class="field">
-                <label>הטלפון שלך (התראות)</label>
-                <input type="tel" id="sales-rep-phone" placeholder="0521234567" inputmode="numeric">
-              </div>
-              <div class="field">
-                <label>כתובת בסיס (דומיין)</label>
-                <input type="url" id="base-url" placeholder="https://crm.ariel-azulay.co.il/price">
-              </div>
+              <div class="field"><label>Instance ID</label><input type="text" id="green-api-instance" placeholder="1234567890" dir="ltr"></div>
+              <div class="field"><label>API Token</label><input type="password" id="green-api-token" placeholder="••••••••••••••" dir="ltr"></div>
+              <div class="field"><label>📞 הטלפון שלך (להתראות)</label><input type="tel" id="sales-rep-phone" placeholder="0521234567" inputmode="numeric"></div>
+              <div class="field"><label>🌐 כתובת בסיס (דומיין)</label><input type="url" id="base-url" placeholder="https://example.com/price" dir="ltr"></div>
             </div>
           </div>
 
-          <div class="auto-card">
-            <div class="auto-header">
-              <div class="auto-info">
-                <div class="auto-title">📤 שליחת הצעה ללקוח</div>
-                <div class="auto-desc">WhatsApp ללקוח כשלוחצים "שלח ללקוח"</div>
+          <!-- שליחת הצעה -->
+          <div class="auto-card-v2">
+            <div class="auto-card-v2-header">
+              <div class="auto-card-v2-icon" style="background:rgba(66,142,255,0.12);border:1px solid rgba(66,142,255,0.2)">📤</div>
+              <div class="auto-card-v2-info">
+                <div class="auto-card-v2-title">שליחת הצעה ללקוח</div>
+                <div class="auto-card-v2-desc">WhatsApp ללקוח כשלוחצים "שלח ללקוח"</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-send-client" checked><span class="toggle-slider"></span></label>
             </div>
-            <details class="auto-msg">
-              <summary>✏️ עריכת הודעה</summary>
-              <div class="auto-msg-body">
-                <div class="field">
+            <div class="auto-card-v2-body">
+              <details class="auto-msg"><summary>✏️ עריכת הודעה</summary>
+                <div class="auto-msg-body"><div class="field">
                   <textarea id="msg-send-client" rows="4"></textarea>
                   <div class="auto-msg-vars">
                     <span class="auto-msg-var" onclick="insertVar('msg-send-client','{name}')">{name}</span>
                     <span class="auto-msg-var" onclick="insertVar('msg-send-client','{num}')">{num}</span>
                     <span class="auto-msg-var" onclick="insertVar('msg-send-client','{link}')">{link}</span>
                   </div>
-                </div>
-              </div>
-            </details>
+                </div></div>
+              </details>
+            </div>
           </div>
 
-          <div class="auto-card">
-            <div class="auto-header">
-              <div class="auto-info">
-                <div class="auto-title">📬 התראה כשלקוח פתח הצעה</div>
-                <div class="auto-desc">WhatsApp אליך ברגע שלקוח פותח את ההצעה</div>
+          <!-- פתיחת הצעה -->
+          <div class="auto-card-v2">
+            <div class="auto-card-v2-header">
+              <div class="auto-card-v2-icon" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2)">👁️</div>
+              <div class="auto-card-v2-info">
+                <div class="auto-card-v2-title">התראה כשלקוח פתח הצעה</div>
+                <div class="auto-card-v2-desc">WhatsApp אליך ברגע שלקוח פותח את ההצעה</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-rep-view" checked><span class="toggle-slider"></span></label>
             </div>
-            <details class="auto-msg">
-              <summary>✏️ עריכת הודעות</summary>
-              <div class="auto-msg-body">
-                <div class="field">
-                  <label>צפייה ראשונה</label>
-                  <textarea id="msg-view-first" rows="4"></textarea>
-                  <div class="auto-msg-vars">
-                    <span class="auto-msg-var" onclick="insertVar('msg-view-first','{name}')">{name}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-view-first','{num}')">{num}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-view-first','{link}')">{link}</span>
+            <div class="auto-card-v2-body">
+              <details class="auto-msg"><summary>✏️ עריכת הודעות</summary>
+                <div class="auto-msg-body">
+                  <div class="field"><label>צפייה ראשונה</label>
+                    <textarea id="msg-view-first" rows="4"></textarea>
+                    <div class="auto-msg-vars">
+                      <span class="auto-msg-var" onclick="insertVar('msg-view-first','{name}')">{name}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-view-first','{num}')">{num}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-view-first','{link}')">{link}</span>
+                    </div>
+                  </div>
+                  <div class="field"><label>חזרה לצפייה (אחרי 3 שעות)</label>
+                    <textarea id="msg-view-return" rows="4"></textarea>
+                    <div class="auto-msg-vars">
+                      <span class="auto-msg-var" onclick="insertVar('msg-view-return','{name}')">{name}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-view-return','{num}')">{num}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-view-return','{link}')">{link}</span>
+                    </div>
                   </div>
                 </div>
-                <div class="field">
-                  <label>חזרה לצפייה (אחרי 3 שעות)</label>
-                  <textarea id="msg-view-return" rows="4"></textarea>
-                  <div class="auto-msg-vars">
-                    <span class="auto-msg-var" onclick="insertVar('msg-view-return','{name}')">{name}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-view-return','{num}')">{num}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-view-return','{link}')">{link}</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+              </details>
+            </div>
           </div>
 
-          <div class="auto-card">
-            <div class="auto-header">
-              <div class="auto-info">
-                <div class="auto-title">✍️ התראה כשלקוח חתם</div>
-                <div class="auto-desc">WhatsApp אליך עם פרטי החתימה והסכום</div>
+          <!-- חתימה -->
+          <div class="auto-card-v2">
+            <div class="auto-card-v2-header">
+              <div class="auto-card-v2-icon" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2)">✍️</div>
+              <div class="auto-card-v2-info">
+                <div class="auto-card-v2-title">התראה כשלקוח חתם</div>
+                <div class="auto-card-v2-desc">WhatsApp אליך + תמונת חתימה עם פרטי ההסכם</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-rep-sign" checked><span class="toggle-slider"></span></label>
             </div>
-            <details class="auto-msg">
-              <summary>✏️ עריכת הודעה</summary>
-              <div class="auto-msg-body">
-                <div class="field">
+            <div class="auto-card-v2-body">
+              <details class="auto-msg"><summary>✏️ עריכת הודעה</summary>
+                <div class="auto-msg-body"><div class="field">
                   <textarea id="msg-sign-rep" rows="5"></textarea>
                   <div class="auto-msg-vars">
                     <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{name}')">{name}</span>
@@ -1151,83 +1192,94 @@ body{
                     <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{signerName}')">{signerName}</span>
                     <span class="auto-msg-var" onclick="insertVar('msg-sign-rep','{link}')">{link}</span>
                   </div>
-                </div>
-              </div>
-            </details>
+                </div></div>
+              </details>
+            </div>
           </div>
 
-          <div class="auto-card">
-            <div class="auto-header">
-              <div class="auto-info">
-                <div class="auto-title">💳 הודעת תשלום ללקוח אחרי חתימה</div>
-                <div class="auto-desc">לינק תשלום (אשראי) או פרטי העברה בנקאית</div>
+          <!-- תשלום -->
+          <div class="auto-card-v2">
+            <div class="auto-card-v2-header">
+              <div class="auto-card-v2-icon" style="background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.2)">💳</div>
+              <div class="auto-card-v2-info">
+                <div class="auto-card-v2-title">הודעת תשלום ללקוח אחרי חתימה</div>
+                <div class="auto-card-v2-desc">לינק תשלום (אשראי) או פרטי העברה בנקאית</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-client-payment" checked><span class="toggle-slider"></span></label>
             </div>
-            <div class="auto-settings">
-              <div class="field">
-                <label>Webhook URL — יצירת לינק תשלום</label>
-                <input type="url" id="grow-webhook-url" placeholder="https://hook.make.com/xxxxx" dir="ltr">
-                <div class="field-hint">השרת שולח POST עם פרטי ההצעה ומצפה לקבל <code>{"url":"..."}</code></div>
+            <div class="auto-card-v2-body">
+              <div class="auto-card-v2-settings">
+                <div class="field">
+                  <label>Webhook URL — יצירת לינק תשלום (Grow)</label>
+                  <input type="url" id="grow-webhook-url" placeholder="https://hook.make.com/xxxxx" dir="ltr">
+                  <div class="field-hint">POST עם פרטי ההצעה — מצפה לקבל <code>{"url":"..."}</code></div>
+                </div>
               </div>
+              <details class="auto-msg"><summary>✏️ עריכת הודעות</summary>
+                <div class="auto-msg-body">
+                  <div class="field"><label>אשראי — עם לינק תשלום</label>
+                    <textarea id="msg-sign-credit" rows="4"></textarea>
+                    <div class="auto-msg-vars">
+                      <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{name}')">{name}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{total}')">{total}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{payLink}')">{payLink}</span>
+                    </div>
+                  </div>
+                  <div class="field"><label>אשראי — ללא לינק (כשלון webhook)</label>
+                    <textarea id="msg-sign-no-link" rows="3"></textarea>
+                    <div class="auto-msg-vars"><span class="auto-msg-var" onclick="insertVar('msg-sign-no-link','{name}')">{name}</span></div>
+                  </div>
+                  <div class="field"><label>העברה בנקאית</label>
+                    <textarea id="msg-sign-bank" rows="5"></textarea>
+                    <div class="auto-msg-vars">
+                      <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{name}')">{name}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{num}')">{num}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{total}')">{total}</span>
+                      <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{bank}')">{bank}</span>
+                    </div>
+                  </div>
+                </div>
+              </details>
             </div>
-            <details class="auto-msg">
-              <summary>✏️ עריכת הודעות</summary>
-              <div class="auto-msg-body">
-                <div class="field">
-                  <label>אשראי — עם לינק תשלום</label>
-                  <textarea id="msg-sign-credit" rows="4"></textarea>
-                  <div class="auto-msg-vars">
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{name}')">{name}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{total}')">{total}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-credit','{payLink}')">{payLink}</span>
-                  </div>
-                </div>
-                <div class="field">
-                  <label>אשראי — ללא לינק (כשלון webhook)</label>
-                  <textarea id="msg-sign-no-link" rows="3"></textarea>
-                  <div class="auto-msg-vars">
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-no-link','{name}')">{name}</span>
-                  </div>
-                </div>
-                <div class="field">
-                  <label>העברה בנקאית</label>
-                  <textarea id="msg-sign-bank" rows="5"></textarea>
-                  <div class="auto-msg-vars">
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{name}')">{name}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{num}')">{num}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{total}')">{total}</span>
-                    <span class="auto-msg-var" onclick="insertVar('msg-sign-bank','{bank}')">{bank}</span>
-                  </div>
-                </div>
-              </div>
-            </details>
+          </div>
+
+          <!-- Webhooks -->
+          <div class="webhook-section">
+            <div class="webhook-section-title">
+              <svg style="width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none;flex-shrink:0" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+              Webhooks — חיבור לאוטומציות חיצוניות (Make / n8n)
+            </div>
+            <div class="field">
+              <label>Webhook URL — התראה בחתימה</label>
+              <input type="url" id="sign-webhook-url" placeholder="https://hook.make.com/xxxxx" dir="ltr">
+              <div class="field-hint">POST אוטומטי עם פרטי ההסכם ברגע שלקוח חותם</div>
+            </div>
           </div>
 
         </div><!-- /atab-wa -->
 
-        <!-- ══ טאב: תזכורות ══ -->
+        <!-- ══ תזכורות ══ -->
         <div class="auto-tab-pane" id="atab-remind">
 
-          <div class="auto-card">
-            <div class="auto-header">
-              <div class="auto-info">
-                <div class="auto-title">📨 לא פתח הצעה</div>
-                <div class="auto-desc">WhatsApp ללקוח שקיבל הצעה אבל לא פתח אותה</div>
+          <div class="auto-card-v2">
+            <div class="auto-card-v2-header">
+              <div class="auto-card-v2-icon" style="background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2)">📨</div>
+              <div class="auto-card-v2-info">
+                <div class="auto-card-v2-title">לא פתח הצעה</div>
+                <div class="auto-card-v2-desc">WhatsApp ללקוח שקיבל הצעה אבל לא פתח אותה</div>
               </div>
               <label class="toggle"><input type="checkbox" id="reminder-not-open-enabled"><span class="toggle-slider"></span></label>
             </div>
-            <div class="auto-hours">
-              <label>שלח אחרי</label>
-              <input type="number" id="reminder-not-open-hours" value="24" min="0" max="720" inputmode="numeric">
-              <span>שע׳</span>
-              <input type="number" id="reminder-not-open-minutes" value="0" min="0" max="59" inputmode="numeric">
-              <span>דק׳ מהשליחה</span>
-            </div>
-            <details class="auto-msg">
-              <summary>✏️ עריכת הודעה</summary>
-              <div class="auto-msg-body">
-                <div class="field">
+            <div class="auto-card-v2-body">
+              <div class="auto-hours">
+                <label>שלח אחרי</label>
+                <input type="number" id="reminder-not-open-hours" value="24" min="0" max="720" inputmode="numeric">
+                <span>שע׳</span>
+                <input type="number" id="reminder-not-open-minutes" value="0" min="0" max="59" inputmode="numeric">
+                <span>דק׳ מהשליחה</span>
+              </div>
+              <details class="auto-msg" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)"><summary>✏️ עריכת הודעה</summary>
+                <div class="auto-msg-body"><div class="field">
                   <textarea id="msg-reminder-not-open" rows="4"></textarea>
                   <div class="auto-msg-vars">
                     <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-open','{name}')">{name}</span>
@@ -1235,33 +1287,33 @@ body{
                     <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-open','{link}')">{link}</span>
                     <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-open','{hours}')">{hours}</span>
                   </div>
-                </div>
-              </div>
-            </details>
-            <button class="auto-run-btn" onclick="triggerReminders('not-open',this)">
-              <svg class="icon"><use href="#i-refresh"/></svg>הרץ עכשיו
-            </button>
+                </div></div>
+              </details>
+              <button class="auto-run-btn" style="margin-top:12px" onclick="triggerReminders('not-open',this)">
+                <svg class="icon"><use href="#i-refresh"/></svg>הרץ עכשיו
+              </button>
+            </div>
           </div>
 
-          <div class="auto-card">
-            <div class="auto-header">
-              <div class="auto-info">
-                <div class="auto-title">👁️ פתח אבל לא חתם</div>
-                <div class="auto-desc">WhatsApp ללקוח שצפה בהצעה אבל עדיין לא חתם</div>
+          <div class="auto-card-v2">
+            <div class="auto-card-v2-header">
+              <div class="auto-card-v2-icon" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2)">👁️</div>
+              <div class="auto-card-v2-info">
+                <div class="auto-card-v2-title">פתח אבל לא חתם</div>
+                <div class="auto-card-v2-desc">WhatsApp ללקוח שצפה בהצעה אבל עדיין לא חתם</div>
               </div>
               <label class="toggle"><input type="checkbox" id="reminder-not-signed-enabled"><span class="toggle-slider"></span></label>
             </div>
-            <div class="auto-hours">
-              <label>שלח אחרי</label>
-              <input type="number" id="reminder-not-signed-hours" value="48" min="0" max="720" inputmode="numeric">
-              <span>שע׳</span>
-              <input type="number" id="reminder-not-signed-minutes" value="0" min="0" max="59" inputmode="numeric">
-              <span>דק׳ מהצפייה</span>
-            </div>
-            <details class="auto-msg">
-              <summary>✏️ עריכת הודעה</summary>
-              <div class="auto-msg-body">
-                <div class="field">
+            <div class="auto-card-v2-body">
+              <div class="auto-hours">
+                <label>שלח אחרי</label>
+                <input type="number" id="reminder-not-signed-hours" value="48" min="0" max="720" inputmode="numeric">
+                <span>שע׳</span>
+                <input type="number" id="reminder-not-signed-minutes" value="0" min="0" max="59" inputmode="numeric">
+                <span>דק׳ מהצפייה</span>
+              </div>
+              <details class="auto-msg" style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.06)"><summary>✏️ עריכת הודעה</summary>
+                <div class="auto-msg-body"><div class="field">
                   <textarea id="msg-reminder-not-signed" rows="4"></textarea>
                   <div class="auto-msg-vars">
                     <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-signed','{name}')">{name}</span>
@@ -1269,71 +1321,82 @@ body{
                     <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-signed','{link}')">{link}</span>
                     <span class="auto-msg-var" onclick="insertVar('msg-reminder-not-signed','{hours}')">{hours}</span>
                   </div>
-                </div>
-              </div>
-            </details>
-            <button class="auto-run-btn" onclick="triggerReminders('not-signed',this)">
-              <svg class="icon"><use href="#i-refresh"/></svg>הרץ עכשיו
-            </button>
+                </div></div>
+              </details>
+              <button class="auto-run-btn" style="margin-top:12px" onclick="triggerReminders('not-signed',this)">
+                <svg class="icon"><use href="#i-refresh"/></svg>הרץ עכשיו
+              </button>
+            </div>
           </div>
 
-          <div class="section-card" style="margin-top:12px">
-            <div class="section-title">
-              <div class="section-title-icon"><svg class="icon"><use href="#i-zap"/></svg></div>Cron Job — הפעלה אוטומטית
-            </div>
-            <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px;line-height:1.7">הגדר Cron Job בשרת (cPanel / SSH) כדי שהתזכורות יישלחו אוטומטית.</p>
-            <div class="field">
-              <label>URL</label>
-              <div style="display:flex;gap:6px;align-items:stretch">
-                <div class="cron-box" id="cron-url-display" onclick="copyCronUrl()" style="flex:1;min-height:36px"></div>
-                <button class="btn btn-secondary" style="padding:8px 12px;min-width:40px" onclick="copyCronUrl()" title="העתק"><svg class="icon"><use href="#i-copy"/></svg></button>
+          <!-- Cron -->
+          <div class="settings-section" style="margin-top:12px">
+            <div class="settings-section-header">
+              <div class="settings-section-icon" style="background:linear-gradient(135deg,#6366f1,#8b5cf6)">
+                <svg class="icon"><use href="#i-zap"/></svg>
               </div>
-              <div class="field-hint">לחץ להעתקה · כל 30 דקות</div>
+              <div>
+                <div class="settings-section-title">Cron Job — הפעלה אוטומטית</div>
+                <div class="settings-section-desc">הגדר ב-cPanel / SSH כדי שהתזכורות יישלחו אוטומטית כל 30 דקות</div>
+              </div>
             </div>
-            <div class="field">
-              <label>פקודת Cron</label>
-              <div class="cron-box" id="cron-cmd-display" onclick="copyCronCmd()"></div>
-              <div class="field-hint">לחץ להעתקה</div>
+            <div class="settings-body">
+              <div class="field">
+                <label>URL להפעלה</label>
+                <div style="display:flex;gap:6px;align-items:stretch">
+                  <div class="cron-box" id="cron-url-display" onclick="copyCronUrl()" style="flex:1;min-height:36px"></div>
+                  <button class="btn btn-secondary" style="padding:8px 12px;min-width:40px" onclick="copyCronUrl()" title="העתק"><svg class="icon"><use href="#i-copy"/></svg></button>
+                </div>
+                <div class="field-hint">לחץ להעתקה</div>
+              </div>
+              <div class="field">
+                <label>פקודת Cron (SSH)</label>
+                <div class="cron-box" id="cron-cmd-display" onclick="copyCronCmd()"></div>
+                <div class="field-hint">לחץ להעתקה</div>
+              </div>
+              <button class="auto-run-btn" onclick="triggerReminders('all',this)">
+                <svg class="icon"><use href="#i-refresh"/></svg>הרץ את כל התזכורות עכשיו
+              </button>
             </div>
-            <button class="auto-run-btn" style="margin-top:6px" onclick="triggerReminders('all',this)">
-              <svg class="icon"><use href="#i-refresh"/></svg>הרץ את כל התזכורות עכשיו
-            </button>
           </div>
 
         </div><!-- /atab-remind -->
 
-        <!-- ══ טאב: Drive ══ -->
+        <!-- ══ Drive ══ -->
         <div class="auto-tab-pane" id="atab-drive">
 
-          <div class="auto-card">
-            <div class="auto-header">
-              <div class="auto-info">
-                <div class="auto-title">📁 שמירת הסכמים ב-Google Drive</div>
-                <div class="auto-desc">כל חוזה חתום מועלה אוטומטית לתיקיה</div>
+          <div class="auto-card-v2">
+            <div class="auto-card-v2-header">
+              <div class="auto-card-v2-icon" style="background:rgba(16,185,129,0.1);border:1px solid rgba(16,185,129,0.2)">📁</div>
+              <div class="auto-card-v2-info">
+                <div class="auto-card-v2-title">שמירת הסכמים ב-Google Drive</div>
+                <div class="auto-card-v2-desc">כל חוזה חתום מועלה אוטומטית לתיקיה שהגדרת</div>
               </div>
               <label class="toggle"><input type="checkbox" id="auto-drive"><span class="toggle-slider"></span></label>
             </div>
-            <div class="auto-settings">
-              <div class="field">
-                <label>Drive Folder ID</label>
-                <input type="text" id="drive-folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms">
-                <div class="field-hint">העתק מה-URL: drive.google.com/drive/folders/<strong>ID</strong></div>
-              </div>
-              <div class="field">
-                <label>Google Service Account JSON</label>
-                <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                  <label class="btn btn-secondary" style="cursor:pointer;font-size:13px;padding:7px 14px">
-                    📂 בחר קובץ JSON
-                    <input type="file" id="drive-sa-file" accept=".json,application/json" style="display:none" onchange="uploadDriveSA(this)">
-                  </label>
-                  <span id="drive-sa-status" style="font-size:13px;color:#64748b">טוען...</span>
+            <div class="auto-card-v2-body">
+              <div class="auto-card-v2-settings">
+                <div class="field">
+                  <label>Drive Folder ID</label>
+                  <input type="text" id="drive-folder-id" placeholder="1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms" dir="ltr">
+                  <div class="field-hint">מה-URL: drive.google.com/drive/folders/<strong>ID_כאן</strong></div>
                 </div>
-                <div class="field-hint" style="margin-top:6px">
-                  <a href="https://console.cloud.google.com/iam-admin/serviceaccounts" target="_blank" rel="noopener" style="color:#3b82f6">צור Service Account</a>
-                  ← הורד מפתח JSON ← שתף התיקיה ב-Drive עם כתובת ה-Service Account
+                <div class="field">
+                  <label>Google Service Account JSON</label>
+                  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+                    <label class="btn btn-secondary" style="cursor:pointer;font-size:13px;padding:7px 14px">
+                      📂 בחר קובץ JSON
+                      <input type="file" id="drive-sa-file" accept=".json,application/json" style="display:none" onchange="uploadDriveSA(this)">
+                    </label>
+                    <span id="drive-sa-status" style="font-size:13px;color:#64748b">טוען...</span>
+                  </div>
+                  <div class="field-hint" style="margin-top:6px">
+                    <a href="https://console.cloud.google.com/iam-admin/serviceaccounts" target="_blank" rel="noopener" style="color:#3b82f6">צור Service Account</a>
+                    ← הורד מפתח JSON ← שתף התיקיה ב-Drive עם כתובת ה-Service Account
+                  </div>
                 </div>
+                <button class="btn btn-secondary" style="font-size:13px;margin-top:8px" onclick="testDrive(this)">🔗 בדוק חיבור</button>
               </div>
-              <button class="btn btn-secondary" style="font-size:13px;margin-top:8px" onclick="testDrive(this)">🔗 בדוק חיבור</button>
             </div>
           </div>
 
@@ -1894,6 +1957,7 @@ function applySettings(s){
   document.getElementById('sales-rep-phone').value=s.salesRepPhone||'';
   document.getElementById('base-url').value=s.baseUrl||'';
   document.getElementById('grow-webhook-url').value=s.growWebhookUrl||'';
+  document.getElementById('sign-webhook-url').value=s.signWebhookUrl||'';
   document.getElementById('drive-folder-id').value=s.driveFolderId||'';
   document.getElementById('terms-landing').value =s.termsLanding  || PRODUCT_PRESETS['דף נחיתה'].terms;
   document.getElementById('terms-brochure').value=s.termsBrochure || PRODUCT_PRESETS['אתר תדמית'].terms;
@@ -1936,6 +2000,7 @@ async function saveSettings(){
     salesRepPhone:document.getElementById('sales-rep-phone').value,
     baseUrl:document.getElementById('base-url').value,
     growWebhookUrl:document.getElementById('grow-webhook-url').value.trim(),
+    signWebhookUrl:document.getElementById('sign-webhook-url').value.trim(),
     driveFolderId:document.getElementById('drive-folder-id').value,
     termsLanding :document.getElementById('terms-landing').value,
     termsBrochure:document.getElementById('terms-brochure').value,
